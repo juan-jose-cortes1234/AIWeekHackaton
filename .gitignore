@@ -1,0 +1,29 @@
+# Secretos
+.env
+scripts/.env
+
+# Entornos y caches
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Artefactos generados (se publican en la nube, no en git)
+build/
+runs/
+dist/
+models/
+*.gguf
+*.faiss
+
+# Corpus crudo del equipo (vive en CORPUS_RAW_DIR)
+corpus_raw/
+
+# Material oficial que no es parte del repo
+enunciado.pdf
+InformacionReto/
+
+# Sistema
+.DS_Store
+Thumbs.db
