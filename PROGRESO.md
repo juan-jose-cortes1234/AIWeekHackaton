@@ -178,3 +178,15 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 - Qué se hizo: `src/config.py` sin `decoder_base_url`/`decoder_api_key`/`decoder_timeout_s`; backends válidos `llamacpp` (GGUF `Qwen/Qwen3-8B-GGUF`, `Qwen3-8B-Q4_K_M.gguf`) y `transformers` (`Qwen/Qwen3-8B`); nuevos `DECODER_GGUF_REPO`, `DECODER_GGUF_FILE`, `DECODER_DEVICE`, `DECODER_THREADS`. **Lista blanca `MODELOS_ABIERTOS`** (decoder, encoder, reranker) verificada por `validar_final()`: rechaza GPT, Gemini, jina-v3, Cohere, `openai_compat`… `.env` y `.env.example` actualizados (solo el bloque del decoder; la llave del juez no se tocó). `CLAUDE.md`, `docs/ARQUITECTURA.md` §5 y §8, `PLAN.md` T15 y T24 actualizados.
 - Cómo se verificó: `pytest -q tests/test_config.py` → 11 passed (acepta los modelos por defecto; rechaza 5 configuraciones cerradas).
 - Archivos creados/modificados: `src/config.py`, `.env`, `.env.example`, `tests/test_config.py`, `CLAUDE.md`, `docs/ARQUITECTURA.md`, `PLAN.md`.
+
+## 2026-09-27 — T15 Cliente del decoder (Qwen3-8B real, en proceso)
+- Estado: hecho (backend `transformers` implementado pero sin verificar: necesita GPU; se valida en la sala Turing)
+- Qué se hizo: `src/generation/llm.py` (`LLM`): valida la lista blanca antes de cargar; backend `llamacpp` (descarga `Qwen/Qwen3-8B-GGUF/Qwen3-8B-Q4_K_M.gguf` con `huggingface_hub`, JSON forzado con `response_format` + schema), backend `transformers` (`Qwen/Qwen3-8B`, bf16, `enable_thinking=False`, voraz); temperatura 0, top_k 1, semilla fija, `/no_think`; parser JSON tolerante + un reintento; caché de generaciones en `build/cache/gen/` con clave sha256 (modelo, mensajes, esquema, parámetros) y `usar_cache=False` para la verificación en vivo. `python -m src.generation.ping [--sin-cache]`. `llama-cpp-python==0.3.35` (rueda precompilada CPU) y `huggingface_hub` en `requirements.txt`.
+- Cómo se verificó: `pytest -q tests/test_llm.py` → 8 passed con el modelo real (JSON válido, respuesta correcta a una MC trivial, **misma salida en dos generaciones sin caché**, caché, rechazo de modelo fuera de la lista blanca, parser). `ping`: carga 11 s, JSON correcto.
+- **Medición real en CPU (Ryzen 7 8840HS, Q4_K_M):** prompt de 10 pasajes = 4.188 tokens + 63 de salida → **130 s por pregunta**. ⇒ 992 preguntas ≈ 36 h en CPU: el sábado **requiere GPU** (o varias máquinas en paralelo).
+- Para probar en la sala Turing (GPU NVIDIA): `pip install -r requirements.txt` y luego una de dos:
+  - `DECODER_BACKEND=transformers`, `DECODER_DEVICE=cuda` (bf16, ~16 GB de VRAM), o
+  - reinstalar llama-cpp-python con CUDA: `pip install llama-cpp-python==0.3.35 --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124 --force-reinstall --no-deps` y `DECODER_DEVICE=cuda`.
+  - Medir con `python -m src.generation.ping --sin-cache` y con el pipeline completo cuando exista (T19).
+- Archivos creados/modificados: `src/generation/llm.py`, `src/generation/ping.py`, `tests/test_llm.py`, `requirements.txt`, `PLAN.md`.
+- Siguiente paso: T16 prompts por formato y constructor de contexto.

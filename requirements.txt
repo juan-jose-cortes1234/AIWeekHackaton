@@ -1,9 +1,13 @@
 # Dependencias del sistema RAG (Python >= 3.10; probado con 3.11.16).
 # torch en su build para CPU; en GPU instalar la rueda CUDA correspondiente.
 --extra-index-url https://download.pytorch.org/whl/cpu
+# Ruedas precompiladas de llama-cpp-python (CPU). En GPU usar el índice .../whl/cu124.
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
 torch==2.14.0
 transformers==5.17.0
 sentence-transformers==6.1.0
+llama-cpp-python==0.3.35
+huggingface_hub==1.33.0
 faiss-cpu==1.15.1
 numpy==2.4.6
 bm25s==0.3.11
