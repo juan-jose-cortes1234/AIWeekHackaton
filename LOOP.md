@@ -45,6 +45,7 @@ terminada, probada y registrada.
 - Código mínimo y completo; nada de “TODO: implementar”. Pruebas en `tests/`
   para toda lógica determinista (segmentación, encabezados, post-filtro de citas,
   esquema, abstención).
+- Sin modelos falsos ni mocks: las pruebas usan los modelos reales de `.env` (ver `CLAUDE.md`).
 - Fixtures de prueba: texto inventado marcado `TEXTO DE PRUEBA`, nunca
   presentado como norma real, nunca dentro de `CORPUS_RAW_DIR` ni del índice real.
 

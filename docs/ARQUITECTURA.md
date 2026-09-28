@@ -134,11 +134,18 @@ Por pregunta (y por opción en MC):
 
 ## 5. Generación (paso 3)
 
-- Cliente único `generation/llm.py` con backends:
-  - `openai_compat`: cualquier servidor compatible (Ollama, vLLM, llama.cpp
-    server, LM Studio). Es el backend para GPU (sala Turing / Colab).
-  - `llamacpp`: `llama-cpp-python` en proceso con GGUF (para el contenedor limpio
-    sin servidores externos).
+- Cliente único `generation/llm.py`, **todo en proceso y con pesos de Hugging
+  Face**; no hay APIs, servidores HTTP ni proveedores externos (decisión del
+  equipo: ningún camino de configuración puede terminar en un modelo cerrado):
+  - `llamacpp`: `llama-cpp-python` con el GGUF oficial `Qwen/Qwen3-8B-GGUF`
+    (`Qwen3-8B-Q4_K_M.gguf`, ~5 GB), descargado con `huggingface_hub`. Corre en
+    CPU (portátil, contenedor limpio) y en GPU si la rueda tiene CUDA.
+  - `transformers`: `Qwen/Qwen3-8B` con transformers (bf16 ~16 GB: requiere GPU;
+    en el portátil de 15 GB no cabe). Backend para la sala Turing / Colab.
+  - Ambos deben producir la misma salida estructurada; la elección final se fija
+    antes del sábado y no se cambia después de generar la entrega.
+- **Lista blanca** (`src/config.py::MODELOS_ABIERTOS`): `validar_final()` rechaza
+  cualquier decoder, encoder o reranker que no esté en ella.
 - Parámetros fijos: `temperature=0`, `top_p=1`, `seed=DECODER_SEED`,
   `max_tokens` por formato, contexto fijo. Qwen3: **modo sin razonamiento**
   (`enable_thinking=False` / `/no_think`) salvo que un experimento demuestre
@@ -202,12 +209,10 @@ Cuentas por ítem (aproximadas, con los pesos oficiales):
 - Sábado: 992 preguntas en ~6 h ⇒ **≤ 20 s por pregunta** de punta a punta con margen.
 - Equipo de desarrollo actual: sin GPU dedicada (Radeon 780M, 15 GB RAM).
   Un 8B cuantizado en CPU no cumple el presupuesto. Plan:
-  - Desarrollo diario: Ollama/llama.cpp local con `qwen3:8b` (Q4_K_M) sobre
-    subconjuntos pequeños, o `qwen3:4b` solo para depurar formato (no para medir).
-  - Mediciones y ejecución final: GPU (sala Turing o Colab) con vLLM u Ollama
-    exponiendo endpoint `openai_compat`.
-  - Cualquier alternativa de hosting de un modelo abierto se consulta antes con
-    el organizador (rf.manrique@uniandes.edu.co).
+  - Desarrollo diario: backend `llamacpp` con `Qwen3-8B-Q4_K_M.gguf` en CPU
+    sobre subconjuntos pequeños (lento, sirve para validar el flujo).
+  - Mediciones y ejecución final: GPU (sala Turing o Colab) con el backend
+    `transformers` (o `llamacpp` compilado con CUDA), mismos pesos de Hugging Face.
 - `runs/<tag>/tiempos.json`: p50/p95 por etapa (recuperación, rerank, generación).
 - Reanudable: el pipeline salta ids ya presentes en la salida parcial.
 

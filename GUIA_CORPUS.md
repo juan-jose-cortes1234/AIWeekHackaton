@@ -147,7 +147,10 @@ Ley 599 de 2000, CPACA = Ley 1437 de 2011, Código de la Infancia = Ley 1098 de
 2006, Estatuto Tributario = Decreto 624 de 1989, Estatuto del Consumidor = Ley
 1480 de 2011) usen `tipo=codigo` **y** llenen `numero`/`anio`: el pipeline
 genera el encabezado “Código General del Proceso (Ley 1564 de 2012), artículo N.”,
-que el evaluador reconoce por ambas vías.
+que el evaluador reconoce por ambas vías. Para los demás códigos (Civil,
+Comercio, Sustantivo del Trabajo…) basta el título exacto (“Código Civil”):
+el evaluador los reconoce por su nombre. `python -m src.corpus.build` avisa
+si el nombre de algún documento no produce una cita reconocible.
 
 ## 4. Consejos prácticos de descarga
 

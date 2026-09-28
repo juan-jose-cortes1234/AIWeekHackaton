@@ -13,7 +13,25 @@ from dotenv import dotenv_values
 
 RAIZ = Path(__file__).resolve().parents[1]
 
-SECRETOS = {"openrouter_api_key", "decoder_api_key", "hf_token"}
+# Lista blanca: solo modelos de pesos y licencia abiertos (enunciado §3.1 y §3.2).
+# El sistema corre todo en proceso desde Hugging Face; no hay APIs de terceros.
+MODELOS_ABIERTOS = {
+    "decoder": {
+        "Qwen/Qwen3-8B": "Apache-2.0",
+        "Qwen/Qwen3-8B-GGUF": "Apache-2.0",
+        "BSC-LT/salamandra-7b-instruct": "Apache-2.0",
+    },
+    "encoder": {
+        "BAAI/bge-m3": "MIT",
+        "intfloat/multilingual-e5-large": "MIT",
+    },
+    "reranker": {
+        "BAAI/bge-reranker-v2-m3": "Apache-2.0",
+    },
+}
+BACKENDS_DECODER = ("llamacpp", "transformers")
+
+SECRETOS = {"openrouter_api_key", "hf_token"}
 
 
 def _ruta(valor: str) -> Path:
@@ -39,17 +57,25 @@ class Config:
     encoder_batch_size: int = 16
     use_reranker: bool = True
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
+    rerank_candidatos: int = 20
     top_k_pasajes: int = 10
+    candidatos: int = 50
+    rrf_k: int = 60
+    peso_denso: float = 1.0
+    peso_bm25: float = 1.0
+    boost_area: float = 0.002
+    boost_cuerpo: float = 0.01
+    max_por_articulo: int = 3
 
-    decoder_backend: str = "openai_compat"
-    decoder_base_url: str = "http://localhost:11434/v1"
-    decoder_model: str = "qwen3:8b"
-    decoder_api_key: str = field(default="local", repr=False)
-    decoder_gguf_path: str = ""
+    decoder_backend: str = "llamacpp"
+    decoder_model: str = "Qwen/Qwen3-8B"
+    decoder_gguf_repo: str = "Qwen/Qwen3-8B-GGUF"
+    decoder_gguf_file: str = "Qwen3-8B-Q4_K_M.gguf"
+    decoder_device: str = "cpu"
     decoder_temperature: float = 0.0
     decoder_seed: int = 42
     decoder_num_ctx: int = 8192
-    decoder_timeout_s: int = 120
+    decoder_threads: int = 0
 
     hf_token: str = field(default="", repr=False)
 
@@ -77,8 +103,21 @@ class Config:
             raise ValueError("DECODER_TEMPERATURE debe ser 0 en la ejecución final.")
         if self.corpus_source not in ("auto", "nube", "local"):
             raise ValueError("CORPUS_SOURCE debe ser auto, nube o local.")
-        if self.decoder_backend not in ("openai_compat", "llamacpp"):
-            raise ValueError("DECODER_BACKEND debe ser openai_compat o llamacpp.")
+        if self.decoder_backend not in BACKENDS_DECODER:
+            raise ValueError(f"DECODER_BACKEND debe ser uno de {BACKENDS_DECODER}.")
+        self.validar_modelos()
+
+    def validar_modelos(self) -> None:
+        """Rechaza cualquier modelo fuera de la lista blanca de modelos abiertos."""
+        decoder = (self.decoder_gguf_repo if self.decoder_backend == "llamacpp"
+                   else self.decoder_model)
+        for tipo, nombre in (("decoder", decoder), ("encoder", self.encoder_model),
+                             ("reranker", self.reranker_model)):
+            if nombre not in MODELOS_ABIERTOS[tipo]:
+                raise ValueError(
+                    f"{tipo} '{nombre}' no está en la lista blanca de modelos abiertos "
+                    f"({sorted(MODELOS_ABIERTOS[tipo])}). Solo se admiten modelos de licencia "
+                    "abierta; para añadir uno, verifique su licencia y agréguelo en src/config.py.")
 
 
 def _convertir(tipo, valor: str):

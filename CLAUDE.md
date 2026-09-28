@@ -26,6 +26,10 @@ tienes dudas de reglas; mandan sobre este archivo).
    - **Prohibidos**: OpenAI, Anthropic, Google, Cohere y cualquier modelo cerrado.
      También `jinaai/jina-embeddings-v3` (CC-BY-NC, no es licencia abierta) y
      cualquier modelo con licencia no comercial o restrictiva.
+   - **Sin APIs ni servidores de modelos**: decoder, encoder y reranker corren en
+     proceso con pesos de Hugging Face (backends `llamacpp` y `transformers`). No
+     se agregan clientes HTTP de LLM (“OpenAI-compatible”, OpenRouter, etc.) y todo
+     modelo debe estar en `MODELOS_ABIERTOS` de `src/config.py`.
    - Tú (Claude) eres herramienta de desarrollo: escribes código. **Nunca**
      generas contenido que entre al sistema: ni texto del corpus, ni respuestas,
      ni reformulaciones de consultas, ni ejemplos few-shot de contenido jurídico,
@@ -74,6 +78,12 @@ Lee `scripts/citations.py` y `scripts/evaluate.py` antes de tocar generación. L
 - Configuración solo desde `src/config.py` (lee `.env`); sin rutas absolutas en el código.
 - Todo módulo ejecutable con `python -m src.<módulo>`; salidas en `build/` y `runs/` (ignoradas por git).
 - Pruebas con `pytest -q`; deben pasar al cerrar cada tarea.
+- **Nada de modelos falsos ni simulados** (encoders, rerankers o decoders “fake”/mock):
+  el código y las pruebas usan siempre los modelos reales configurados en `.env`
+  (bge-m3, bge-reranker-v2-m3, Qwen3-8B). Si un modelo o servidor no está
+  disponible, la tarea queda `[B]` con instrucciones; no se sustituye por un doble.
+  El único dato de prueba permitido es el mini-corpus `TEXTO DE PRUEBA` de
+  `tests/conftest.py`, que existe solo para probar el flujo hasta que llegue el corpus real.
 - Comentarios y mensajes en español, identificadores en inglés o español, pero consistentes por módulo.
 - **Git lo maneja solo el usuario.** No ejecutes ningún comando de git (`init`,
   `add`, `commit`, `push`, `stash`, `checkout`, ramas…). Al cerrar un hito

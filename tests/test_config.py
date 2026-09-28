@@ -48,3 +48,25 @@ def test_validar_final_exige_temperatura_cero(tmp_path, monkeypatch):
     monkeypatch.setenv("DECODER_TEMPERATURE", "0.7")
     with pytest.raises(ValueError):
         cargar(_env(tmp_path, "")).validar_final()
+
+
+def test_lista_blanca_acepta_los_modelos_por_defecto(tmp_path, monkeypatch):
+    for v in ("DECODER_BACKEND", "DECODER_MODEL", "DECODER_GGUF_REPO", "ENCODER_MODEL",
+              "RERANKER_MODEL", "DECODER_TEMPERATURE"):
+        monkeypatch.delenv(v, raising=False)
+    cargar(_env(tmp_path, "")).validar_final()
+
+
+@pytest.mark.parametrize("linea", [
+    "DECODER_BACKEND=transformers\nDECODER_MODEL=gpt-4o\n",
+    "DECODER_GGUF_REPO=google/gemini\n",
+    "ENCODER_MODEL=jinaai/jina-embeddings-v3\n",
+    "RERANKER_MODEL=cohere/rerank-3\n",
+    "DECODER_BACKEND=openai_compat\n",
+])
+def test_lista_blanca_rechaza_modelos_cerrados(tmp_path, monkeypatch, linea):
+    for v in ("DECODER_BACKEND", "DECODER_MODEL", "DECODER_GGUF_REPO", "ENCODER_MODEL",
+              "RERANKER_MODEL", "DECODER_TEMPERATURE"):
+        monkeypatch.delenv(v, raising=False)
+    with pytest.raises(ValueError):
+        cargar(_env(tmp_path, linea)).validar_final()
