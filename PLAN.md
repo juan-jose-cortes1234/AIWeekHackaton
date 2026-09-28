@@ -42,13 +42,13 @@ sábado 3 oct 9:00–15:00 (ejecución ciega de 992 + interfaz) · 15:00 verific
 ## F3 — Generación, citas y abstención (pasos 3 y 4)
 
 - [x] **T15 Cliente del decoder** en proceso desde Hugging Face, sin servidores ni APIs: backend `llamacpp` (`llama-cpp-python` + `Qwen/Qwen3-8B-GGUF` / `Qwen3-8B-Q4_K_M.gguf` descargado con `huggingface_hub`) y backend `transformers` (`Qwen/Qwen3-8B`, para GPU). Temperatura 0, semilla fija, Qwen3 sin razonamiento (`enable_thinking=False`), salida JSON forzada (gramática/JSON schema en llamacpp; parser + reintento en transformers), caché de generaciones, `validar_final()` con la lista blanca antes de cargar. `python -m src.generation.ping` carga el modelo real y genera un JSON corto. Si `llama-cpp-python` no instala en Windows (requiere rueda precompilada o compilador), anotar `[B] decoder` con instrucciones concretas.
-- [ ] **T16 Prompts por formato** (`src/generation/prompts/*.txt`) y constructor de contexto `[P1]…[P10]`. MC con recuperación por opción (pregunta + texto de la opción) fusionada.
-- [ ] **T17 Post-filtro de citas** (ARQUITECTURA §6) + render determinista de `referencia_legal` / “Fundamento normativo”. Prueba: `citas_sin_respaldo == 0` sobre salidas simuladas con citas inventadas.
-- [ ] **T18 Abstención** (ARQUITECTURA §7) con umbral configurable; nunca en MC.
-- [ ] **T19 Pipeline principal.** `python -m src.pipeline.main --split sample|test --input <jsonl> --out submissions.jsonl [--ids ...] [--no-cache]`: valida contra `schema/submission.schema.json`, `latencia_ms`, reanudable, trazas en `runs/<tag>/trazas.jsonl`.
-- [ ] **T19b Corpus desde la nube** (`src/corpus/nube.py`, ARQUITECTURA §1.1): `python -m src.corpus.nube` descarga `CORPUS_ZIP_URL`, verifica `CORPUS_ZIP_SHA256`, valida la estructura y descomprime en `build/`. Conversión de enlaces Drive/OneDrive/Dropbox/Zenodo. Mientras no exista el enlace, queda probado con un zip de fixture en un servidor HTTP local y se anota `[B] enlace nube` en Bloqueos.
+- [x] **T16 Prompts por formato** (`src/generation/prompts/*.txt`) y constructor de contexto `[P1]…[P10]`. MC con recuperación por opción (pregunta + texto de la opción) fusionada.
+- [x] **T17 Post-filtro de citas** (ARQUITECTURA §6) + render determinista de `referencia_legal` / “Fundamento normativo”. Prueba: `citas_sin_respaldo == 0` sobre salidas simuladas con citas inventadas.
+- [x] **T18 Abstención** (ARQUITECTURA §7) con umbral configurable; nunca en MC.
+- [x] **T19 Pipeline principal.** `python -m src.pipeline.main --split sample|test --input <jsonl> --out submissions.jsonl [--ids ...] [--no-cache]`: valida contra `schema/submission.schema.json`, `latencia_ms`, reanudable, trazas en `runs/<tag>/trazas.jsonl`.
+- [x] **T19b Corpus desde la nube** (`src/corpus/nube.py`, ARQUITECTURA §1.1): `python -m src.corpus.nube` descarga `CORPUS_ZIP_URL`, verifica `CORPUS_ZIP_SHA256`, valida la estructura y descomprime en `build/`. Conversión de enlaces Drive/OneDrive/Dropbox/Zenodo. Mientras no exista el enlace, queda probado con un zip de fixture en un servidor HTTP local y se anota `[B] enlace nube` en Bloqueos.
   *Acepta:* prueba con fixture pasa; con `CORPUS_ZIP_URL` vacío, mensaje claro de cómo configurarlo.
-- [ ] **T20 Comando único.** `run.sh` y `run.py`: (1) instala dependencias si faltan, (2) obtiene el corpus e índice según `CORPUS_SOURCE` (por defecto la nube vía T19b; modo local solo para desarrollo), (3) corre el pipeline sobre la muestra, (4) corre `scripts/evaluate.py` (con `--ragas` solo si hay llave). `Dockerfile` que ejecuta `bash run.sh`. Probar `docker build` localmente.
+- [x] **T20 Comando único.** `run.sh` y `run.py`: (1) instala dependencias si faltan, (2) obtiene el corpus e índice según `CORPUS_SOURCE` (por defecto la nube vía T19b; modo local solo para desarrollo), (3) corre el pipeline sobre la muestra, (4) corre `scripts/evaluate.py` (con `--ragas` solo si hay llave). `Dockerfile` que ejecuta `bash run.sh`. Probar `docker build` localmente.
 
 ## F4 — Medición e iteración (hasta el viernes)
 
@@ -70,6 +70,8 @@ sábado 3 oct 9:00–15:00 (ejecución ciega de 992 + interfaz) · 15:00 verific
 
 ## Bloqueos (requieren acción humana)
 
+- [B] 2026-09-28 T20 docker: Docker Desktop no está abierto. Abrirlo y correr `docker build -t hackathon-rag .` (luego `docker run --rm --env-file .env -v hf-cache:/root/.cache/huggingface hackathon-rag`, que necesita `CORPUS_ZIP_URL`).
+- [B] 2026-09-28 T19b enlace nube: falta el zip publicado. Generarlo con `python -m src.corpus.empaquetar` (T27), subirlo con acceso público y pegar `CORPUS_ZIP_URL` y `CORPUS_ZIP_SHA256` en `.env`; luego `python -m src.corpus.nube`.
 - [B] 2026-09-27 T14 medición: comparar recall@10 con y sin reranker (`python -m src.eval.recuperacion` con `USE_RERANKER=1` y `0`) requiere el corpus real.
 - [B] 2026-09-27 T04 corpus: `CORPUS_RAW_DIR` (./corpus_raw) aún no existe. Crear la carpeta con `fuentes.csv` (plantilla en `docs/fuentes.ejemplo.csv`) y los documentos según `GUIA_CORPUS.md §3`; apuntar `CORPUS_RAW_DIR` en `.env`. Mientras tanto el loop sigue con fixtures.
 

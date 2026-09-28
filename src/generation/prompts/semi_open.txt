@@ -1,0 +1,14 @@
+Área: {area}
+Tipo de tarea: {sub_tarea}
+
+EVIDENCIA:
+{evidencia}
+
+PREGUNTA:
+{pregunta}
+
+Devuelve:
+- "respuesta": entre 3 y 5 oraciones y como máximo 150 palabras. La primera oración responde la pregunta de forma directa; las siguientes dan el fundamento con la cita de la norma o sentencia de la evidencia.
+- "palabras_clave": de 3 a 6 términos jurídicos centrales de la respuesta.
+- "referencia_legal": la norma o artículo principal que fundamenta la respuesta, tal como aparece en la evidencia.
+- "pasajes_usados": números de los pasajes en que te apoyaste.

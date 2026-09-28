@@ -109,6 +109,20 @@ class LLM:
             device_map=self.cfg.decoder_device, token=self.cfg.hf_token or None)
         self.modelo.eval()
 
+    # ---- tamaño
+    @property
+    def n_ctx(self) -> int:
+        return self.cfg.decoder_num_ctx
+
+    def contar_tokens(self, mensajes: list[dict]) -> int:
+        """Tokens del prompt con la plantilla de chat (margen de 16 por mensaje en llamacpp)."""
+        if self.backend == "llamacpp":
+            texto = "\n".join(m["content"] for m in mensajes) + SIN_RAZONAMIENTO
+            return len(self.modelo.tokenize(texto.encode("utf-8"), add_bos=False)) + 16 * len(mensajes)
+        ids = self.tokenizer.apply_chat_template(mensajes, add_generation_prompt=True,
+                                                 enable_thinking=False, tokenize=True)
+        return len(ids)
+
     # ---- caché
     def _clave(self, mensajes: list[dict], esquema: dict | None, max_tokens: int) -> str:
         cuerpo = json.dumps({"backend": self.backend, "modelo": self.id_modelo,

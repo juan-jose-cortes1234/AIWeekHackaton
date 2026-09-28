@@ -190,3 +190,71 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
   - Medir con `python -m src.generation.ping --sin-cache` y con el pipeline completo cuando exista (T19).
 - Archivos creados/modificados: `src/generation/llm.py`, `src/generation/ping.py`, `tests/test_llm.py`, `requirements.txt`, `PLAN.md`.
 - Siguiente paso: T16 prompts por formato y constructor de contexto.
+
+## 2026-09-28 — T16 Prompts por formato y constructor de contexto
+- Estado: hecho
+- Qué se hizo: `src/generation/prompts/{sistema,multiple_choice,semi_open,open_ended}.txt` (solo instrucciones, sin ejemplos de contenido jurídico: usar solo la evidencia, citar con nombre completo y año, primera oración directa, longitudes del enunciado, `pasajes_usados`). `src/generation/contexto.py`: evidencia `[P1]…[Pn]` con encabezado intacto y cuerpo recortado (`PASAJES_PROMPT=10`, `PALABRAS_POR_PASAJE=180`, para bajar el costo del prompt), JSON schema por formato con las claves del evaluador + `pasajes_usados` (enum de letras en MC; `descarte_opciones` con las letras), `MAX_TOKENS` por formato. `src/generation/responder.py`: recuperar (en MC, pregunta + cada opción como consultas extra) → mensajes → generar.
+- Bug encontrado: `maxLength` en el schema genera una gramática de un nivel por carácter y llama.cpp falla (access violation). Se quitó; la longitud se controla con `MAX_TOKENS` y el post-proceso (T17).
+- Cómo se verificó: `pytest -q tests/test_contexto.py` → 7 passed; incluye una respuesta **real de punta a punta** (bge-m3 + reranker + Qwen3-8B) sobre el mini-corpus: recupera el artículo 1820 del Código Civil primero y responde la opción correcta con JSON válido.
+- Archivos creados/modificados: `src/generation/prompts/*.txt`, `src/generation/contexto.py`, `src/generation/responder.py`, `src/config.py`, `.env`, `.env.example`, `tests/test_contexto.py`, `PLAN.md`.
+- Siguiente paso: T17 post-filtro de citas y render determinista de referencias.
+
+## 2026-09-28 — Decisión: flujo final sin recorte de pasajes
+- Medición en CPU (mismo prompt de 10 pasajes): completos (4.188 tokens) **158 s**; recortados a 180 palabras (2.708 tokens) **102 s**. En CPU ninguno cabe en el sábado (≈ 44 h vs ≈ 28 h para 992); en GPU la diferencia es marginal.
+- Decisión del usuario: el flujo final usa **pasajes completos** (`PALABRAS_POR_PASAJE=0`, nuevo valor por defecto); el recorte queda solo como perilla para pruebas en CPU.
+- Archivos modificados: `src/config.py`, `src/generation/contexto.py`, `.env`, `.env.example`, `tests/test_contexto.py`.
+
+## 2026-09-28 — T17 Post-filtro de citas y render de referencias
+- Estado: hecho
+- Qué se hizo: `src/generation/citas.py`. (1) `completar_anios`: “Ley 1150” → “Ley 1150 de 2007” si los pasajes resuelven el año de forma única. (2) `localizar`: spans de cada cita usando las mismas expresiones regulares de `scripts/citations.py` sobre una normalización que conserva offsets; `filtrar`: reemplaza por “la normativa aplicable” cada cita no respaldada por los 10 primeros pasajes (incluye “el artículo N del…” y “la Sentencia…” previos), y si aun así queda algo sin respaldo descarta la oración. (3) `referencias`: render desde el encabezado canónico de los pasajes usados por el modelo + los pertinentes (rerank ≥ `UMBRAL_CITA`=0,5 o router), sin repetir, máx. `MAX_REFERENCIAS`=6. (4) `postprocesar` por formato: MC añade “Fundamento normativo: …” a la justificación y quita la letra elegida de `descarte_opciones`; semiabierta: `referencia_legal` renderizada, respuesta ≤ 5 oraciones y ≤ 150 palabras, 3–6 palabras clave; abierta: añade al marco las normas usadas que no estén ya citadas, análisis ≤ 8 oraciones. `pasajes_usados` no pasa a la entrega.
+- Cómo se verificó: `pytest -q tests/test_citas.py` → 9 passed, **calificando con el evaluador oficial** (`evaluate.answer_text`, `citas_respaldadas`, `citations.score`): `citas_sin_respaldo == 0` en los 3 formatos con salidas que traían normas inventadas; `localizar` extrae exactamente los mismos cuerpos que el evaluador; el texto filtrado conserva el contenido y se lee bien.
+- Incidente: al editar regex con un heredoc de bash se escribieron caracteres de retroceso (0x08) en lugar de `\b`; detectado por el resultado y corregido. Lección: editar regex con la herramienta Edit, no con heredocs.
+- Archivos creados/modificados: `src/generation/citas.py`, `tests/test_citas.py`, `src/config.py`, `.env.example`, `PLAN.md`.
+- Siguiente paso: T18 abstención.
+
+## 2026-09-28 — T18 Abstención
+- Estado: hecho (umbral a calibrar con la muestra cuando haya corpus: T22)
+- Qué se hizo: `src/generation/abstencion.py`. `decidir()`: MC nunca; texto libre se abstiene si no hay pasajes, si el modelo no produjo campos utilizables, o si la pertinencia máxima (reranker; si está apagado, similitud densa) está bajo `UMBRAL_ABSTENCION`=0,05 (`UMBRAL_ABSTENCION_DENSO`=0,35); nunca si el router encontró un artículo citado en la pregunta. `registro_abstencion()`: campos vacíos, `abstencion: true`, pasajes conservados (como el ítem 218 del ejemplo oficial).
+- Cómo se verificó: `pytest -q tests/test_abstencion.py` → 6 passed; el registro valida contra `schema/submission.schema.json`; con el recuperador real, una pregunta ajena al mini-corpus provoca abstención en semiabierta y no en MC, y una pregunta cubierta no se abstiene.
+- Archivos creados/modificados: `src/generation/abstencion.py`, `tests/test_abstencion.py`, `src/config.py`, `.env.example`, `PLAN.md`.
+- Siguiente paso: T19 pipeline principal (prototipo de punta a punta para medir en Turing).
+
+## 2026-09-28 — T19 Pipeline principal (prototipo de punta a punta)
+- Estado: hecho
+- Qué se hizo: `src/pipeline/main.py` (`python -m src.pipeline.main --split sample|test [--input] [--out] [--tag] [--ids] [--limite] [--no-cache] [--desde-cero]`): por ítem recuperar → generar → post-filtro de citas → abstención → validación contra `schema/submission.schema.json` (una línea inválida nunca se escribe: se sustituye por respaldo determinista en MC o abstención en texto libre) → escritura inmediata con flush (reanudable: salta ids ya presentes). Respaldo MC si el modelo no da letra: opción más pertinente según el reranker. Trazas por ítem (`trazas.jsonl`: pasajes y scores, pasajes leídos/usados, citas eliminadas, referencias, tokens, tiempos) y `tiempos.json` (media, p50, p95 por etapa).
+- Bug real encontrado por la prueba: con pasajes completos el prompt puede superar la ventana de contexto y llama.cpp lanza excepción (tumbaría la corrida del sábado). Solución: `LLM.contar_tokens` + `responder.mensajes_que_caben`, que quita pasajes **enteros desde el final** (menos pertinentes) hasta que prompt + salida quepan; `pasajes_recuperados` siempre lleva los 10 completos. Coherente con la decisión de no recortar pasajes.
+- Enunciado revisado (pregunta del usuario): no exige pasar pasajes completos al decoder (B.4, B.1, §4.4: diseño del prompt es decisión del equipo); lo obligatorio es que toda norma citada esté en `pasajes_recuperados` de la entrega (paso 4), lo que se cumple siempre.
+- Cómo se verificó: `pytest -q tests/test_pipeline.py` → 2 passed con bge-m3 + reranker + Qwen3-8B reales sobre el mini-corpus: 3 líneas válidas según el esquema oficial; MC correcta; semiabierta con `referencia_legal` “Ley 1150 de 2007, artículo 11”; pregunta ajena → abstención; **0 citas sin respaldo según el evaluador oficial**; reanudación sin regenerar; recorte por contexto verificado.
+- Tiempos en CPU (incluye reranker y generación): 158,9 s / 157,4 s / 140,8 s por pregunta.
+- Archivos creados/modificados: `src/pipeline/main.py`, `src/generation/llm.py`, `src/generation/responder.py`, `tests/test_pipeline.py`, `PLAN.md`.
+- Siguiente paso: T19b corpus desde la nube; luego T20 comando único (cierra F3).
+- **Prototipo listo para Turing:** con índice construido, `python -m src.pipeline.main --split sample --limite 5` y revisar `runs/<tag>/tiempos.json`.
+
+## 2026-09-28 — T19b Corpus desde la nube
+- Estado: hecho (el enlace real queda `[B]` hasta que el equipo publique el zip)
+- Qué se hizo: `src/corpus/nube.py` (`python -m src.corpus.nube [--forzar]`): convierte enlaces de compartir (Google Drive vía gdown; OneDrive/SharePoint `download=1`; Dropbox `dl=1`; Zenodo `download=1`; directas), descarga en streaming con reanudación y barra de progreso, detecta si el enlace devuelve una página de inicio de sesión en vez del zip, verifica `CORPUS_ZIP_SHA256` (si no coincide, se niega: índice congelado), valida la estructura oficial (LICENSE, manifiesto, corpus/*.txt, índice FAISS, chunks, manifiesto del índice, BM25) y que el encoder del índice sea el de `.env`, y extrae a `CORPUS_OUT_DIR`/`INDEX_DIR` (acepta carpeta raíz dentro del zip; bloquea rutas `..`). Marca `.origen_nube.json` para no repetir la descarga.
+- Cómo se verificó: `pytest -q tests/test_nube.py` → 6 passed: ida y vuelta con un zip del índice real del mini-corpus servido por HTTP local ⇒ **mismos pasajes y scores** que el índice original; hash incorrecto rechazado; zip incompleto rechazado; enlace vacío con mensaje claro; enlace que devuelve HTML rechazado; conversión de enlaces. `python -m src.corpus.nube` sin enlace → mensaje de cómo configurarlo.
+- Archivos creados/modificados: `src/corpus/nube.py`, `tests/test_nube.py`, `PLAN.md`.
+- Siguiente paso: T20 comando único y Dockerfile (cierra F3).
+
+## 2026-09-28 — T20 Comando único (EN CURSO, pausado por el usuario)
+- Estado: parcial
+- Qué se hizo: `run.py` (dependencias → corpus nube/local con validar, build, anti-fuga, manifiesto e índice → pipeline → evaluador oficial, con `--ragas` solo si hay llave y dependencias del juez; opciones `--split`, `--limite`, `--tag`, `--sin-ragas`, `--no-cache`), `run.sh` (venv fuera de Docker, `EN_CONTENEDOR` dentro), `Dockerfile` (python:3.11-slim, `CORPUS_SOURCE=nube`, `--env-file .env`), `.dockerignore` (excluye `.env`, build, runs, corpus crudo…).
+- Falta: (1) prueba de humo de `bash run.sh --limite 1 --sin-ragas` con el mini-corpus en una carpeta temporal (el usuario pausó antes de correrla); (2) `docker build` — Docker Desktop no estaba abierto (`[B]`: abrir Docker Desktop).
+- Archivos creados: `run.py`, `run.sh`, `Dockerfile`, `.dockerignore`, `PLAN.md`.
+- Siguiente paso: correr la prueba de humo del comando único; luego `docker build`.
+
+## 2026-09-28 — T20 Comando único (cierre)
+- Estado: hecho (salvo `docker build`: `[B]` hasta abrir Docker Desktop)
+- Cómo se verificó: `bash run.sh --limite 1 --sin-ragas` en una carpeta temporal con el mini-corpus (`CORPUS_SOURCE=local`): dependencias OK → validar → build + anti-fuga → manifiesto → índice FAISS + BM25 → pipeline (1 pregunta de la muestra, id 51) → `scripts/evaluate.py` corrió y emitió el reporte: la MC respondida fue **correcta** y con **0 citas sin respaldo** (el resto cuenta como fallo por ser una corrida de 1 ítem sobre el mini-corpus).
+- Incidente: el paso de manifiesto escribe `corpus_manifest.json` y las tablas AUTO de `CORPUS.md` en la raíz; la prueba con el mini-corpus los ensució. Se restauraron (tablas vacías, manifiesto borrado) y se borró `runs/smoke_t20`. Con el corpus real ese comportamiento es el deseado. Nota para pruebas de humo futuras: correrlas en una copia del repo.
+- Archivos: `run.py`, `run.sh`, `Dockerfile`, `.dockerignore`, `PLAN.md`.
+
+## HITO F3 listo — generación, citas, abstención, pipeline y comando único
+- Qué funciona: Qwen3-8B en proceso desde Hugging Face (lista blanca de modelos abiertos, temperatura 0, determinista), prompts por formato con evidencia completa y salvaguarda de ventana de contexto, post-filtro de citas (0 sin respaldo según el evaluador oficial), referencias renderizadas desde metadatos, abstención (nunca en MC), pipeline reanudable con trazas y tiempos, corpus desde la nube (zip verificado por sha256) y comando único `bash run.sh` / `python run.py` + `Dockerfile`.
+- Cómo probarlo:
+  - `.venv/Scripts/python.exe -m pytest -q` (suite completa con modelos reales; tarda varios minutos en CPU)
+  - Con índice construido: `python -m src.pipeline.main --split sample --limite 5`
+  - Comando único: `bash run.sh` (usa `CORPUS_ZIP_URL` si existe; si no, `CORPUS_RAW_DIR`)
+- Pendiente humano: corpus real, enlace de la nube, llave del juez, GPU (Turing) y abrir Docker Desktop.
+- Mensaje de commit sugerido: `F3: decoder Qwen3-8B, prompts, filtro de citas, abstención, pipeline, corpus desde la nube y comando único`

@@ -59,6 +59,8 @@ class Config:
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
     rerank_candidatos: int = 20
     top_k_pasajes: int = 10
+    pasajes_prompt: int = 10
+    palabras_por_pasaje: int = 0      # 0 = pasajes completos (flujo final)
     candidatos: int = 50
     rrf_k: int = 60
     peso_denso: float = 1.0
@@ -66,6 +68,10 @@ class Config:
     boost_area: float = 0.002
     boost_cuerpo: float = 0.01
     max_por_articulo: int = 3
+    umbral_cita: float = 0.5
+    max_referencias: int = 6
+    umbral_abstencion: float = 0.05
+    umbral_abstencion_denso: float = 0.35
 
     decoder_backend: str = "llamacpp"
     decoder_model: str = "Qwen/Qwen3-8B"

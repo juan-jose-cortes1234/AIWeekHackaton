@@ -1,0 +1,13 @@
+.env
+.venv/
+build/
+runs/
+dist/
+models/
+InformacionReto/
+enunciado.pdf
+**/__pycache__/
+.pytest_cache/
+*.gguf
+*.faiss
+corpus_raw/

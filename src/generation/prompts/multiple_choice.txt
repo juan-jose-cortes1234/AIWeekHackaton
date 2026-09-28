@@ -1,0 +1,16 @@
+Área: {area}
+
+EVIDENCIA:
+{evidencia}
+
+PREGUNTA DE SELECCIÓN MÚLTIPLE:
+{pregunta}
+
+OPCIONES:
+{opciones}
+
+Elige la única opción correcta según la evidencia. Devuelve:
+- "respuesta_correcta": la letra elegida.
+- "justificacion": dos a cuatro oraciones que expliquen por qué esa opción es correcta, citando la norma o sentencia aplicable de la evidencia.
+- "descarte_opciones": para cada una de las otras letras ({letras_descarte}), una razón breve de por qué es incorrecta.
+- "pasajes_usados": números de los pasajes en que te apoyaste.
