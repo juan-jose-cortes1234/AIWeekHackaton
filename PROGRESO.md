@@ -258,3 +258,54 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
   - Comando único: `bash run.sh` (usa `CORPUS_ZIP_URL` si existe; si no, `CORPUS_RAW_DIR`)
 - Pendiente humano: corpus real, enlace de la nube, llave del juez, GPU (Turing) y abrir Docker Desktop.
 - Mensaje de commit sugerido: `F3: decoder Qwen3-8B, prompts, filtro de citas, abstención, pipeline, corpus desde la nube y comando único`
+
+## 2026-09-28 — T25 Interfaz gráfica
+- Estado: hecho (paleta de Software Colombia aproximada; confirmar con su guía de marca)
+- Qué se hizo: `interfaz/app.py` (FastAPI; `python -m interfaz.app` → http://localhost:8000). `POST /api/recuperar` (evidencia rápida) y `POST /api/consulta` (mismo `responder_item` del pipeline de la entrega: recuperación + reranker + Qwen3-8B + filtro de citas + abstención), `GET /api/estado`; modelos cargados en la primera consulta; una generación a la vez. Frontend estático `interfaz/static/{index.html,styles.css,app.js}`: pregunta, formato (con opciones A–D para MC), área, “regenerar sin caché”; muestra la evidencia mientras se genera; respuesta por campos del formato; **normas citadas marcadas como respaldadas (con enlace al pasaje) o sin respaldo**; pasajes con encabezado, pertinencia del reranker, origen (router/denso/bm25), offsets y enlace a la fuente; tiempos y citas eliminadas. Identidad: turquesa del cubo de Software Colombia, fondo negro y franjas azules diagonales de la portada del enunciado; Playfair Display + Roboto.
+- Cómo se verificó: `pytest -q tests/test_interfaz.py` → 4 passed con modelos reales (página y estáticos, estado, recuperación con el artículo 1820 primero, 422 en MC sin opciones, consulta completa con todas las citas respaldadas). Revisión visual en el navegador con una demo del mini-corpus: se corrigieron (1) las franjas que tapaban el título en pantallas angostas y (2) la tarjeta de resultados visible antes de consultar (`[hidden]` anulado por `display: grid`).
+- Rúbrica §6.2 (10 pts): consulta de extremo a extremo (4) ✔; pasajes y normas citadas por respuesta (3) ✔; identidad visual (3) ✔ aproximada.
+- Archivos creados: `interfaz/app.py`, `interfaz/static/*`, `tests/test_interfaz.py`, `PLAN.md`.
+- Siguiente paso: T26 README.
+
+## 2026-09-28 — T26 README
+- Estado: hecho (con marcadores `<…>` para lo que depende del equipo: nombre, integrantes, enlace/tamaño/sha256 del zip, fecha de vigencia, puntajes y tiempos medidos, limitaciones observadas)
+- Qué se hizo: `README.md` según la plantilla oficial `README_EQUIPO.md`: sección obligatoria `## Corpus e índice` (tabla, sha256, contenido del zip, vigencia), reproducción con comando único (`bash run.sh` / `python run.py`, Docker), requisitos de hardware con la medición real en CPU, tabla de comandos por etapa, arquitectura (diagrama + tabla de componentes con motivos), estructura del repo, tabla de resultados, interfaz, limitaciones, nota de transparencia sobre el uso de un asistente de programación y licencias.
+- Cómo se verificó: todos los comandos listados existen como módulos (`python -m …`) implementados en F0–F5; revisión contra la checklist de `entregables/sabado/README.md`.
+- Archivos: `README.md`, `PLAN.md`.
+- Siguiente paso: T27 empaquetado del corpus.
+
+## 2026-09-28 — T27 Empaquetado del corpus
+- Estado: hecho (el zip real se genera cuando exista el corpus indexado)
+- Qué se hizo: `src/corpus/empaquetar.py` (`python -m src.corpus.empaquetar [--out]`) → `dist/corpus_<equipo>.zip` con `LICENSE` (texto legal completo de CC-BY-4.0 descargado de creativecommons.org a `docs/LICENSE-CORPUS-CC-BY-4.0.txt`), `corpus_manifest.json`, `corpus/*.txt` e `indice/` (FAISS, chunks, manifiesto, BM25). **Zip determinista** (entradas ordenadas, fechas fijas): mismo contenido ⇒ mismo sha256. Se niega a publicar si falta algo, si la guardia anti-fuga reportó graves o si el índice está desactualizado respecto a `chunks.jsonl`. Imprime el sha256 y las líneas exactas para `.env` y el README.
+- Cómo se verificó: `pytest -q tests/test_empaquetar.py` → 4 passed (estructura oficial validada por `nube.validar_zip`, determinismo, nombre por equipo, ida y vuelta empaquetar → extraer → mismos pasajes, rechazo de índice desactualizado). CLI sin índice → mensaje claro.
+- Archivos: `src/corpus/empaquetar.py`, `docs/LICENSE-CORPUS-CC-BY-4.0.txt`, `tests/test_empaquetar.py`, `PLAN.md`.
+- Siguiente paso: T28 borradores del informe técnico y del reporte de avance.
+
+## 2026-09-28 — T28 Borradores de informes
+- Estado: hecho (borradores; los números de la muestra se completan cuando exista el corpus)
+- Qué se hizo: `informe/INFORME_TECNICO.md` (estructura oficial de `entregables/sabado/INFORME_TECNICO.md`, en `informe/` como pide la estructura del repo: arquitectura en 5 etapas, selección de modelos con motivos y alternativas descartadas, configuración de inferencia con los tiempos medidos, estrategia de recuperación, verificación de citas y abstención, tabla de resultados y limitaciones) y `docs/REPORTE_AVANCE.md` (estructura oficial del viernes, con instrucciones de envío, arquitectura y riesgos con mitigaciones). Marcadores `<…>` para puntajes, estado del corpus y tiempos en GPU.
+- Cómo se verificó: contenido contrastado con el código y con las mediciones de `PROGRESO.md`; el informe tiene ~970 palabras (holgado para 3 páginas en PDF, deja espacio para resultados y análisis de errores); el reporte ~390 (1 página).
+- Archivos: `informe/INFORME_TECNICO.md`, `docs/REPORTE_AVANCE.md`, `PLAN.md`.
+- Siguiente paso: T29 runbook del sábado y verificador para la verificación en vivo.
+
+## 2026-09-28 — T29 Runbook del sábado + herramientas de verificación
+- Estado: hecho
+- Qué se hizo: `docs/RUNBOOK_SABADO.md` (preparación hasta el viernes con índice congelado y proyección de tiempos; recepción de preguntas; ejecución reanudable; plan B con varias máquinas; validación; checklist oficial de cierre; verificación en vivo; problemas frecuentes). `src/eval/verificar.py` (`python -m src.eval.verificar --ids … --split test`): regenera sin caché y compara pasajes (doc_id, inicio, fin), normas citadas, abstención y letra con `submissions.jsonl`. `src/eval/validar_entrega.py`: esquema oficial, ids completos y sin duplicados, formato coherente, pasajes presentes, ≤ 10 pasajes. Pipeline más robusto: (1) una excepción en un ítem ya no tumba la corrida (respuesta de respaldo válida y error en la traza); (2) `--particion k/n` para repartir entre máquinas.
+- Cómo se verificó: `pytest -q tests/test_verificar.py` → 3 passed (simulacro real: generar y regenerar sin caché ⇒ COINCIDE; comparación detecta cambios de normas y pasajes pero no de redacción; validación de entrega). `pytest -k "particion or falla" tests/test_pipeline.py` → 2 passed (particiones cubren todo sin solaparse; una pregunta que excede la ventana del modelo provoca una excepción real de llama.cpp y la corrida sigue con la siguiente). `validar_entrega` sobre el ejemplo oficial detecta los 45 faltantes.
+- Archivos: `docs/RUNBOOK_SABADO.md`, `src/eval/verificar.py`, `src/eval/validar_entrega.py`, `src/pipeline/main.py`, `tests/test_verificar.py`, `tests/test_pipeline.py`, `PLAN.md`.
+- Siguiente paso: T30 ensayo general.
+
+## 2026-09-28 — T30 Ensayo general (Docker, contenedor limpio)
+- Estado: hecho (con el mini-corpus de prueba; repetir con el corpus real y en GPU antes del viernes)
+- Qué se hizo:
+  1. Copia limpia del repo en una carpeta temporal (sin `.git`, `.venv`, `build`, `.env`) → flujo del equipo completo: `validar` → `build` (+ anti-fuga) → `manifest` → `index.build` → `empaquetar` ⇒ zip oficial (16 fragmentos, sha256 `e72c92ca…`) en 54 s.
+  2. `docker build -t hackathon-rag .` ⇒ imagen de 2,34 GB, sin errores (valida `Dockerfile` y `requirements.txt` en Linux limpio).
+  3. Zip servido por HTTP local como “nube”; `docker run … hackathon-rag bash run.sh --limite 2 --sin-ragas` con `CORPUS_ZIP_URL`/`CORPUS_ZIP_SHA256` y la caché de Hugging Face montada, **configuración completa con reranker**.
+- Resultado (14:26:38 → 14:37:34, 11 min): dependencias OK; zip descargado y sha256 verificado; 2 preguntas respondidas (265 s y 231 s), 0 errores de esquema; evaluador oficial: 1 de 2 MC correcta, **2 aciertos de citación, 0 citas sin respaldo**; único error de validación = 48 ítems no corridos (esperado).
+- Hallazgos: (1) Docker Desktop tenía 7,9 GB de RAM y los tres modelos requieren ~10 GB ⇒ el usuario subió WSL2 a 12 GB con `.wslconfig`; requisito **≥ 12 GB** documentado en el README. (2) En CPU dentro de Docker ~250 s por pregunta ⇒ las 50 de muestra ~3,5 h: documentado; conviene preguntar al organizador qué hardware usa la verificación de reproducibilidad.
+- Archivos: `README.md` (requisitos de hardware), `PLAN.md`.
+
+## HITO F5 listo — entregables
+- Qué funciona: interfaz gráfica (T25), README (T26), empaquetado determinista del corpus (T27), borradores del informe técnico y del reporte (T28), runbook del sábado con verificador y validador de entrega, pipeline tolerante a fallos y con particiones (T29), ensayo general en Docker con configuración completa (T30).
+- Quedan en manos del equipo (bloqueos en `PLAN.md`): corpus real → T21/T22; llave del juez → T23; medición en GPU → T24; publicar el zip (`CORPUS_ZIP_URL`).
+- Mensaje de commit sugerido: `F5: interfaz, README, empaquetado del corpus, informes, runbook del sábado, verificación en vivo y ensayo en Docker`

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consulta jurídica RAG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div class="franjas" aria-hidden="true"></div>
+    <div class="marca">
+      <div class="cubo" aria-hidden="true"></div>
+      <div>
+        <p class="patrocina">Hackathon 2026 · Patrocina Software Colombia</p>
+        <h1>¿Puede un modelo pequeño responder derecho colombiano?</h1>
+        <p class="sub">Qwen3-8B · bge-m3 · bge-reranker-v2-m3 — todo abierto, todo con evidencia.</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="aviso" class="aviso" hidden></div>
+
+    <section class="tarjeta formulario">
+      <form id="form">
+        <label for="pregunta">Pregunta jurídica</label>
+        <textarea id="pregunta" rows="4" required minlength="5"
+                  placeholder="Escriba la pregunta tal como la formularía un jurista…"></textarea>
+
+        <div class="fila">
+          <div>
+            <label for="formato">Formato</label>
+            <select id="formato">
+              <option value="semi_open">Semiabierta</option>
+              <option value="multiple_choice">Selección múltiple</option>
+              <option value="open_ended">Abierta (caso)</option>
+            </select>
+          </div>
+          <div>
+            <label for="area">Área</label>
+            <select id="area"><option value="">(sin área)</option></select>
+          </div>
+        </div>
+
+        <fieldset id="opciones" hidden>
+          <legend>Opciones</legend>
+          <div class="opcion"><span>A</span><input data-letra="A"></div>
+          <div class="opcion"><span>B</span><input data-letra="B"></div>
+          <div class="opcion"><span>C</span><input data-letra="C"></div>
+          <div class="opcion"><span>D</span><input data-letra="D"></div>
+        </fieldset>
+
+        <div class="acciones">
+          <label class="check"><input type="checkbox" id="sinCache"> Regenerar sin caché</label>
+          <button type="submit" id="enviar">Consultar</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="resultados" class="resultados" hidden>
+      <div class="columna">
+        <article class="tarjeta">
+          <div class="titulo-tarjeta">
+            <h2>Respuesta</h2>
+            <span id="estadoRespuesta" class="insignia"></span>
+          </div>
+          <div id="respuesta" class="respuesta"></div>
+          <h3>Normas citadas</h3>
+          <div id="citas" class="citas"></div>
+          <p id="tiempos" class="tiempos"></p>
+        </article>
+      </div>
+      <div class="columna">
+        <article class="tarjeta">
+          <div class="titulo-tarjeta">
+            <h2>Pasajes recuperados</h2>
+            <span id="nPasajes" class="insignia neutra"></span>
+          </div>
+          <ol id="pasajes" class="pasajes"></ol>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Universidad de los Andes · AI Week 2026 · Toda norma citada debe aparecer en los pasajes recuperados.
+  </footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -95,6 +95,15 @@ def responder_item(item: dict, rec, llm, cfg: Config = config, usar_cache: bool 
     return linea, traza
 
 
+def particion(preguntas: list[dict], spec: str) -> list[dict]:
+    """Parte k de n (1 ≤ k ≤ n), por posición: las n partes cubren todo sin solaparse.
+    Las salidas se unen concatenando los submissions.jsonl de cada máquina."""
+    k, n = (int(x) for x in spec.split("/"))
+    if not 1 <= k <= n:
+        raise ValueError("--particion debe ser k/n con 1 ≤ k ≤ n")
+    return preguntas[k - 1::n]
+
+
 def _percentiles(valores: list[float]) -> dict:
     if not valores:
         return {}
@@ -120,8 +129,17 @@ def ejecutar(preguntas: list[dict], rec, llm, salida: Path, dir_trazas: Path,
     with salida.open("a", encoding="utf-8", newline="\n") as out, \
             (dir_trazas / "trazas.jsonl").open("a", encoding="utf-8", newline="\n") as tr:
         for n, item in enumerate(pendientes, start=1):
-            linea, traza = responder_item(item, rec, llm, cfg, usar_cache)
-            problemas = [e.message for e in validador.iter_errors(linea)]
+            t0 = time.perf_counter()
+            try:
+                linea, traza = responder_item(item, rec, llm, cfg, usar_cache)
+                problemas = [e.message for e in validador.iter_errors(linea)]
+            except Exception as exc:            # un ítem nunca tumba la corrida
+                seg = round(time.perf_counter() - t0, 3)
+                linea = {"latencia_ms": int(seg * 1000)}
+                traza = {"id": item["id"], "formato": item["formato"],
+                         "excepcion": f"{type(exc).__name__}: {exc}", "s_recuperacion": 0.0,
+                         "s_generacion": seg, "s_total": seg}
+                problemas = [traza["excepcion"]]
             if problemas:                      # nunca se escribe una línea inválida
                 errores += 1
                 traza["errores_esquema"] = problemas
@@ -164,6 +182,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limite", type=int, default=None, help="solo las primeras N preguntas")
     ap.add_argument("--no-cache", action="store_true", help="regenera sin usar la caché")
     ap.add_argument("--desde-cero", action="store_true", help="no reanuda: sobrescribe la salida")
+    ap.add_argument("--particion", default=None,
+                    help="k/n: procesa solo la parte k de n (repartir entre varias máquinas)")
     args = ap.parse_args(argv)
 
     config.validar_final()
@@ -180,6 +200,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.ids:
         ids = {int(x) for x in args.ids.split(",") if x.strip()}
         preguntas = [q for q in preguntas if q["id"] in ids]
+    if args.particion:
+        preguntas = particion(preguntas, args.particion)
     if args.limite:
         preguntas = preguntas[:args.limite]
     tag = args.tag or f"{datetime.now():%Y%m%d_%H%M}_{args.split}"

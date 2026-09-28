@@ -82,3 +82,30 @@ def test_recorta_evidencia_si_no_cabe(indice_prueba, llm_real):
         llm_real.cfg = original
     assert n < n_completo
     assert llm_real.contar_tokens(msgs) <= 1200 - 400
+
+
+def test_particion_cubre_todo_sin_solapar():
+    from src.pipeline.main import particion
+
+    items = [{"id": i} for i in range(10)]
+    partes = [particion(items, f"{k}/3") for k in (1, 2, 3)]
+    ids = sorted(x["id"] for p in partes for x in p)
+    assert ids == list(range(10)) and all(partes)
+    with pytest.raises(ValueError):
+        particion(items, "4/3")
+
+
+def test_un_item_que_falla_no_tumba_la_corrida(indice_prueba, llm_real, tmp_path, monkeypatch):
+    monkeypatch.setattr("src.generation.llm.DIR_CACHE", tmp_path / "gen")
+    _, rec = indice_prueba
+    enorme = {"id": 930001, "formato": "semi_open", "area": "Derecho civil",
+              "pregunta": "¿Qué es la sociedad conyugal? " + "contexto adicional " * 3000}
+    normal = PREGUNTAS[0]
+    salida = tmp_path / "s.jsonl"
+    res = ejecutar([enorme, normal], rec, llm_real, salida, tmp_path)
+    lineas = [json.loads(l) for l in salida.read_text(encoding="utf-8").splitlines()]
+    assert [l["id"] for l in lineas] == [930001, normal["id"]]        # siguió con la siguiente
+    assert lineas[0]["abstencion"] is True and res["errores_esquema"] == 1
+    traza = json.loads((tmp_path / "trazas.jsonl").read_text(encoding="utf-8").splitlines()[0])
+    assert "excepcion" in traza
+    jsonschema.validate(lineas[0], esquema_oficial())

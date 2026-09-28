@@ -52,25 +52,27 @@ sábado 3 oct 9:00–15:00 (ejecución ciega de 992 + interfaz) · 15:00 verific
 
 ## F4 — Medición e iteración (hasta el viernes)
 
-- [ ] **T21 Línea base** sin `--ragas`: correr la muestra completa, guardar `runs/<fecha>_base/reporte.json`, anotar puntajes en `PROGRESO.md` y en la tabla de evolución de `CORPUS.md`.
-- [ ] **T22 Experimentos** (uno por iteración, registrados en `docs/EXPERIMENTOS.md` con hipótesis, cambio, resultado y decisión): pesos RRF, k, reranker, boost de área, nº de cuerpos en `referencia_legal`, prompt MC por opción, longitud de respuestas, umbral de abstención, bge-m3 vs e5-large. Mantener la mejor configuración en `.env.example`/`config.py`. **No sobreajustar a 50 ítems**: preferir cambios con justificación general.
-- [ ] **T23 RAGAS.** Cuando `OPENROUTER_API_KEY` exista: `python scripts/evaluate.py ... --ragas` sobre la mejor configuración (máximo 1 corrida con juez por día salvo que el usuario pida más). Si la llave falta: `[B] llave`.
-- [ ] **T24 Latencia y plan de hardware.** Medir p50/p95 en el hardware disponible; proyectar 992 ítems; documentar en `docs/RUNBOOK_SABADO.md` la configuración GPU (sala Turing/Colab con backend `transformers` o `llamacpp` CUDA) y un plan B.
+- [B] **T21 Línea base** sin `--ragas`: correr la muestra completa, guardar `runs/<fecha>_base/reporte.json`, anotar puntajes en `PROGRESO.md` y en la tabla de evolución de `CORPUS.md`.
+- [B] **T22 Experimentos** (uno por iteración, registrados en `docs/EXPERIMENTOS.md` con hipótesis, cambio, resultado y decisión): pesos RRF, k, reranker, boost de área, nº de cuerpos en `referencia_legal`, prompt MC por opción, longitud de respuestas, umbral de abstención, bge-m3 vs e5-large. Mantener la mejor configuración en `.env.example`/`config.py`. **No sobreajustar a 50 ítems**: preferir cambios con justificación general.
+- [B] **T23 RAGAS.** Cuando `OPENROUTER_API_KEY` exista: `python scripts/evaluate.py ... --ragas` sobre la mejor configuración (máximo 1 corrida con juez por día salvo que el usuario pida más). Si la llave falta: `[B] llave`.
+- [B] **T24 Latencia y plan de hardware.** Medir p50/p95 en el hardware disponible; proyectar 992 ítems; documentar en `docs/RUNBOOK_SABADO.md` la configuración GPU (sala Turing/Colab con backend `transformers` o `llamacpp` CUDA) y un plan B.
 
 ## F5 — Entregables
 
-- [ ] **T25 Interfaz gráfica** (`interfaz/`): pregunta libre + selector de formato/área, respuesta, pasajes con score y enlace, normas citadas marcadas respaldadas/no; identidad Software Colombia. Prueba de humo con `httpx`.
-- [ ] **T26 README.md** según `InformacionReto/Hackathon 2026/entregables/sabado/README_EQUIPO.md` (arquitectura, reproducción, hardware, resultados, limitaciones, sección `## Corpus e índice`).
-- [ ] **T27 Empaquetado del corpus.** `python -m src.corpus.empaquetar` → `dist/corpus_<equipo>.zip` con `LICENSE` (CC-BY-4.0 para el trabajo de procesamiento), `corpus_manifest.json`, `corpus/`, `indice/`; imprime sha256 y las dos líneas exactas para pegar en `.env` (`CORPUS_ZIP_URL=` vacío para que el equipo lo complete y `CORPUS_ZIP_SHA256=<hash>`). Subirlo a la nube lo hace el equipo. Prueba de ida y vuelta: empaquetar → servir local → T19b lo descarga → mismo resultado de recuperación.
-- [ ] **T28 Borradores de informes**: `docs/INFORME_TECNICO.md` (≤ 3 páginas) y `docs/REPORTE_AVANCE.md` (1 página) con números reales de `runs/`. La exportación a PDF la hace el equipo.
-- [ ] **T29 Runbook del sábado** (`docs/RUNBOOK_SABADO.md`): congelar índice, lanzar 992 con reanudación, monitoreo, validar esquema, `src/eval/verificar.py` para la verificación en vivo, checklist oficial de `entregables/sabado/README.md`.
-- [ ] **T30 Ensayo general**: simular el sábado con la muestra desde cero en Docker con el comando único; cronometrar; corregir lo que falle.
+- [x] **T25 Interfaz gráfica** (`interfaz/`): pregunta libre + selector de formato/área, respuesta, pasajes con score y enlace, normas citadas marcadas respaldadas/no; identidad Software Colombia. Prueba de humo con `httpx`.
+- [x] **T26 README.md** según `InformacionReto/Hackathon 2026/entregables/sabado/README_EQUIPO.md` (arquitectura, reproducción, hardware, resultados, limitaciones, sección `## Corpus e índice`).
+- [x] **T27 Empaquetado del corpus.** `python -m src.corpus.empaquetar` → `dist/corpus_<equipo>.zip` con `LICENSE` (CC-BY-4.0 para el trabajo de procesamiento), `corpus_manifest.json`, `corpus/`, `indice/`; imprime sha256 y las dos líneas exactas para pegar en `.env` (`CORPUS_ZIP_URL=` vacío para que el equipo lo complete y `CORPUS_ZIP_SHA256=<hash>`). Subirlo a la nube lo hace el equipo. Prueba de ida y vuelta: empaquetar → servir local → T19b lo descarga → mismo resultado de recuperación.
+- [x] **T28 Borradores de informes**: `docs/INFORME_TECNICO.md` (≤ 3 páginas) y `docs/REPORTE_AVANCE.md` (1 página) con números reales de `runs/`. La exportación a PDF la hace el equipo.
+- [x] **T29 Runbook del sábado** (`docs/RUNBOOK_SABADO.md`): congelar índice, lanzar 992 con reanudación, monitoreo, validar esquema, `src/eval/verificar.py` para la verificación en vivo, checklist oficial de `entregables/sabado/README.md`.
+- [x] **T30 Ensayo general**: simular el sábado con la muestra desde cero en Docker con el comando único; cronometrar; corregir lo que falle.
 
 ---
 
 ## Bloqueos (requieren acción humana)
 
-- [B] 2026-09-28 T20 docker: Docker Desktop no está abierto. Abrirlo y correr `docker build -t hackathon-rag .` (luego `docker run --rm --env-file .env -v hf-cache:/root/.cache/huggingface hackathon-rag`, que necesita `CORPUS_ZIP_URL`).
+- [B] 2026-09-28 T21–T22: necesitan el corpus real indexado (línea base y experimentos sobre la muestra).
+- [B] 2026-09-28 T23: necesita `OPENROUTER_API_KEY` en `.env` y `pip install -r scripts/requirements-evaluador.txt`.
+- [B] 2026-09-28 T24: necesita la prueba en GPU (sala Turing) con `python -m src.pipeline.main --split sample --limite 5`.
 - [B] 2026-09-28 T19b enlace nube: falta el zip publicado. Generarlo con `python -m src.corpus.empaquetar` (T27), subirlo con acceso público y pegar `CORPUS_ZIP_URL` y `CORPUS_ZIP_SHA256` en `.env`; luego `python -m src.corpus.nube`.
 - [B] 2026-09-27 T14 medición: comparar recall@10 con y sin reranker (`python -m src.eval.recuperacion` con `USE_RERANKER=1` y `0`) requiere el corpus real.
 - [B] 2026-09-27 T04 corpus: `CORPUS_RAW_DIR` (./corpus_raw) aún no existe. Crear la carpeta con `fuentes.csv` (plantilla en `docs/fuentes.ejemplo.csv`) y los documentos según `GUIA_CORPUS.md §3`; apuntar `CORPUS_RAW_DIR` en `.env`. Mientras tanto el loop sigue con fixtures.
