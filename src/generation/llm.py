@@ -91,11 +91,17 @@ class LLM:
 
         ruta = hf_hub_download(self.cfg.decoder_gguf_repo, self.cfg.decoder_gguf_file,
                                token=self.cfg.hf_token or None)
-        self.modelo = Llama(
-            model_path=ruta, n_ctx=self.cfg.decoder_num_ctx, seed=self.cfg.decoder_seed,
-            n_threads=self.cfg.decoder_threads or None,
-            n_gpu_layers=-1 if self.cfg.decoder_device == "cuda" else 0,
-            verbose=False)
+        try:
+            self.modelo = Llama(
+                model_path=ruta, n_ctx=self.cfg.decoder_num_ctx, seed=self.cfg.decoder_seed,
+                n_threads=self.cfg.decoder_threads or None,
+                n_gpu_layers=-1 if self.cfg.decoder_device == "cuda" else 0,
+                verbose=False)
+        except ValueError as exc:
+            pista = (" En GPU, la causa habitual es falta de VRAM: revise con nvidia-smi qué "
+                     "proceso ocupa la memoria (JAX/TensorFlow reservan el 75 % al importarse) "
+                     "o baje DECODER_NUM_CTX.") if self.cfg.decoder_device == "cuda" else ""
+            raise RuntimeError(f"No se pudo cargar {self.id_modelo}.{pista}") from exc
 
     def _cargar_transformers(self) -> None:
         import torch

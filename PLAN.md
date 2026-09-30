@@ -52,9 +52,9 @@ sábado 3 oct 9:00–15:00 (ejecución ciega de 992 + interfaz) · 15:00 verific
 
 ## F4 — Medición e iteración (hasta el viernes)
 
-- [B] **T21 Línea base** sin `--ragas`: correr la muestra completa, guardar `runs/<fecha>_base/reporte.json`, anotar puntajes en `PROGRESO.md` y en la tabla de evolución de `CORPUS.md`.
+- [x] **T21 Línea base** sin `--ragas`: correr la muestra completa, guardar `runs/<fecha>_base/reporte.json`, anotar puntajes en `PROGRESO.md` y en la tabla de evolución de `CORPUS.md`.
 - [B] **T22 Experimentos** (uno por iteración, registrados en `docs/EXPERIMENTOS.md` con hipótesis, cambio, resultado y decisión): pesos RRF, k, reranker, boost de área, nº de cuerpos en `referencia_legal`, prompt MC por opción, longitud de respuestas, umbral de abstención, bge-m3 vs e5-large. Mantener la mejor configuración en `.env.example`/`config.py`. **No sobreajustar a 50 ítems**: preferir cambios con justificación general.
-- [B] **T23 RAGAS.** Cuando `OPENROUTER_API_KEY` exista: `python scripts/evaluate.py ... --ragas` sobre la mejor configuración (máximo 1 corrida con juez por día salvo que el usuario pida más). Si la llave falta: `[B] llave`.
+- [x] **T23 RAGAS.** Cuando `OPENROUTER_API_KEY` exista: `python scripts/evaluate.py ... --ragas` sobre la mejor configuración (máximo 1 corrida con juez por día salvo que el usuario pida más). Si la llave falta: `[B] llave`.
 - [B] **T24 Latencia y plan de hardware.** Medir p50/p95 en el hardware disponible; proyectar 992 ítems; documentar en `docs/RUNBOOK_SABADO.md` la configuración GPU (sala Turing/Colab con backend `transformers` o `llamacpp` CUDA) y un plan B.
 
 ## F5 — Entregables
@@ -70,8 +70,6 @@ sábado 3 oct 9:00–15:00 (ejecución ciega de 992 + interfaz) · 15:00 verific
 
 ## Bloqueos (requieren acción humana)
 
-- [B] 2026-09-28 T21–T22: necesitan el corpus real indexado (línea base y experimentos sobre la muestra).
-- [B] 2026-09-28 T23: necesita `OPENROUTER_API_KEY` en `.env` y `pip install -r scripts/requirements-evaluador.txt`.
 - [B] 2026-09-28 T24: necesita la prueba en GPU (sala Turing) con `python -m src.pipeline.main --split sample --limite 5`.
 - [B] 2026-09-28 T19b enlace nube: falta el zip publicado. Generarlo con `python -m src.corpus.empaquetar` (T27), subirlo con acceso público y pegar `CORPUS_ZIP_URL` y `CORPUS_ZIP_SHA256` en `.env`; luego `python -m src.corpus.nube`.
 - [B] 2026-09-27 T14 medición: comparar recall@10 con y sin reranker (`python -m src.eval.recuperacion` con `USE_RERANKER=1` y `0`) requiere el corpus real.

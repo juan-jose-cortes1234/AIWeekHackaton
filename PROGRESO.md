@@ -26,6 +26,7 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 
 | Fecha | Run | Docs | Fragmentos | Cerradas /20 | Citas /20 | Abstención /10 | RAGAS /30 | Total | s/preg | Nota |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 2026-09-29 | muestra_colab (T4) | 186 | 41.384 | 12,00 | 15,51 | 7,79 | 13,37 | 48,67/80 | 34,9 | Línea base |
 
 ---
 
@@ -322,3 +323,11 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 - Codificación: 93 `.htm` de la relatoría están en windows-1252 (se ven con � al abrirlos en un editor/navegador que asume UTF-8); el extractor los lee bien. En el corpus procesado solo 4 caracteres dañados en 2 documentos (irrelevante).
 - Archivos: `src/corpus/fuga.py`, `src/corpus/extraer.py`, `tests/test_fuga.py`, `tests/test_extraer.py`.
 - Siguiente paso: `python -m src.corpus.manifest` e índice (`python -m src.index.build`, en GPU: ~41 mil fragmentos ≈ 8 h en CPU).
+
+## 2026-09-29 — T21 Línea base + T23 RAGAS (Colab, GPU T4)
+- Corrida: `notebooks/muestra_en_colab.ipynb` (bge-m3 + reranker en GPU, Qwen3-8B Q4_K_M con llama.cpp CUDA), 50 preguntas, 0 errores de esquema. Resultados en `runs/muestra_colab/`.
+- **Puntaje (evaluador oficial):** cerradas 9/15 = 0,600 → **12,00/20** · citas recall ponderado 0,776, **0 citas sin respaldo** (38 aciertos, todos respaldados) → **15,51/20** · abstención 0,779 → **7,79/10** · RAGAS answer correctness **0,4456** (referencia GPT-5.4: 0,451) → **13,37/30** · **total 48,67/80** (35,30/50 sin juez).
+- **Tiempos en T4:** recuperación 1,9 s; generación media 33,0 s (p50 27,3; p95 64,6; máx 163) ⇒ **~35 s por pregunta ⇒ 992 ≈ 9,6 h en una T4**: el sábado hacen falta ≥ 2 GPU en paralelo (`--particion`) o acelerar la generación.
+- **Análisis:** texto libre: 26/28 recuperan alguna norma del fundamento. MC: en 5 de las 6 falladas la norma de referencia **sí** estaba en los pasajes (58, 128, 528, 647, 748) ⇒ el cuello de botella es el razonamiento/elección, no la recuperación; la 671 es “Doctrina”. Abstenciones: 513 (fundamento en un PDF de la OMPI, fuera del corpus) y 697 (caso Dow Chemical, fuera del corpus) son razonables; **247 se abstuvo porque el modelo no produjo una respuesta utilizable** (probable JSON truncado por `MAX_TOKENS` en abierta) ⇒ revisar.
+- Incidentes resueltos en Colab: JAX preinstalado reservaba el 75 % de la VRAM (bm25s lo importa) y Qwen no cabía ⇒ `src/config.py` fuerza JAX/TF a CPU; mensaje de error claro al fallar la carga en GPU; la celda del pipeline imprime el código de salida.
+- Siguientes (T22): (1) caso 247 (salida truncada en abiertas); (2) MC: prompt que analice cada opción contra la evidencia y/o modo razonamiento solo en MC si el tiempo lo permite; (3) límite de fragmentos por documento (una sentencia ocupaba 5 de 10 puestos); (4) velocidad de generación.

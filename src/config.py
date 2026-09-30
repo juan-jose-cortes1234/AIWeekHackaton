@@ -11,6 +11,13 @@ from pathlib import Path
 
 from dotenv import dotenv_values
 
+# La GPU es solo para PyTorch (encoder, reranker) y llama.cpp (decoder). Si el entorno
+# trae JAX o TensorFlow (p. ej. Colab), bm25s/transformers los importan y XLA reserva el
+# 75 % de la VRAM al arrancar, dejando sin memoria al decoder. Se fuerzan a CPU.
+for _var, _valor in (("JAX_PLATFORMS", "cpu"), ("XLA_PYTHON_CLIENT_PREALLOCATE", "false"),
+                     ("TF_FORCE_GPU_ALLOW_GROWTH", "true"), ("USE_TF", "0"), ("USE_JAX", "0")):
+    os.environ.setdefault(_var, _valor)
+
 RAIZ = Path(__file__).resolve().parents[1]
 
 # Lista blanca: solo modelos de pesos y licencia abiertos (enunciado §3.1 y §3.2).

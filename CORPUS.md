@@ -89,6 +89,7 @@ semana, con el efecto atribuible a cada incorporación documental.
 
 | Fecha | Documentos | Fragmentos | Cerradas /20 | Citación /20 | Abstención /10 | Total /50 | Qué cambió |
 |---|---:|---:|---:|---:|---:|---:|---|
+| 2026-09-29 | 186 | 41.384 | 12,00 | 15,51 | 7,79 | 35,30 | Corpus inicial completo (nivel 1 y 2 de la guía + 150 sentencias del seed). RAGAS 0,4456 (13,37/30) |
 
 Lectura de la curva:
 

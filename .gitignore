@@ -27,3 +27,6 @@ InformacionReto/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Comprimidos (índice y resultados de Colab, corpus publicado): van a la nube, no al repo
+*.zip
