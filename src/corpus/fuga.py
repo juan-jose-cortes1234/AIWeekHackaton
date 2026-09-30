@@ -4,15 +4,25 @@ Indexar el banco de preguntas o material con respuestas esperadas descalifica
 (enunciado §3.2 y §8). Esta guardia revisa el corpus procesado contra
 `data/sample_50.jsonl` (y cualquier otro JSONL de preguntas que se le pase):
 
+Lo prohibido es indexar el **banco** (preguntas con sus respuestas), no las
+normas: una norma oficial contiene, por diseño, lo que responde la pregunta, y
+muchas preguntas citan textualmente artículos o sentencias (p. ej. "reproducción
+literal"). Por eso:
+
 - **Grave** (bloquea la construcción del índice):
   * un archivo del corpus crudo que parece banco de preguntas (JSON/JSONL con
     `respuesta_esperada`, `legal_basis` o `respuesta_correcta`), o
     `CORPUS_RAW_DIR` dentro de `data/`;
-  * un fragmento que contiene la **pregunta** (≥ 3 8-gramas distintos de ella):
-    las normas no copian el enunciado de las preguntas;
-  * un fragmento que contiene ≥ 50 % de los 8-gramas de una **respuesta esperada**.
-- **Revisión humana** (solo se lista): coincidencias menores, casi siempre porque
-  la respuesta cita literalmente una norma. No se borra nada automáticamente.
+  * un fragmento que contiene **a la vez** la pregunta (≥ 3 8-gramas) y ≥ 50 % de
+    la respuesta esperada **del mismo ítem** (firma de material de preguntas y respuestas);
+  * un fragmento que contiene enunciados de **varias preguntas distintas**
+    (≥ 3 ítems con ≥ 3 8-gramas cada uno): parece una lista de preguntas.
+- **Revisión humana** (solo se lista): coincidencias solo con la pregunta o solo
+  con la respuesta, típicamente citas literales de normas. No se borra nada.
+
+Decisión tomada al construir el corpus real (2026-09-29): con la regla anterior,
+la Constitución, el Código Civil y sentencias del propio seed oficial quedaban
+bloqueados por ser citados literalmente en la muestra.
 """
 from __future__ import annotations
 
@@ -83,28 +93,39 @@ def revisar_fragmentos(fragmentos: list[dict], preguntas: list[dict]) -> Informe
         for g in ngramas(fr["texto"]):
             indice.setdefault(g, set()).add(fr["chunk_id"])
 
+    def conteos(texto: str) -> tuple[dict[str, int], int]:
+        gs = ngramas(texto or "")
+        c: dict[str, int] = {}
+        for g in gs:
+            for cid in indice.get(g, ()):
+                c[cid] = c.get(cid, 0) + 1
+        return c, len(gs)
+
+    preguntas_por_chunk: dict[str, set] = {}
     for q in preguntas:
         qid = q.get("id")
-        g_preg = ngramas(q.get("pregunta") or "")
-        conteo: dict[str, int] = {}
-        for g in g_preg:
-            for cid in indice.get(g, ()):
-                conteo[cid] = conteo.get(cid, 0) + 1
-        for cid, n in sorted(conteo.items()):
-            msg = f"pregunta {qid}: {n} 8-gramas del enunciado en {cid}"
-            (inf.graves if n >= MIN_NGRAMAS_PREGUNTA else inf.revision).append(msg)
-
-        g_resp = ngramas(q.get("respuesta_esperada") or "")
-        if g_resp:
-            conteo = {}
-            for g in g_resp:
-                for cid in indice.get(g, ()):
-                    conteo[cid] = conteo.get(cid, 0) + 1
-            for cid, n in sorted(conteo.items()):
-                frac = n / len(g_resp)
-                msg = (f"pregunta {qid}: {n}/{len(g_resp)} 8-gramas de la respuesta esperada "
-                       f"en {cid} ({frac:.0%})")
-                (inf.graves if frac >= FRACCION_RESPUESTA else inf.revision).append(msg)
+        c_preg, _ = conteos(q.get("pregunta"))
+        c_resp, n_resp = conteos(q.get("respuesta_esperada"))
+        for cid in sorted(set(c_preg) | set(c_resp)):
+            np_, nr = c_preg.get(cid, 0), c_resp.get(cid, 0)
+            con_preg = np_ >= MIN_NGRAMAS_PREGUNTA
+            con_resp = n_resp > 0 and nr / n_resp >= FRACCION_RESPUESTA
+            if con_preg:
+                preguntas_por_chunk.setdefault(cid, set()).add(qid)
+            partes = []
+            if np_:
+                partes.append(f"{np_} 8-gramas del enunciado")
+            if nr:
+                partes.append(f"{nr}/{n_resp} 8-gramas de la respuesta esperada ({nr / n_resp:.0%})")
+            msg = f"pregunta {qid}: {' y '.join(partes)} en {cid}"
+            if con_preg and con_resp:
+                inf.graves.append(msg + " — contiene pregunta y respuesta del mismo ítem")
+            else:
+                inf.revision.append(msg)
+    for cid, qids in sorted(preguntas_por_chunk.items()):
+        if len(qids) >= MIN_NGRAMAS_PREGUNTA:
+            inf.graves.append(f"{cid}: contiene enunciados de {len(qids)} preguntas distintas "
+                              f"{sorted(qids)} — parece una lista de preguntas")
     return inf
 
 

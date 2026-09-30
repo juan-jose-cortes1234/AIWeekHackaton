@@ -18,18 +18,29 @@ def test_corpus_de_prueba_limpio(corpus_crudo, tmp_path):
     assert inf.ok, inf.graves
 
 
-def test_detecta_pregunta_copiada():
-    q = _muestra()[0]
-    frag = {"chunk_id": "x#00000", "texto": "Ley 1 de 2000, artículo 1.\n" + q["pregunta"]}
+def test_pregunta_y_respuesta_juntas_es_grave():
+    q = next(r for r in _muestra() if r.get("respuesta_esperada") and len(r["pregunta"].split()) > 12)
+    frag = {"chunk_id": "x#00000", "texto": q["pregunta"] + "\n" + q["respuesta_esperada"]}
     inf = revisar_fragmentos([frag], [q])
-    assert not inf.ok and "x#00000" in inf.graves[0]
+    assert not inf.ok and "pregunta y respuesta" in inf.graves[0]
 
 
-def test_detecta_respuesta_esperada_copiada():
+def test_lista_de_preguntas_es_grave():
+    qs = [r for r in _muestra() if len(r["pregunta"].split()) > 12][:3]
+    frag = {"chunk_id": "banco#00000", "texto": "\n".join(q["pregunta"] for q in qs)}
+    inf = revisar_fragmentos([frag], qs)
+    assert not inf.ok and any("preguntas distintas" in g for g in inf.graves)
+
+
+def test_cita_literal_de_una_norma_solo_para_revision():
+    # Una respuesta esperada que reproduce un artículo: la norma oficial la contiene.
     q = next(r for r in _muestra() if r.get("respuesta_esperada"))
-    frag = {"chunk_id": "y#00000", "texto": "Doctrina.\n" + q["respuesta_esperada"]}
+    frag = {"chunk_id": "norma#00000", "texto": "Código Civil, artículo 1.\n" + q["respuesta_esperada"]}
     inf = revisar_fragmentos([frag], [q])
-    assert not inf.ok
+    assert inf.ok and inf.revision
+    solo_preg = {"chunk_id": "norma#00001", "texto": q["pregunta"]}
+    inf2 = revisar_fragmentos([solo_preg], [q])
+    assert inf2.ok
 
 
 def test_coincidencia_menor_solo_para_revision():

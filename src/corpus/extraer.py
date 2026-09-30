@@ -6,6 +6,7 @@ la Secretaría del Senado publica por separado).
 """
 from __future__ import annotations
 
+import html
 import re
 import shutil
 import unicodedata
@@ -124,6 +125,29 @@ def extraer_pdf(ruta: Path, avisos: list[str]) -> str:
     return normalizar(_unir_guiones("\n".join(lineas)))
 
 
+def _notas_docx(ruta: Path) -> list[str]:
+    """Texto de las notas al pie y al final de un .docx (python-docx no las lee).
+
+    En las sentencias estas notas suelen citar normas y precedentes.
+    """
+    import zipfile
+
+    notas: list[str] = []
+    with zipfile.ZipFile(ruta) as z:
+        for parte in ("word/footnotes.xml", "word/endnotes.xml"):
+            if parte not in z.namelist():
+                continue
+            xml = z.read(parte).decode("utf-8", errors="ignore")
+            for nota in re.findall(r"<w:(?:footnote|endnote)\b(.*?)</w:(?:footnote|endnote)>", xml,
+                                   flags=re.DOTALL):
+                if re.search(r'w:type="(?:separator|continuationSeparator|continuationNotice)"', nota):
+                    continue
+                texto = " ".join(re.findall(r"<w:t(?:\s[^>]*)?>([^<]*)</w:t>", nota)).strip()
+                if texto:
+                    notas.append(html.unescape(texto))
+    return notas
+
+
 def extraer_docx(ruta: Path) -> str:
     import docx
 
@@ -132,6 +156,10 @@ def extraer_docx(ruta: Path) -> str:
     for tabla in documento.tables:
         for fila in tabla.rows:
             partes.append(" ".join(c.text.strip() for c in fila.cells))
+    notas = _notas_docx(ruta)
+    if notas:
+        partes.append("\nNOTAS")
+        partes += [f"[{n}] {t}" for n, t in enumerate(notas, start=1)]
     return normalizar("\n".join(partes))
 
 

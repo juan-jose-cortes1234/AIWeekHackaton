@@ -80,6 +80,31 @@ def test_docx(tmp_path):
     assert "ARTÍCULO 1. Párrafo de prueba." in t and "uno dos" in t
 
 
+def test_docx_incluye_notas_al_pie(tmp_path):
+    import zipfile
+
+    import docx
+
+    base = tmp_path / "base.docx"
+    d = docx.Document()
+    d.add_paragraph("Texto principal de prueba.")
+    d.save(base)
+    notas = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+             '<w:footnotes xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+             '<w:footnote w:type="separator" w:id="-1"><w:p><w:r><w:t>---</w:t></w:r></w:p></w:footnote>'
+             '<w:footnote w:id="1"><w:p><w:r><w:t xml:space="preserve">Ver Ley 1150 de 2007 </w:t></w:r>'
+             '<w:r><w:t>y Sentencia C-355 de 2006.</w:t></w:r></w:p></w:footnote></w:footnotes>')
+    ruta = tmp_path / "con_notas.docx"
+    with zipfile.ZipFile(base) as zin, zipfile.ZipFile(ruta, "w") as zout:
+        for item in zin.infolist():
+            zout.writestr(item, zin.read(item.filename))
+        zout.writestr("word/footnotes.xml", notas)
+    t = extraer(ruta).texto
+    assert "Texto principal de prueba." in t
+    assert "[1] Ver Ley 1150 de 2007 y Sentencia C-355 de 2006." in t
+    assert "---" not in t                                  # el separador no es contenido
+
+
 def test_txt_cp1252(tmp_path):
     ruta = tmp_path / "doc.txt"
     ruta.write_bytes("Artículo 5. Niño y compañía.\r\n\r\n\r\n\r\nFin".encode("cp1252"))
