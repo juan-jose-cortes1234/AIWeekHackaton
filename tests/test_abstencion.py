@@ -55,3 +55,11 @@ def test_con_recuperador_real(indice_prueba):
     assert not decidir({"id": 1, "formato": "multiple_choice"}, pasajes, None).abstener
     propia = rec.buscar("¿Qué es la sociedad conyugal según el Código Civil?", k=10)
     assert not decidir({"id": 2, "formato": "semi_open"}, propia, OK_SEMI).abstener
+
+
+def test_sin_campo_principal_se_abstiene():
+    # Salida rescatada que solo trajo palabras clave: no hay respuesta que evaluar.
+    assert decidir(SEMI, [P(rerank=0.9)], {"respuesta": "", "palabras_clave": ["a"],
+                                           "referencia_legal": "x"}).abstener
+    assert not decidir(ABIERTA, [P(rerank=0.9)], {"analisis": "Algo.", "marco_normativo": "",
+                                                   "jurisprudencia": "", "conclusion": ""}).abstener

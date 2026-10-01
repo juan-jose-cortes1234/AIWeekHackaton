@@ -4,6 +4,7 @@ Uso:
     python -m src.pipeline.main --split sample                  # muestra, salida en runs/<tag>/
     python -m src.pipeline.main --split test --out submissions.jsonl   # sábado
     python -m src.pipeline.main --split sample --ids 51,290 --no-cache --out runs/verif.jsonl
+    python -m src.pipeline.main --split test --rango 1 250 --tag sabado_1   # preguntas 1.ª a 250.ª
 
 Por ítem: recuperar (híbrido + reranker) → generar (Qwen3-8B, temperatura 0) →
 post-filtro de citas → abstención → validación contra el esquema → escritura
@@ -24,7 +25,7 @@ from src.config import RAIZ, Config, config
 from src.generation.abstencion import decidir, registro_abstencion
 from src.generation.citas import postprocesar
 from src.generation.contexto import LETRAS, MAX_TOKENS, esquema
-from src.generation.responder import mensajes_que_caben, recuperar
+from src.generation.responder import generar_respuesta, recuperar
 
 ENTRADAS = {"sample": RAIZ / "data" / "sample_50.jsonl", "test": RAIZ / "data" / "test_992.jsonl"}
 CAMPOS_INTERNOS = ("pasajes_usados",)
@@ -56,9 +57,8 @@ def responder_item(item: dict, rec, llm, cfg: Config = config, usar_cache: bool 
     t0 = time.perf_counter()
     pasajes = recuperar(item, rec, cfg)
     t1 = time.perf_counter()
-    msgs, n_leidos = mensajes_que_caben(item, pasajes, llm, cfg)
-    g = llm.generar(msgs, esquema=esquema(item), max_tokens=MAX_TOKENS[item["formato"]],
-                    usar_cache=usar_cache)
+    g, n_leidos, extra = generar_respuesta(item, pasajes, llm, cfg, usar_cache,
+                                           encoder=getattr(rec, "encoder", None))
     t2 = time.perf_counter()
 
     datos = dict(g.datos or {})
@@ -91,8 +91,22 @@ def responder_item(item: dict, rec, llm, cfg: Config = config, usar_cache: bool 
         "tokens_prompt": g.tokens_prompt, "tokens_salida": g.tokens_salida,
         "s_recuperacion": round(t1 - t0, 3), "s_generacion": round(t2 - t1, 3),
         "s_total": round(time.perf_counter() - t0, 3),
+        **extra,
     }
     return linea, traza
+
+
+def rango(preguntas: list[dict], inicio: int, fin: int) -> list[dict]:
+    """Preguntas de la posición `inicio` a la `fin` (1 = la primera del archivo), ambas incluidas.
+
+    Son posiciones en el orden del archivo, no ids. Para repartir entre máquinas, rangos
+    contiguos que no se solapen (1–250, 251–500…); las salidas se unen concatenando.
+    """
+    if not 1 <= inicio <= fin:
+        raise ValueError("--rango debe ser INICIO FIN con 1 ≤ INICIO ≤ FIN")
+    if inicio > len(preguntas):
+        raise ValueError(f"--rango: el archivo solo tiene {len(preguntas)} preguntas")
+    return preguntas[inicio - 1:fin]
 
 
 def particion(preguntas: list[dict], spec: str) -> list[dict]:
@@ -182,6 +196,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limite", type=int, default=None, help="solo las primeras N preguntas")
     ap.add_argument("--no-cache", action="store_true", help="regenera sin usar la caché")
     ap.add_argument("--desde-cero", action="store_true", help="no reanuda: sobrescribe la salida")
+    ap.add_argument("--rango", type=int, nargs=2, metavar=("INICIO", "FIN"), default=None,
+                    help="solo las preguntas en las posiciones INICIO a FIN del archivo (incluidas; "
+                         "1 = la primera). Para repartir entre máquinas: 1 250, 251 500…")
     ap.add_argument("--particion", default=None,
                     help="k/n: procesa solo la parte k de n (repartir entre varias máquinas)")
     args = ap.parse_args(argv)
@@ -200,6 +217,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.ids:
         ids = {int(x) for x in args.ids.split(",") if x.strip()}
         preguntas = [q for q in preguntas if q["id"] in ids]
+    if args.rango:
+        try:
+            preguntas = rango(preguntas, *args.rango)
+        except ValueError as e:
+            print(e)
+            return 1
     if args.particion:
         preguntas = particion(preguntas, args.particion)
     if args.limite:

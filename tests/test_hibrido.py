@@ -58,3 +58,36 @@ def test_modelo_distinto_al_del_indice(indice_prueba):
 
     with pytest.raises(ValueError):
         Recuperador.cargar(indice_prueba[0] / "indice", encoder=Otro())
+
+
+def test_tope_por_documento_y_excepcion_si_se_menciona(rec):
+    import dataclasses
+    from collections import Counter
+
+    estricto = Recuperador(rec.chunks, rec.denso, rec.bm25, rec.encoder,
+                           dataclasses.replace(rec.cfg, max_por_documento=1), rec.reranker)
+    sin_mencion = estricto.buscar("plazo de liquidación palabra1 palabra200 palabra400", k=10)
+    assert max(Counter(p.doc_id for p in sin_mencion).values()) == 1
+    con_mencion = estricto.buscar("plazo según la Ley 1150 de 2007 palabra1 palabra200 palabra400", k=10)
+    assert Counter(p.doc_id for p in con_mencion)["ley_1150_2007"] > 1   # mencionada: supera el tope
+
+
+def test_frecuencia_documental_bm25(rec):
+    assert rec.bm25.frecuencia("de") is None                  # palabra vacía
+    assert rec.bm25.frecuencia("zzzinexistente") == 0
+    assert rec.bm25.frecuencia("definiciones") > 0
+
+
+def test_tope_de_complementarios_y_excepcion_si_se_menciona(rec, tmp_path):
+    import dataclasses
+
+    lista = tmp_path / "complementarios.txt"
+    lista.write_text("# comentario\nley_1150_2007\n", encoding="utf-8")
+    cfg = dataclasses.replace(rec.cfg, max_complementarios=1, max_por_documento=0,
+                              documentos_complementarios=lista)
+    tope = Recuperador(rec.chunks, rec.denso, rec.bm25, rec.encoder, cfg, rec.reranker)
+    assert tope.complementarios == frozenset({"ley_1150_2007"})
+    sin_mencion = tope.buscar("plazo de liquidación palabra1 palabra200 palabra400", k=10)
+    assert sum(p.doc_id == "ley_1150_2007" for p in sin_mencion) <= 1
+    con_mencion = tope.buscar("plazo según la Ley 1150 de 2007 palabra1 palabra200 palabra400", k=10)
+    assert sum(p.doc_id == "ley_1150_2007" for p in con_mencion) > 1    # mencionada: sin tope

@@ -27,6 +27,9 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 | Fecha | Run | Docs | Fragmentos | Cerradas /20 | Citas /20 | Abstención /10 | RAGAS /30 | Total | s/preg | Nota |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | 2026-09-29 | muestra_colab (T4) | 186 | 41.384 | 12,00 | 15,51 | 7,79 | 13,37 | 48,67/80 | 34,9 | Línea base |
+| 2026-09-30 | muestra_t22 (T4) | 186 | 41.336 | 12,00 | 15,10 | 7,67 | 12,62 | 47,39/80 | 31,7 | C-01..C-05: neutro/levemente peor |
+| 2026-10-01 | muestra_v2 (T4) | 238 | 45.201 | 12,00 | 15,92 | 7,91 | 13,81 | **49,64/80** | 33,4 | Corpus v2 (+52 fuentes) + C-06 (MC elegir primero) |
+| 2026-10-01 | muestra_v3 (Kaggle T4) | 338 | 68.603 | 12,00 | 15,10 | 7,67 | 11,45 | 46,22/80 | 29,4 | Corpus v3 (+100 leyes y decretos) + C-07 (consulta por opción) |
 
 ---
 
@@ -331,3 +334,88 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 - **Análisis:** texto libre: 26/28 recuperan alguna norma del fundamento. MC: en 5 de las 6 falladas la norma de referencia **sí** estaba en los pasajes (58, 128, 528, 647, 748) ⇒ el cuello de botella es el razonamiento/elección, no la recuperación; la 671 es “Doctrina”. Abstenciones: 513 (fundamento en un PDF de la OMPI, fuera del corpus) y 697 (caso Dow Chemical, fuera del corpus) son razonables; **247 se abstuvo porque el modelo no produjo una respuesta utilizable** (probable JSON truncado por `MAX_TOKENS` en abierta) ⇒ revisar.
 - Incidentes resueltos en Colab: JAX preinstalado reservaba el 75 % de la VRAM (bm25s lo importa) y Qwen no cabía ⇒ `src/config.py` fuerza JAX/TF a CPU; mensaje de error claro al fallar la carga en GPU; la celda del pipeline imprime el código de salida.
 - Siguientes (T22): (1) caso 247 (salida truncada en abiertas); (2) MC: prompt que analice cada opción contra la evidencia y/o modo razonamiento solo en MC si el tiempo lo permite; (3) límite de fragmentos por documento (una sentencia ocupaba 5 de 10 puestos); (4) velocidad de generación.
+
+## 2026-09-30 — T22a Abiertas sin truncar
+- Estado: hecho (medición en la muestra pendiente de T22e). Detalle antes/ahora en `docs/CAMBIOS.md` C-01.
+- Cómo se verificó: `pytest -q tests/test_llm.py tests/test_citas.py tests/test_abstencion.py` → 31 passed (incluye salida real de Qwen3-8B cortada y rescatada sin reintento).
+- Archivos: `src/generation/{llm,contexto,citas,abstencion}.py`, `src/generation/prompts/open_ended.txt`, tests.
+- Siguiente paso: T22b tope de 4 fragmentos por documento.
+
+## 2026-09-30 — T22b Tope por documento
+- Estado: hecho. Detalle y medición en `docs/CAMBIOS.md` C-02 (recall neutro 87,8 %; acaparamiento 24 → 9 preguntas, todas con mención explícita).
+- Verificación: `pytest -q tests/test_hibrido.py tests/test_eval_recuperacion.py` → 10 passed; medición real con `src.eval.recuperacion` (CPU, índice completo).
+- Siguiente paso: T22c evidencia por opción en selección múltiple.
+
+## 2026-09-30 — T22c Evidencia por opción en MC (loop detenido a pedido del usuario)
+- Estado: hecho (implementado y probado); medición de recuperación en `docs/CAMBIOS.md` C-03: neutra en la norma de referencia (13/15), la 748 aún sin el art. 137 del CPACA; efecto en exactitud pendiente de Colab.
+- Loop detenido por el usuario (reunión). Siguiente al relanzar: T22d (secciones de sentencias), luego T22e (una sola ida a Colab).
+
+## 2026-09-30 — Guía de ejecución e índice incremental en Colab
+- `docs/COMO_EJECUTAR.md`: paso a paso para el equipo (instalación, configuración, corpus, índice en Colab o local, muestra, evaluación, interfaz, comando único, experimentos en ramas, problemas frecuentes). Enlazada desde `README.md` y `docs/MAPA_DEL_PROYECTO.md`.
+- `src/index/paquete_colab.py`: el paquete del índice incluye la caché de embeddings (`--sin-cache` para desactivarla) ⇒ Colab solo calcula fragmentos nuevos o modificados. `notebooks/indice_en_colab.ipynb` reescrito: trae el paquete desde Drive (175 MB), fuerza JAX a CPU, imprime código de salida y guarda el resultado en Drive.
+
+## 2026-09-30 — T22d Detección de secciones (detector + pruebas)
+- Estado: hecho. Detalle en `docs/CAMBIOS.md` C-04. `pytest` segmentador 35 passed; corpus 25 passed.
+- Siguiente paso: T22e (reconstruir corpus, chequeo automático de secciones, paquete único para Colab).
+
+## 2026-09-30 — T22e Una sola ida a Colab (preparada)
+- Corpus reconstruido en local con el detector nuevo: 186 documentos, **41.336 fragmentos** (antes 41.384); guardia anti-fuga sin graves; `corpus_manifest.json` y `CORPUS.md` regenerados.
+- Chequeo automático nuevo `python -m src.corpus.secciones [--todas]`: encontró 3 problemas más del detector (subtítulo "7.1. Decisión" en la SU-455, "CONSIDERACIONES DE LA CORTE CONSTITUCIONAL" no reconocido, título "ACLARACIÓN DE / VOTO…" partido en la C-355) ⇒ corregidos. Resultado: las 3 sentencias de control OK; 64 → 26 sentencias con avisos (solo etiquetas faltantes). Detalle y tabla antes/ahora en `docs/CAMBIOS.md` C-04.
+- Incidente: el build se caía en la consola de Windows al imprimir "→" antes de la guardia anti-fuga ⇒ `src/config.py` pone la consola en UTF-8 (C-05).
+- `src/index/paquete_colab.py --modo muestra`: ya no lleva el índice; lleva código, `data/`, `schema/`, `chunks.jsonl`, caché de embeddings y `_fuga.json`. `dist/paquete_colab_muestra.zip` = 174,9 MB, sin `.env`. 10.496 fragmentos por recalcular (~13 min en T4).
+- `notebooks/muestra_en_colab.ipynb`: índice en GPU → ping del decoder → 50 preguntas (`runs/muestra_t22`, no pisa la línea base) → evaluador sin juez y con RAGAS → un zip `muestra_t22.zip` con índice + caché + resultados.
+- Pruebas: segmentador + secciones 42 passed; extractor, fuga, config y citas 36 passed.
+- Siguiente paso (usuario): commit, subir el zip a Drive y correr el cuaderno. Al volver: registrar puntajes en C-01..C-05, PROGRESO, CORPUS.md §4 y REPORTE_AVANCE.
+
+## 2026-09-30 — Resultados de la corrida T22e en Colab (`runs/muestra_t22`)
+- Archivos del cuaderno ubicados: índice (`index.faiss`, manifiesto, `bm25/`) en `build/indice/`, caché en `build/cache/emb/`, resultados en `runs/muestra_t22/`. Verificado: `sha256_chunks` del manifiesto = hash del `chunks.jsonl` local; `src.index.build` → "reutilizado (sin cambios)". Colab calculó 10.496 embeddings en 1.001 s.
+- **Puntaje:** cerradas 9/15 → 12,00 (=) · citas 15,10 (−0,41) · abstención 7,67 (−0,12) · RAGAS 0,4208 → 12,62 (−0,75) · **total 47,39/80** (línea base 48,67). 0 errores de esquema, 0 citas sin respaldo. **31,7 s por pregunta** (antes 34,9; p95 61 s, máx 81 s, antes 163 s).
+- **Pregunta por pregunta:** MC 748 **arreglada** (D → A, objetivo de C-03), pero la 290 **se dañó** (C → A): con el análisis previo, el modelo citó bien que [P1] fija 4 meses y aun así marcó C como "la contradice" y eligió A. 58, 528, 647 y 671 siguen mal (cambian de letra equivocada). 247 **ya no se abstiene** (C-01): responde y acierta la norma (Ley 472 de 1998). Citas: se pierden la 748 (ahora sin la norma de referencia) y la 879 (cita solo el Código Civil, no el CGP); se gana la 247. Longitud de respuestas abiertas igual (semiabiertas 76 → 77 palabras).
+- **RAGAS:** −0,025 sin atribución posible (el reporte no trae puntaje por pregunta). Puede ser ruido del juez: no hay medición de su variabilidad.
+- Lectura: C-01 (247) y C-03 (748) hicieron lo que debían en sus casos; el formato "analizar antes de elegir" de C-03 cuesta otro caso (290). Neto: **neutro con leve baja**, dentro de lo que podría ser ruido.
+
+## 2026-09-30 — C-06 Selección múltiple: elegir primero (experimento preparado)
+- `MC_ANALISIS_PREVIO=0` por defecto: letra → justificación → descartes, con la evidencia por opción de C-03. Detalle en `docs/CAMBIOS.md` C-06.
+- Prueba local en CPU (`runs/mc_elegir_local`): **290 → C y 748 → A, ambas correctas** (con C-03 solo acertaba la 748; en la línea base, solo la 290). ~287 s por MC en CPU.
+- `src/eval/combinar.py` (+2 pruebas) y `IDS` en el cuaderno: Colab responde solo las 15 MC; se combinan en local con `runs/muestra_t22` y se evalúan sin juez.
+- Paquete `dist/paquete_colab_muestra.zip` regenerado (215,4 MB, sin `.env`). Siguiente: corrida de las 15 MC en Colab.
+
+## 2026-09-30 — Corpus v2: 52 fuentes nuevas
+- Revisión de las 59 filas nuevas de `fuentes_v2.csv`: todas de fuentes admitidas por el enunciado §5 (relatorías de la Corte Constitucional, Corte Suprema y Consejo de Estado; normograma DIAN; SIC). Texto extraído revisado en los 18 conceptos DIAN/SIC: documentos oficiales completos, con su número; datos personales anonimizados por la entidad. Sin duplicados (por tipo/número/año ni por bytes).
+- Incorporación: 41 archivos copiados de `jurisprudencia_v2/` y `normas_v2/` a sus rutas en `corpus_raw` (sin tocar los existentes; los demás archivos de las carpetas `_v2` son copias de lo que ya había, con `.htm` renombrado a `.html`); 59 filas añadidas tal cual a `fuentes.csv` (respaldo previo en el temporal de la sesión).
+- Ajustes acordados con el usuario: número de 13 sentencias CSJ `SP2287-2024` → `SP-2287` (formato que reconoce el evaluador); Resolución DIAN `000165` → `165` (con ceros el evaluador no la reconoce como cita); 7 sentencias del Consejo de Estado (identificadas por radicado, no citables por el evaluador) **apartadas** en `corpus_raw/fuentes_pendientes.csv` con sus archivos en disco.
+- Build: 238 documentos (+52), **45.201 fragmentos** (+3.865), guardia anti-fuga sin graves, validador 0 errores. Los 18 conceptos DIAN/SIC y el concepto del Consejo de Estado no son citables por el evaluador (sirven como evidencia). Secciones: 138 sentencias, 35 con avisos (9 nuevas, sobre todo CSJ sin "RESUELVE": etiquetas faltantes, no equivocadas).
+- `dist/paquete_colab.zip` (217,5 MB) para `notebooks/indice_en_colab.ipynb`: 3.865 embeddings por calcular (~6 min en T4).
+- Corrida completa pedida por el usuario (corpus v2 + C-06): cuaderno de la muestra con `TAG = "muestra_v2"`, `IDS = ""` (50 preguntas + RAGAS); `dist/paquete_colab_muestra.zip` regenerado (217,5 MB, 45.201 fragmentos, sin `.env`). La comparación contra `muestra_t22` mezcla dos cambios (corpus y formato MC); el efecto aislado de C-06 se puede separar después con `IDS` sobre el corpus anterior si hace falta.
+
+## 2026-10-01 — Corrida completa `runs/muestra_v2` (corpus v2 + C-06, Colab T4)
+- Ubicación: resultados en `runs/muestra_v2/`. El índice que devolvió es idéntico al local (`sha256_faiss` 8910bf…, misma caché); los archivos BM25 difieren en bytes porque bm25s numera el vocabulario en distinto orden en cada construcción, pero los puntajes son idénticos (50/50 preguntas, diferencia 0, mismo top-50). Carpeta duplicada eliminada.
+- **Puntaje: 49,64/80** (mejor hasta ahora; línea base 48,67, t22 47,39): cerradas 9/15 → 12,00 · citas 39 aciertos → 15,92 (0 sin respaldo) · abstención 7,91 · RAGAS 0,4605 → 13,81. 50 respondidas, 0 errores de esquema; 33,4 s por pregunta (p95 44 s, máx 71 s).
+- **MC 9/15, pero no las mismas 9:** recupera la 290 (vuelve a C, como en la línea base) y mantiene la 748 (A), pero pierde la 487 (A → D) con **la misma evidencia** que en t22 (10 pasajes idénticos, art. 1820 del Código Civil en P2): la pierde el formato "elegir primero", no el corpus. Cada formato acierta y falla casos distintos ⇒ la elección del modelo en MC es inestable (±1 pregunta).
+- **Corpus nuevo:** documentos v2 en la evidencia de 22 de 50 preguntas. Citas: gana la 60 (0/2 → 1/2) y recupera la 879; la 247 pasa de 38 normas citadas a 4.
+
+## 2026-10-01 — Corpus v3: 100 leyes y decretos nuevos
+- `corpus_raw/fuentes.csv` llegó dañado por Excel (abierto con `;` como separador): codificación mezclada (190 líneas UTF-8, 156 cp1252), `;`/`;;` añadidos al final y 49 filas partidas en su `;` interno y entre comillas. Reparado deshaciendo exactamente esa transformación (leer cada línea con `;`, volver a unir sus partes con `;`, quitar separadores vacíos): las 186 filas originales coinciden campo por campo con el respaldo. Copia del archivo dañado en el temporal de la sesión.
+- Las filas del 30-sep volvieron a su versión de `fuentes_v2.csv`: se reaplicaron los ajustes acordados (13 números CSJ, Resolución DIAN `165`, 7 sentencias del Consejo de Estado apartadas en `fuentes_pendientes.csv`).
+- 100 fuentes nuevas (80 leyes, 20 decretos): Función Pública (94), Bogotá Jurídica (3), Colpensiones (2), MinTIC (1); sin duplicados; todas con su número en el encabezado y artículos detectados. Incluye decretos únicos reglamentarios grandes (2555/2010: 3.091 fragmentos; 780/2016: 2.811; 1074/2015: 2.509; 1071/2015: 2.263).
+- Build: **338 documentos, 68.603 fragmentos (+23.402)**, validador 0 errores, guardia anti-fuga sin graves. `dist/paquete_colab_muestra.zip` (239,1 MB) con `TAG = "muestra_v3"`: 23.402 embeddings por calcular (~30 min en T4) + 50 preguntas + RAGAS.
+- C-07 (MC: consulta por opción = opción + palabras clave raras de la pregunta) implementado; 34 pruebas pasan (incluida generación real). Paquete regenerado: la corrida `muestra_v3` mide juntos corpus v3 + C-07.
+- Colab sin GPU ("Cannot connect to GPU backend", probable cuota agotada): `notebooks/muestra_en_kaggle.ipynb`, mismo flujo que el de Colab con Dataset de Kaggle en lugar de Drive, Secrets de Kaggle para la llave, una sola T4 (`CUDA_VISIBLE_DEVICES=0`) y descarga desde Output. Documentado en `docs/COMO_EJECUTAR.md`.
+- `src.pipeline.main --rango INICIO FIN` (posiciones 1-based en el archivo, ambos extremos incluidos; valida rangos inválidos) + prueba; variable `RANGO` en los cuadernos de Colab y Kaggle (corrida parcial ⇒ se evalúa en local); runbook del sábado §D con el reparto por rangos. Kaggle: corregido el enlace de descarga (la celda estaba en `proyecto/`).
+
+## 2026-10-01 — Corrida `runs/muestra_v3` (corpus v3 + C-07, Kaggle T4)
+- Instalada: índice de Kaggle = fragmentos locales (`sha256_chunks` 8f0ca4…, 68.603; 23.402 embeddings calculados); `src.index.build` → reutilizado. Resultados en `runs/muestra_v3/`.
+- **Puntaje: 46,22/80 (peor que v2, 49,64)**: cerradas 9/15 (=) · citas 37 → 15,10 (−0,82) · abstención 7,67 · **RAGAS 0,3815 → 11,45 (−2,36)**. 50 respondidas, 0 errores de esquema, 29,4 s por pregunta.
+- MC (C-07): gana la 58 (B → A) y pierde la 748 (A → D): 9/15 de nuevo.
+- Documentos v3 en la evidencia de 19 de 35 preguntas de texto libre, casi siempre decretos únicos reglamentarios (1074/2015, 2555/2010, 1069/2015, 1072/2015) y en 1073 hasta 5 de 10 pasajes. Pero las normas de referencia siguen en la evidencia casi igual (v2 44/49, v3 42/49; solo pierde la 1073) ⇒ la caída no es de recuperación de la norma correcta, sino de lo que el modelo escribe con evidencia más ruidosa, o variación del juez (no medida; el reporte no da RAGAS por pregunta).
+- Decisión pendiente con el usuario: medir RAGAS por pregunta (v2 vs v3, y v2 dos veces para el ruido del juez) antes de decidir qué hacer con los decretos únicos.
+- C-08 (MC: responder en abierto sin opciones y luego elegir; `MC_MODO=abierta`) implementado: 48 pruebas pasan (contexto, pipeline, híbrido, citas, config; incluye generación real con los dos pasos). Paquete regenerado (329,3 MB, 68.603 fragmentos, sin `.env`); cuadernos con `TAG = "mc_abierta"`, `RANGO = "1 15"`. Se evalúa combinando con las 35 de texto libre de `muestra_v3`.
+
+## 2026-10-01 — Resultado C-08 (MC "abierta y luego opción"), `runs/mc_abierta`
+- Kaggle T4, 15 MC (`RANGO 1 15`), índice idéntico al local (mismo `sha256_faiss`, 0 embeddings); carpeta duplicada eliminada. Combinada con las 35 de texto libre de `muestra_v3` → `runs/mc_abierta_50`.
+- **MC 10/15** (antes siempre 9): gana la 487 sin perder ninguna frente a v3. Sin juez **36,75/50** (v3 34,77; v2 35,83). Con el RAGAS de v3 (11,45, mismas respuestas de texto) el total estimado es 48,20/80. Elegir por similitud del encoder: 4/15 (descartado). 51,9 s por MC.
+- Siguiente: decidir corpus (v2 vs v3) con RAGAS por pregunta; combinar C-08 con el corpus que gane.
+- MC vuelve a una sola llamada (`MC_MODO=directo`, decisión del usuario: C-08 +1/15 con casi el doble de latencia). C-09 (modo de razonamiento de Qwen3 en MC, tope `MC_RAZONAMIENTO_TOKENS=1024`) implementado; reglas del reto revisadas: no lo prohíben (temperatura 0, determinista; límite práctico ~22 s/pregunta). Prueba local 528 (`runs/c09_local`): JSON válido, razonamiento correcto sobre los umbrales del art. 25 CGP pero sin el valor del SMLMV en la evidencia ⇒ sigue en "mayor"; el razonamiento agotó los 1.024 tokens (en inglés). Paquete regenerado; cuadernos `TAG = "mc_razonamiento"`, `RANGO = "1 15"`.
+- Para que el equipo pruebe otros decoders: `/no_think` y el razonamiento C-09 solo se aplican si el modelo es Qwen3 (`LLM.es_qwen3`); celda 4 de los cuadernos con `DECODER_GGUF_REPO`/`DECODER_GGUF_FILE`; `docs/COMO_EJECUTAR.md` §10 (lista blanca, GGUF, licencia ≤ 8B). `src.index.paquete_colab --con-indice` incluye el índice ya construido si corresponde a los fragmentos (zip de 611 MB para compartir por Drive y para que la celda 4 lo reutilice). Guía §4–5 reescritas (compartir índice, `TAG`/`RANGO`/`IDS`, Colab y Kaggle, evaluación de corridas parciales).
+- Comando único para las GPUs de Turing: `run.py`/`run.sh` aceptan `--rango INICIO FIN`, `--gpu` (encoder, reranker y decoder en CUDA) e `--indice-existente` (usa el índice de `build/` verificado por sha256, sin reconstruir el corpus; garantiza el mismo índice congelado en todas las máquinas); corrida parcial ⇒ no evalúa y explica cómo unir. Guía §11 (preparar la máquina con CUDA, extraer solo `build/` del zip, ensayo, el comando, reparto en 4 máquinas, unir y validar) y runbook §D actualizados. Sin pruebas corridas (el usuario pide que se le pregunte antes).
+- C-10 (máximo 2 pasajes de las 100 fuentes v3, lista en `config/documentos_complementarios.txt`) implementado + prueba (sin correr); `config/` agregado a los paquetes de Colab/Kaggle; cuadernos `TAG = "muestra_v4"` (las 50). Paquete con índice regenerado.

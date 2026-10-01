@@ -95,6 +95,19 @@ def test_particion_cubre_todo_sin_solapar():
         particion(items, "4/3")
 
 
+def test_rango_por_posicion_incluye_los_extremos():
+    from src.pipeline.main import rango
+
+    items = [{"id": i} for i in (51, 58, 60, 128, 290)]                 # ids no consecutivos
+    assert [x["id"] for x in rango(items, 1, 3)] == [51, 58, 60]
+    assert [x["id"] for x in rango(items, 4, 99)] == [128, 290]          # FIN mayor: hasta el final
+    partes = rango(items, 1, 2) + rango(items, 3, 5)                    # rangos contiguos = todo
+    assert partes == items
+    for malo in ((0, 3), (3, 2), (6, 9)):
+        with pytest.raises(ValueError):
+            rango(items, *malo)
+
+
 def test_un_item_que_falla_no_tumba_la_corrida(indice_prueba, llm_real, tmp_path, monkeypatch):
     monkeypatch.setattr("src.generation.llm.DIR_CACHE", tmp_path / "gen")
     _, rec = indice_prueba

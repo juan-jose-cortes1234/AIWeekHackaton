@@ -50,6 +50,17 @@ def _cuerpos(texto: str) -> set[tuple]:
     return citations.bodies(citations.extract(texto))
 
 
+
+def leer_complementarios(ruta: Path | None) -> frozenset[str]:
+    """doc_id de los documentos complementarios (C-10): uno por línea, `#` para comentarios.
+
+    Sin archivo, ninguno (todos los documentos son principales).
+    """
+    if not ruta or not Path(ruta).is_file():
+        return frozenset()
+    lineas = Path(ruta).read_text(encoding="utf-8").splitlines()
+    return frozenset(l.strip() for l in lineas if l.strip() and not l.lstrip().startswith("#"))
+
 class Recuperador:
     def __init__(self, chunks: list[dict], indice_denso, bm25: IndiceBM25, encoder,
                  cfg: Config = config, reranker=None):
@@ -61,6 +72,7 @@ class Recuperador:
         self.cfg = cfg
         # Cuerpo normativo del documento de cada fragmento (por su nombre canónico).
         cache_doc: dict[str, frozenset] = {}
+        self.complementarios = leer_complementarios(cfg.documentos_complementarios)
         self.cuerpo_doc: list[frozenset] = []
         self.por_articulo: dict[tuple, list[int]] = defaultdict(list)
         self.por_cuerpo: dict[tuple, set[int]] = defaultdict(set)
@@ -123,7 +135,8 @@ class Recuperador:
 
     # ------------------------------------------------------------------ búsqueda
     def buscar(self, pregunta: str, area: str | None = None,
-               consultas_extra: list[str] | None = None, k: int | None = None) -> list[Pasaje]:
+               consultas_extra: list[str] | None = None, k: int | None = None,
+               n_rerank: int | None = None) -> list[Pasaje]:
         cfg = self.cfg
         k = k or cfg.top_k_pasajes
         consultas = [pregunta] + [c for c in (consultas_extra or []) if c.strip()]
@@ -154,7 +167,8 @@ class Recuperador:
         s_rerank: dict[int, float] = {}
         if self.reranker is not None and cfg.use_reranker:
             # Reordena con el cross-encoder los mejores candidatos de la fusión.
-            cabeza, cola = orden[:cfg.rerank_candidatos], orden[cfg.rerank_candidatos:]
+            n = n_rerank or cfg.rerank_candidatos
+            cabeza, cola = orden[:n], orden[n:]
             ids = directos + cabeza
             puntos = self.reranker.puntuar(pregunta, [self.chunks[i]["texto"] for i in ids])
             s_rerank = {i: round(float(p), 5) for i, p in zip(ids, puntos)}
@@ -169,12 +183,26 @@ class Recuperador:
 
         res: list[Pasaje] = []
         por_unidad: dict[tuple, int] = defaultdict(int)
+        por_documento: dict[str, int] = defaultdict(int)
+        n_complementarios = 0
         for i, puntaje, etiqueta in candidatos:
             c = self.chunks[i]
             unidad = (c["doc_id"], c.get("articulo") or c.get("seccion") or c["chunk_id"])
             if por_unidad[unidad] >= cfg.max_por_articulo:
                 continue
+            # Tope por documento, salvo si la pregunta lo menciona (p. ej. "según la
+            # Sentencia SU-455 de 2020…"): ahí conviene ver varias partes del mismo documento.
+            mencionado = etiqueta == "router" or bool(mencionados & self.cuerpo_doc[i])
+            if (cfg.max_por_documento and not mencionado
+                    and por_documento[c["doc_id"]] >= cfg.max_por_documento):
+                continue
+            # Documentos complementarios (C-10): pocos pasajes entre los 10, salvo si se mencionan.
+            complementario = c["doc_id"] in self.complementarios and not mencionado
+            if complementario and cfg.max_complementarios and n_complementarios >= cfg.max_complementarios:
+                continue
+            n_complementarios += complementario
             por_unidad[unidad] += 1
+            por_documento[c["doc_id"]] += 1
             orig = sorted(origen.get(i, set()) | ({etiqueta} if etiqueta else set()))
             res.append(Pasaje(
                 id=i, chunk_id=c["chunk_id"], doc_id=c["doc_id"], inicio=c["inicio"],

@@ -56,3 +56,33 @@ def test_rechaza_modelo_fuera_de_lista_blanca():
     cfg = dataclasses.replace(config, decoder_gguf_repo="openai/gpt-oss")
     with pytest.raises(ValueError):
         LLM(cfg)
+
+
+@pytest.mark.parametrize("texto,esperado", [
+    ('{"marco_normativo": "Ley 1 de 2000.", "analisis": "Primera oración. Segunda sin termi',
+     {"marco_normativo": "Ley 1 de 2000."}),
+    ('{"a": "x", "b": [1, 2', {"a": "x"}),
+    ('{"a": "x", "b": "y"}', {"a": "x", "b": "y"}),
+    ('{"a": "sin cerrar', None),
+    ('texto sin json', None),
+    ('{"a": "con \\"comillas\\" dentro", "b": "cor', {"a": 'con "comillas" dentro'}),
+])
+def test_reparar_json_truncado(texto, esperado):
+    from src.generation.llm import reparar_json_truncado
+
+    assert reparar_json_truncado(texto) == esperado
+
+
+def test_salida_cortada_se_rescata_sin_reintentar(llm_real, tmp_path):
+    esquema = {"type": "object",
+               "properties": {"marco_normativo": {"type": "string"}, "analisis": {"type": "string"},
+                              "conclusion": {"type": "string"}},
+               "required": ["marco_normativo", "analisis", "conclusion"]}
+    msgs = [{"role": "system", "content": "Respondes en español y solo en JSON."},
+            {"role": "user", "content": "Escribe un marco_normativo de una frase sobre el contrato "
+                                        "de compraventa, luego un analisis MUY extenso de al menos "
+                                        "30 oraciones y una conclusion."}]
+    g = llm_real.generar(msgs, esquema=esquema, max_tokens=120, usar_cache=False, dir_cache=tmp_path)
+    assert g.truncada
+    assert g.tokens_salida <= 125                    # sin reintento: no se duplican los tokens
+    assert g.datos and g.datos.get("marco_normativo")

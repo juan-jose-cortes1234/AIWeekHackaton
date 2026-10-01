@@ -1,0 +1,11 @@
+Área: {area}
+
+EVIDENCIA:
+{evidencia}
+
+PREGUNTA:
+{pregunta}
+
+Responde la pregunta con base en la evidencia, como si fuera una pregunta abierta (todavía no conoces las opciones de respuesta). Devuelve:
+- "respuesta": dos o tres oraciones con la respuesta concreta (el plazo, la figura, la entidad, la norma o la consecuencia que se pregunta) y la norma o sentencia de la evidencia que la sustenta, por ejemplo "[P2] establece …".
+- "pasajes_usados": números de los pasajes en que te apoyaste.

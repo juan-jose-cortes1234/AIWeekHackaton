@@ -1,0 +1,19 @@
+Área: {area}
+
+EVIDENCIA (algunos pasajes indican la opción para la que se recuperaron):
+{evidencia}
+
+PREGUNTA DE SELECCIÓN MÚLTIPLE:
+{pregunta}
+
+OPCIONES:
+{opciones}
+
+RESPUESTA PRELIMINAR (redactada a partir de la misma evidencia, antes de ver las opciones):
+{respuesta_abierta}
+
+Elige la opción que coincide con la respuesta preliminar; si ninguna coincide exactamente, la que más se le acerque. Si la respuesta preliminar contradice claramente la evidencia, prima la evidencia. Devuelve, en este orden:
+- "respuesta_correcta": la letra de la opción elegida.
+- "justificacion": dos o tres oraciones que expliquen por qué esa opción es correcta, citando la norma o sentencia aplicable de la evidencia.
+- "descarte_opciones": para cada una de las otras letras ({letras_descarte}), UNA sola frase breve que explique por qué es incorrecta, con el pasaje en que te apoyas.
+- "pasajes_usados": números de los pasajes en que te apoyaste.

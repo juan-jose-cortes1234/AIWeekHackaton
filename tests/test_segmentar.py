@@ -104,3 +104,69 @@ def test_ventanas_con_solape_y_parrafo_gigante():
 def test_sin_articulos_cae_a_ventanas():
     segs = segmentar("Circular de prueba sin artículos.\nOtra línea.", "circular")
     assert segs and all(s.tipo == "seccion" for s in segs)
+
+
+@pytest.mark.parametrize("linea,esperado", [
+    # Títulos verdaderos (mayúsculas o numerados)
+    ("I. ANTECEDENTES", "ANTECEDENTES"),
+    ("Consideraciones y fundamentos", None),            # sin numeración ni mayúsculas
+    ("II. Consideraciones y fundamentos", "CONSIDERACIONES"),
+    ("1. Competencia", "COMPETENCIA"),
+    ("VII. DECISIÓN", "DECISIÓN"),
+    ("RESUELVE:", "RESUELVE"),
+    ("SÍNTESIS DE LA DECISIÓN", "SÍNTESIS"),
+    ("V. CONCEPTO DEL PROCURADOR GENERAL DE LA NACIÓN", "CONCEPTO DEL MINISTERIO PÚBLICO"),
+    ("SALVAMENTO DE VOTO DEL MAGISTRADO ALVARO TAFUR", "SALVAMENTO DE VOTO"),
+    ("ACLARACIÓN DE VOTO DEL MAGISTRADO", "ACLARACIÓN DE VOTO"),
+    # Falsos positivos reales (C-355 de 2006 y otras)
+    ("concepto del Procurador.", None),
+    ("concepto de vida protegido por la Convención[44].", None),
+    ("aclaración de voto basada esencialmente en las argumentaciones esbozadas en la", None),
+    ("Salvamento de voto: Stevens).", None),
+    ("salvamento de voto, con los cuales se explicó por qué la vida humana del niño", None),
+    ("Salvamento Parcial de Voto de Alfredo Beltrán Sierra, Carlos Gaviria Díaz y", None),
+    ("análisis del caso (“relativo a la inexistencia de una medida regresiva e", None),
+    ("7.1. Decisión", None),                                # subtítulo partido (SU-455 de 2020)
+    ("2.3. COMPETENCIA", None),                             # numeración de varios niveles
+    ("II. CONSIDERACIONES DE LA CORTE CONSTITUCIONAL", "CONSIDERACIONES"),
+])
+def test_titulo_seccion(linea, esperado):
+    from src.corpus.segmentar import titulo_seccion
+
+    assert titulo_seccion(linea) == esperado
+
+
+def test_orden_de_la_sentencia():
+    from src.corpus.segmentar import secciones_sentencia
+
+    texto = "\n".join([
+        "Sentencia de prueba", "I. ANTECEDENTES", "Hechos de prueba.",
+        "II. CONSIDERACIONES", "Razonamiento de prueba.",
+        "SALVAMENTO DE VOTO FALSO",               # antes del RESUELVE: no es un salvamento
+        "III. DECISIÓN", "En mérito de lo expuesto…", "RESUELVE:", "PRIMERO. Declarar exequible.",
+        "SEGUNDO. Orden de prueba.", "Notifíquese, comuníquese y cúmplase.", "Magistrado de prueba",
+        "ANEXO", "II. Consideraciones", "Texto del anexo.", "RESUELVE",   # anexo: sin etiqueta
+        "SALVAMENTO DE VOTO DEL MAGISTRADO X", "Disiento porque…",
+        "CONSIDERACIONES", "Argumento del salvamento.",                   # sigue siendo salvamento
+        "ACLARACIÓN DE VOTO DE LA MAGISTRADA Y", "Aclaro que…",
+    ])
+    b = [(s, " ".join(l for l in lineas if l.strip())) for s, lineas in secciones_sentencia(texto)]
+    etiquetas = [s for s, _ in b]
+    assert etiquetas == [None, "ANTECEDENTES", "CONSIDERACIONES", "DECISIÓN", "RESUELVE", None,
+                         "SALVAMENTO DE VOTO", "ACLARACIÓN DE VOTO"]
+    resuelve = dict(b)["RESUELVE"]
+    assert "SEGUNDO. Orden de prueba." in resuelve and "anexo" not in resuelve
+    assert "Argumento del salvamento." in dict(b)["SALVAMENTO DE VOTO"]
+    assert "SALVAMENTO DE VOTO FALSO" in dict(b)["CONSIDERACIONES"]
+
+
+def test_titulo_de_voto_partido_en_dos_lineas():
+    from src.corpus.segmentar import secciones_sentencia
+
+    texto = "\n".join([
+        "I. ANTECEDENTES", "Hechos.", "RESUELVE:", "PRIMERO. Declarar.",
+        "Notifíquese y cúmplase.", "Magistrado de prueba",
+        "ACLARACIÓN DE", "VOTO A LA SENTENCIA C-000 DE 2006 DEL MAGISTRADO X", "Aclaro que…",
+    ])
+    etiquetas = [s for s, _ in secciones_sentencia(texto)]
+    assert etiquetas == [None, "ANTECEDENTES", "RESUELVE", None, "ACLARACIÓN DE VOTO"]

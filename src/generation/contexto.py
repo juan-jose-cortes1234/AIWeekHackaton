@@ -16,7 +16,8 @@ from pathlib import Path
 from src.config import Config, config
 
 DIR_PROMPTS = Path(__file__).resolve().parent / "prompts"
-MAX_TOKENS = {"multiple_choice": 450, "semi_open": 400, "open_ended": 900}
+MAX_TOKENS = {"multiple_choice": 500, "semi_open": 400, "open_ended": 1400,
+              "mc_abierta": 350}   # paso 1 de MC en modo "abierta" (C-08)
 LETRAS = ("A", "B", "C", "D")
 
 
@@ -41,22 +42,35 @@ def recortar(texto: str, max_palabras: int) -> str:
     return f"{cabeza}\n{' '.join(palabras[:max_palabras])} […]"
 
 
-def evidencia(pasajes, cfg: Config = config) -> str:
-    return "\n\n".join(f"[P{n}] {recortar(p.texto, cfg.palabras_por_pasaje)}"
-                       for n, p in enumerate(pasajes[:cfg.pasajes_prompt], start=1))
+def evidencia(pasajes, cfg: Config = config, marcas: bool = True) -> str:
+    partes = []
+    for n, p in enumerate(pasajes[:cfg.pasajes_prompt], start=1):
+        opcion = (getattr(p, "meta", None) or {}).get("opcion") if marcas else None
+        marca = f"(recuperado para la opción {opcion}) " if opcion else ""
+        partes.append(f"[P{n}] {marca}{recortar(p.texto, cfg.palabras_por_pasaje)}")
+    return "\n\n".join(partes)
 
 
 def letras_de(item: dict) -> list[str]:
     return [l for l in LETRAS if l in (item.get("opciones") or {})]
 
 
-def esquema(item: dict) -> dict:
+def plantilla_de(item: dict, cfg: Config = config) -> str:
+    """Nombre de la plantilla del prompt para el formato del ítem."""
+    if item["formato"] == "multiple_choice" and not cfg.mc_analisis_previo:
+        return "multiple_choice_elegir"
+    return item["formato"]
+
+
+def esquema(item: dict, cfg: Config = config) -> dict:
     """JSON schema de la salida del decoder para el formato del ítem."""
     usados = {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 20},
               "maxItems": 10}
     f = item["formato"]
-    if f == "multiple_choice":
+    if f == "multiple_choice" and (not cfg.mc_analisis_previo or cfg.mc_modo == "abierta"):
         letras = letras_de(item) or list(LETRAS)
+        # Elegir primero (C-06): la letra, la justificación y luego un descarte por cada otra
+        # opción; la evidencia sigue llegando marcada por opción (C-03).
         return {
             "type": "object",
             "properties": {
@@ -69,6 +83,26 @@ def esquema(item: dict) -> dict:
                 "pasajes_usados": usados,
             },
             "required": ["respuesta_correcta", "justificacion", "descarte_opciones",
+                         "pasajes_usados"],
+        }
+    if f == "multiple_choice":
+        letras = letras_de(item) or list(LETRAS)
+        return {
+            "type": "object",
+            # Orden deliberado: primero el análisis de cada opción y después la letra (la
+            # gramática sigue este orden, así el modelo "razona" antes de elegir). Los
+            # descartes de la entrega se derivan de este análisis (citas.postprocesar).
+            "properties": {
+                "analisis_opciones": {
+                    "type": "object",
+                    "properties": {l: {"type": "string"} for l in letras},
+                    "required": letras,
+                },
+                "respuesta_correcta": {"type": "string", "enum": letras},
+                "justificacion": {"type": "string"},
+                "pasajes_usados": usados,
+            },
+            "required": ["analisis_opciones", "respuesta_correcta", "justificacion",
                          "pasajes_usados"],
         }
     if f == "semi_open":
@@ -97,19 +131,42 @@ def esquema(item: dict) -> dict:
     }
 
 
-def mensajes(item: dict, pasajes, cfg: Config = config) -> list[dict]:
-    """Mensajes system + user para un ítem del banco y sus pasajes recuperados."""
+def esquema_mc_abierta() -> dict:
+    """Paso 1 de MC en modo "abierta" (C-08): respuesta libre, sin opciones."""
+    return {
+        "type": "object",
+        "properties": {
+            "respuesta": {"type": "string"},
+            "pasajes_usados": {"type": "array", "items": {"type": "integer", "minimum": 1,
+                                                          "maximum": 20}, "maxItems": 10},
+        },
+        "required": ["respuesta", "pasajes_usados"],
+    }
+
+
+def mensajes(item: dict, pasajes, cfg: Config = config, etapa: str | None = None,
+             respuesta_abierta: str = "") -> list[dict]:
+    """Mensajes system + user para un ítem del banco y sus pasajes recuperados.
+
+    `etapa` solo aplica a MC en modo "abierta" (C-08): "abierta" = paso 1 (la pregunta sin
+    opciones y la evidencia sin marcas de opción); "desde_abierta" = paso 2 (opciones y la
+    respuesta preliminar del paso 1).
+    """
     f = item["formato"]
     campos = {
         "area": item.get("area") or "no indicada",
         "sub_tarea": item.get("sub_tarea") or "no indicada",
-        "evidencia": evidencia(pasajes, cfg) or "(no se recuperó evidencia)",
+        "evidencia": evidencia(pasajes, cfg, marcas=etapa != "abierta")
+                     or "(no se recuperó evidencia)",
         "pregunta": (item.get("pregunta") or "").strip(),
     }
     if f == "multiple_choice":
         letras = letras_de(item)
         campos["opciones"] = "\n".join(f"{l}) {str(item['opciones'][l]).strip()}" for l in letras)
         campos["letras_descarte"] = ", ".join(letras)
-    usuario = plantilla(f).format(**campos)
+        campos["respuesta_abierta"] = respuesta_abierta.strip() or "(sin respuesta preliminar)"
+    nombre = {"abierta": "multiple_choice_abierta",
+              "desde_abierta": "multiple_choice_desde_abierta"}.get(etapa) or plantilla_de(item, cfg)
+    usuario = plantilla(nombre).format(**campos)
     return [{"role": "system", "content": plantilla("sistema")},
             {"role": "user", "content": usuario}]

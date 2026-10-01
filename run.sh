@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Comando único de reproducción. Uso: bash run.sh [--split sample|test] [--limite N] [--sin-ragas]
+# Comando único de reproducción. Uso: bash run.sh [--split sample|test] [--limite N]
+#   [--rango INICIO FIN] [--tag NOMBRE] [--gpu] [--indice-existente] [--sin-ragas]
+# Ej. en una GPU con el índice ya en build/: bash run.sh --split test --gpu --indice-existente --rango 1 250 --tag sabado_1
 set -euo pipefail
 cd "$(dirname "$0")"
 

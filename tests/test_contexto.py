@@ -61,9 +61,25 @@ def test_esquemas_con_claves_del_evaluador(item, claves):
 
 
 def test_consultas_extra_mc():
-    extra = consultas_extra(MC)
-    assert len(extra) == 4 and all(e.startswith(MC["pregunta"]) for e in extra)
+    extra = consultas_extra(MC)                      # modo "clave": la opción va primero
+    assert len(extra) == 4
+    assert all(e.startswith(str(v).strip()) for e, (_, v) in zip(extra, sorted(MC["opciones"].items())))
     assert consultas_extra(SEMI) == []
+    previo = dataclasses.replace(config, mc_consulta_opcion="pregunta")
+    assert all(e.startswith(MC["pregunta"].strip()) for e in consultas_extra(MC, previo))
+
+
+def test_palabras_clave_prefiere_las_raras():
+    from src.generation.responder import palabras_clave
+
+    pregunta = ("Habiendo hecho la lectura previa de la Resolución 368 de 2014, lea con atención "
+                "y responda: ¿qué vicio configura ignorar la consulta previa de los pueblos indígenas?")
+    todas = palabras_clave(pregunta, 50)
+    assert "lea" not in todas and "responda" not in todas and "de" not in todas
+    assert "368" in todas and "2014" in todas
+    raras = {"pueblos": 3, "indígenas": 2, "vicio": 5, "consulta": 40, "368": 1}
+    elegidas = palabras_clave(pregunta, 4, lambda w: raras.get(w, 1000))
+    assert elegidas == ["368", "vicio", "pueblos", "indígenas"]       # las 4 más raras, en orden
 
 
 @pytest.fixture(scope="module")
@@ -80,5 +96,52 @@ def test_respuesta_real_mc(indice_prueba, llm_pequeno_ctx, tmp_path, monkeypatch
     assert r.pasajes and r.pasajes[0].meta["articulo"] == "1820"
     assert r.datos is not None
     assert r.datos["respuesta_correcta"] == "A"
-    assert set(r.datos["descarte_opciones"]) <= {"B", "C", "D"}
+    assert set(r.datos["descarte_opciones"]) <= {"A", "B", "C", "D"}
+    # Modo "abierta" (C-08, por defecto): hubo respuesta sin opciones y una letra por similitud.
+    assert r.extra["mc_modo"] == "abierta" and r.extra["respuesta_abierta"]
+    assert r.extra["opcion_por_similitud"] in {"A", "B", "C", "D"}
     assert r.datos["justificacion"].strip()
+
+
+def test_mc_elige_primero_por_defecto():
+    props = list(esquema(MC)["properties"])
+    assert props[0] == "respuesta_correcta" and "descarte_opciones" in props
+    assert '"descarte_opciones"' in mensajes(MC, [])[1]["content"]
+
+
+def test_mc_analiza_opciones_antes_de_elegir():
+    cfg = dataclasses.replace(config, mc_analisis_previo=True, mc_modo="directo")
+    props = list(esquema(MC, cfg)["properties"])
+    assert props.index("analisis_opciones") < props.index("respuesta_correcta")
+    assert '"analisis_opciones"' in mensajes(MC, [], cfg)[1]["content"]
+
+
+def test_recuperacion_por_opcion(indice_prueba):
+    from collections import Counter
+
+    from src.generation.responder import recuperar
+
+    _, rec = indice_prueba
+    pasajes = recuperar(MC, rec)
+    ids = [p.chunk_id for p in pasajes]
+    assert len(ids) == len(set(ids)) <= config.top_k_pasajes           # sin duplicados
+    marcadas = Counter((p.meta or {}).get("opcion") for p in pasajes)
+    assert sum(v for k, v in marcadas.items() if k) >= 1               # hay evidencia por opción
+    assert pasajes[0].meta["articulo"] == "1820"                       # la pregunta sigue primero
+    texto = mensajes(MC, pasajes)[1]["content"]
+    assert "(recuperado para la opción" in texto
+
+
+def test_mc_abierta_paso_1_sin_opciones_paso_2_con_respuesta():
+    from src.generation.contexto import esquema_mc_abierta
+
+    pasajes = [_pasaje(1, "Código Civil, artículo 1820.\nTEXTO DE PRUEBA")]
+    pasajes[0].meta = {"opcion": "B"}
+    paso1 = mensajes(MC, pasajes, etapa="abierta")[1]["content"]
+    assert "La sociedad conyugal" not in paso1 and "A)" not in paso1          # sin opciones
+    assert "recuperado para la opción" not in paso1                          # ni marcas
+    assert set(esquema_mc_abierta()["required"]) == {"respuesta", "pasajes_usados"}
+    paso2 = mensajes(MC, pasajes, etapa="desde_abierta",
+                     respuesta_abierta="RESPUESTA PRELIMINAR DE PRUEBA")[1]["content"]
+    assert "RESPUESTA PRELIMINAR DE PRUEBA" in paso2 and "A) La sociedad conyugal" in paso2
+    assert "(recuperado para la opción B)" in paso2

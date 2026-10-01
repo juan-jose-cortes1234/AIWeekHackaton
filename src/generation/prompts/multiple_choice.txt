@@ -1,6 +1,6 @@
 Área: {area}
 
-EVIDENCIA:
+EVIDENCIA (algunos pasajes indican la opción para la que se recuperaron):
 {evidencia}
 
 PREGUNTA DE SELECCIÓN MÚLTIPLE:
@@ -9,8 +9,8 @@ PREGUNTA DE SELECCIÓN MÚLTIPLE:
 OPCIONES:
 {opciones}
 
-Elige la única opción correcta según la evidencia. Devuelve:
-- "respuesta_correcta": la letra elegida.
-- "justificacion": dos a cuatro oraciones que expliquen por qué esa opción es correcta, citando la norma o sentencia aplicable de la evidencia.
-- "descarte_opciones": para cada una de las otras letras ({letras_descarte}), una razón breve de por qué es incorrecta.
+Primero analiza cada opción y solo después elige. Devuelve, en este orden:
+- "analisis_opciones": para cada letra ({letras_descarte}), UNA sola frase breve que diga si la evidencia respalda o contradice esa opción y con qué pasaje, por ejemplo "[P3] la contradice porque …".
+- "respuesta_correcta": la letra de la única opción que la evidencia respalda, coherente con el análisis anterior.
+- "justificacion": dos o tres oraciones que expliquen por qué esa opción es correcta, citando la norma o sentencia aplicable de la evidencia.
 - "pasajes_usados": números de los pasajes en que te apoyaste.

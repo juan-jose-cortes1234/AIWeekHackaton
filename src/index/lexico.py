@@ -75,6 +75,20 @@ class IndiceBM25:
 
         return cls(bm25s.BM25.load(str(directorio), show_progress=False))
 
+    def frecuencia(self, palabra: str) -> int | None:
+        """En cuántos fragmentos aparece la palabra (tras tokenizarla); None si es vacía.
+
+        Si la palabra da varios tokens, cuenta el más raro. 0 = no está en el corpus.
+        """
+        toks = tokenizar(palabra)
+        if not toks:
+            return None
+        vocab = self.retriever.vocab_dict
+        indptr = self.retriever.scores["indptr"]
+        dfs = [int(indptr[vocab[t] + 1] - indptr[vocab[t]]) if t in vocab and vocab[t] + 1 < len(indptr)
+               else 0 for t in toks]
+        return min(dfs)
+
     def puntajes(self, consulta: str) -> np.ndarray:
         """Puntaje BM25 de la consulta contra todos los fragmentos (en orden de chunks.jsonl)."""
         toks = tokenizar(consulta)

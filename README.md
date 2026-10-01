@@ -26,6 +26,8 @@ pasajes recuperados del corpus; toda norma citada figura en esos pasajes.
 
 ## Reproducción
 
+> Guía paso a paso para el equipo (instalación, corpus, índice en Colab, muestra, experimentos): [`docs/COMO_EJECUTAR.md`](docs/COMO_EJECUTAR.md).
+
 Un único comando descarga el corpus e índice publicados (o los reconstruye desde
 el corpus crudo), genera las respuestas y las califica con el evaluador oficial.
 
@@ -52,8 +54,12 @@ docker run --rm --env-file .env -v hf-cache:/root/.cache/huggingface hackathon-r
 4. Califica con `scripts/evaluate.py` (con `--ragas` si hay `OPENROUTER_API_KEY`
    y `pip install -r scripts/requirements-evaluador.txt`).
 
-Opciones útiles: `--limite N` (solo N preguntas), `--sin-ragas`, `--no-cache`,
-`--split test` (entrega final).
+Opciones útiles: `--limite N` (solo N preguntas), `--rango INICIO FIN` (preguntas en esas
+posiciones, para repartir entre máquinas), `--gpu` (todo en CUDA), `--indice-existente` (usar el
+índice ya descomprimido en `build/`, verificado por sha256, sin reconstruir), `--tag NOMBRE`,
+`--sin-ragas`, `--no-cache`, `--split test` (entrega final). Ejemplo en una GPU:
+`python run.py --split test --gpu --indice-existente --rango 1 248 --tag sabado_1`
+(detalle en [`docs/COMO_EJECUTAR.md`](docs/COMO_EJECUTAR.md) §11).
 
 **Requisitos de hardware.**
 

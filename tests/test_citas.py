@@ -102,3 +102,16 @@ def test_limites_de_extension():
     assert len(limitar(texto, 5).split(". ")) <= 5
     corto = limitar(" ".join(["Palabra " * 60 + "fin."] * 4), 5, 150)
     assert len(corto.split()) <= 150
+
+
+def test_abierta_rescatada_completa_campos_obligatorios():
+    item = {"id": 1, "formato": "open_ended"}
+    datos = {"marco_normativo": "Aplica el artículo 11 de la Ley 1150 de 2007.",
+             "analisis": "El contrato no se liquidó. El plazo supletorio es de cuatro meses.",
+             "pasajes_usados": [1]}                      # sin jurisprudencia ni conclusión (cortada)
+    pp = postprocesar(item, datos, PASAJES)
+    for campo in ("marco_normativo", "analisis", "jurisprudencia", "conclusion"):
+        assert pp.campos[campo].strip(), campo
+    sub = {"id": 1, "formato": "open_ended", "abstencion": False, **pp.campos,
+           "pasajes_recuperados": [p.a_entrega() for p in PASAJES]}
+    assert evaluate.validate([sub], {1}) == []

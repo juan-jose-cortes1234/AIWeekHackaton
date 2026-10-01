@@ -6,6 +6,7 @@ se resuelven contra la raíz del repo. Los secretos nunca aparecen en `repr`.
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 
@@ -17,6 +18,12 @@ from dotenv import dotenv_values
 for _var, _valor in (("JAX_PLATFORMS", "cpu"), ("XLA_PYTHON_CLIENT_PREALLOCATE", "false"),
                      ("TF_FORCE_GPU_ALLOW_GROWTH", "true"), ("USE_TF", "0"), ("USE_JAX", "0")):
     os.environ.setdefault(_var, _valor)
+
+# La consola de Windows usa cp1252: un "→" en un print tumbaba `src.corpus.build` antes de la
+# guardia anti-fuga. Toda salida de consola va en UTF-8 (lo que no se pueda mostrar se reemplaza).
+for _flujo in (sys.stdout, sys.stderr):
+    if hasattr(_flujo, "reconfigure") and (_flujo.encoding or "").lower() not in ("utf-8", "utf8"):
+        _flujo.reconfigure(encoding="utf-8", errors="replace")
 
 RAIZ = Path(__file__).resolve().parents[1]
 
@@ -75,6 +82,17 @@ class Config:
     boost_area: float = 0.002
     boost_cuerpo: float = 0.01
     max_por_articulo: int = 3
+    puestos_pregunta: int = 4         # MC: puestos para la pregunta; el resto, por opción
+    pasajes_por_opcion: int = 2       # MC: pasajes de cada opción a considerar por ronda
+    rerank_candidatos_opcion: int = 8 # MC: candidatos que el reranker reordena por opción
+    mc_analisis_previo: bool = False  # MC: True = analizar cada opción antes de elegir (C-03)
+    mc_modo: str = "directo"           # MC: "directo" = elegir con las opciones a la vista; "abierta" = responder sin opciones y luego elegir (C-08, descartado por latencia)
+    mc_razonamiento_tokens: int = 1024  # MC: tope del modo de razonamiento de Qwen3 (C-09); 0 = sin razonamiento
+    mc_consulta_opcion: str = "clave"  # MC: "clave" = opción + palabras clave de la pregunta; "pregunta" = pregunta completa + opción (C-03)
+    mc_palabras_clave: int = 10       # MC: palabras de la pregunta que acompañan a cada opción (modo "clave")
+    max_por_documento: int = 4        # 0 = sin tope; no aplica a documentos mencionados
+    max_complementarios: int = 2      # pasajes de documentos complementarios entre los 10 (C-10); 0 = sin tope
+    documentos_complementarios: Path = RAIZ / "config" / "documentos_complementarios.txt"
     umbral_cita: float = 0.5
     max_referencias: int = 6
     umbral_abstencion: float = 0.05

@@ -16,6 +16,8 @@ real y medirlo en GPU.
 | **`README.md`** | La puerta de entrada: cómo reproducir todo con un comando, requisitos de hardware, arquitectura con el motivo de cada elección, comandos por etapa, interfaz y limitaciones. Tiene marcadores `<…>` por llenar: nombre del equipo, integrantes, enlace del corpus y puntajes. |
 | **`GUIA_CORPUS.md`** | **La guía para construir el corpus**, la tarea central del equipo: qué normas descargar por prioridad (nivel 1, 2 y 3 por área), cómo organizar la carpeta de OneDrive, el formato de `fuentes.csv`, consejos de descarga (Senado, SUIN, relatorías) y controles de calidad. |
 | **`docs/BRECHAS.md`** | Lista automática de las normas que **faltan** en el corpus, ordenadas por cuántas preguntas del banco dependen de ellas. Se regenera con `python -m src.eval.brechas`. |
+| **`docs/COMO_EJECUTAR.md`** | **Paso a paso para correr todo**: instalación, corpus, índice (incremental en Colab), muestra, evaluación, interfaz, experimentos en ramas y problemas frecuentes. |
+| **`docs/CAMBIOS.md`** | Registro de cambios del sistema: antes / ahora / por qué / evidencia. |
 | **`docs/fuentes.ejemplo.csv`** | Plantilla de `fuentes.csv` con una fila de ejemplo. |
 
 ## 2. Entregables del reto

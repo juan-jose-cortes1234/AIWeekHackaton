@@ -71,6 +71,9 @@ puedes arreglar, deshaz tu cambio a mano en esos archivos.
 - `PROGRESO.md`: añade **al final** una entrada con la plantilla que hay allí,
   incluida la lista de archivos creados o modificados.
 - Si cambió el puntaje: fila nueva en la tabla de evolución de `CORPUS.md` y en `PROGRESO.md`.
+- Si la tarea **cambia el comportamiento del sistema** (recuperación, generación, citas, corte del corpus,
+  configuración por defecto): entrada nueva en `docs/CAMBIOS.md` con antes / ahora / por qué /
+  evidencia / archivos / si requiere reindexar.
 
 ## 5. Hitos (commit y push los hace el usuario)
 

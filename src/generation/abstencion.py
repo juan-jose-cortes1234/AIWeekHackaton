@@ -22,6 +22,8 @@ CAMPOS = {
     "semi_open": ("respuesta", "palabras_clave", "referencia_legal"),
     "open_ended": ("marco_normativo", "analisis", "jurisprudencia", "conclusion"),
 }
+# Campo sin el cual no hay respuesta que evaluar (los demás se completan si faltan).
+CAMPOS_CLAVE = {"semi_open": ("respuesta",), "open_ended": ("analisis",)}
 
 
 @dataclass
@@ -47,7 +49,7 @@ def decidir(item: dict, pasajes, campos: dict | None, cfg: Config = config) -> D
         return Decision(False, "MC: nunca se abstiene", maximo)
     if not pasajes:
         return Decision(True, "sin pasajes recuperados", maximo)
-    if not campos or not any(str(campos.get(c) or "").strip() for c in CAMPOS[formato]):
+    if not campos or not all(str(campos.get(c) or "").strip() for c in CAMPOS_CLAVE[formato]):
         return Decision(True, "el modelo no produjo una respuesta utilizable", maximo)
     if any("router" in (p.origen or []) for p in pasajes):
         return Decision(False, "la pregunta cita una norma presente en el corpus", maximo)

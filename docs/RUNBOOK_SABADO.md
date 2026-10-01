@@ -57,6 +57,24 @@ En la máquina k de n (misma configuración y mismo zip):
 python -m src.pipeline.main --split test --particion k/n --out parte_k.jsonl --tag sabado_k
 ```
 
+O por **rangos de posiciones** (1.ª a 250.ª, etc.; ambos extremos incluidos; son posiciones en
+el archivo, no ids). Más fácil de repartir a mano y de rehacer si una máquina se cae:
+
+```bash
+python -m src.pipeline.main --split test --rango 1 250   --out parte_1.jsonl --tag sabado_1
+python -m src.pipeline.main --split test --rango 251 500 --out parte_2.jsonl --tag sabado_2
+python -m src.pipeline.main --split test --rango 501 750 --out parte_3.jsonl --tag sabado_3
+python -m src.pipeline.main --split test --rango 751 992 --out parte_4.jsonl --tag sabado_4
+```
+
+En los cuadernos (Colab/Kaggle) es la variable `RANGO = "1 250"` de la celda 2.
+
+Con el comando único (recomendado en Turing; ver `docs/COMO_EJECUTAR.md` §11), en la máquina k:
+
+```bash
+python run.py --split test --gpu --indice-existente --rango INICIO FIN --tag sabado_k
+```
+
 Unir al final (en cualquier orden) y validar:
 
 ```bash

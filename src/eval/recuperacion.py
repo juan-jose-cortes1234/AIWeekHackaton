@@ -11,18 +11,13 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 
 from src.config import RAIZ, config
+from src.generation.responder import recuperar
 from src.oficial import AREA_SLUG, citations
-
-
-def consultas_extra(item: dict) -> list[str]:
-    """En MC, cada opción es una consulta adicional (ARQUITECTURA §4)."""
-    opciones = item.get("opciones") or {}
-    return [str(v) for _, v in sorted(opciones.items())]
 
 
 def evaluar(recuperador, preguntas: list[dict], k: int | None = None) -> dict:
@@ -33,8 +28,7 @@ def evaluar(recuperador, preguntas: list[dict], k: int | None = None) -> dict:
         ref = citations.bodies(citations.extract(it.get("legal_basis") or ""))
         if not ref:
             continue
-        pasajes = recuperador.buscar(it["pregunta"], area=it.get("area"),
-                                     consultas_extra=consultas_extra(it), k=k)
+        pasajes = recuperar(it, recuperador)[:k]
         encontrados = set()
         for p in pasajes:
             encontrados |= citations.bodies(citations.extract(p.texto))
@@ -50,6 +44,7 @@ def evaluar(recuperador, preguntas: list[dict], k: int | None = None) -> dict:
             "ref": sorted(map(list, ref)), "cubiertos": sorted(map(list, cubiertos)),
             "faltantes": sorted(map(list, ref - encontrados)),
             "top": [p.texto.split("\n", 1)[0] for p in pasajes[:3]],
+            "max_mismo_documento": max(Counter(p.doc_id for p in pasajes).values(), default=0),
         })
     n = sum(v[1] for v in por_area.values())
     hits = sum(v[0] for v in por_area.values())
@@ -57,6 +52,7 @@ def evaluar(recuperador, preguntas: list[dict], k: int | None = None) -> dict:
     tot = sum(v[3] for v in por_area.values())
     return {
         "k": k, "items_evaluados": n,
+        "max_mismo_documento": dict(sorted(Counter(d["max_mismo_documento"] for d in detalle).items())),
         "acierto_at_k": round(hits / n, 4) if n else 0.0,
         "recall_cuerpos_at_k": round(cu / tot, 4) if tot else 0.0,
         "por_area": {a: {"items": v[1], "acierto_at_k": round(v[0] / v[1], 4),
@@ -89,6 +85,7 @@ def main(argv: list[str] | None = None) -> int:
           f"{rep['recall_cuerpos_at_k']:.1%} · {rep['items_evaluados']} ítems")
     for a, v in rep["por_area"].items():
         print(f"  {AREA_SLUG.get(a, a):15} {v['acierto_at_k']:6.1%}  ({v['items']} ítems)")
+    print(f"máximo de pasajes del mismo documento → n.º de preguntas: {rep['max_mismo_documento']}")
     print(f"Detalle: {out}")
     return 0
 

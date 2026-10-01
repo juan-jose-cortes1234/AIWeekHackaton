@@ -15,6 +15,7 @@ después, en `src.corpus.fragmentar`.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass
 
 # ARTÍCULO 1o. · ARTICULO 11A. · Artículo 5 bis. · ART. 20. · ARTÍCULO 240-1. ·
@@ -37,14 +38,6 @@ NOTA_RE = re.compile(
     r"legislaci[oó]n anterior|texto original|notas? de la relator[ií]a)\s*:?\s*$", re.IGNORECASE)
 CONCORDANCIA_RE = re.compile(r"^(concordancias|doctrina concordante)\s*:?\s*$", re.IGNORECASE)
 
-SECCION_SENTENCIA_RE = re.compile(
-    r"^(?:[IVXLC]{1,5}[\.\-)]?\s+|\d{1,2}[\.\-)]\s+|[A-H][\.\-)]\s+)?"
-    r"(?P<nombre>S[IÍ]NTESIS(?: DE LA DECISI[OÓ]N)?|RESUMEN|ANTECEDENTES|HECHOS|LA DEMANDA|"
-    r"NORMAS? DEMANDADAS?|TEXTO DE LA NORMA DEMANDADA|INTERVENCIONES|CONCEPTO DEL? .{0,40}|"
-    r"PROBLEMA JUR[IÍ]DICO|CONSIDERACIONES(?: DE LA (?:CORTE|SALA))?(?: Y FUNDAMENTOS)?|"
-    r"FUNDAMENTOS(?: JUR[IÍ]DICOS)?|DECISI[OÓ]N|RESUELVE|SALVAMENTO(?: PARCIAL)? DE VOTO.*|"
-    r"ACLARACI[OÓ]N DE VOTO.*|COMPETENCIA|CASO CONCRETO|AN[AÁ]LISIS DEL CASO.*)\s*:?\s*$",
-    re.IGNORECASE)
 
 PALABRAS_VENTANA = 300
 SOLAPE = 0.15
@@ -191,15 +184,102 @@ def ventanas(parrafos: list[str], palabras: int = PALABRAS_VENTANA,
     return res
 
 
-def segmentar_sentencia(texto: str) -> list[Segmento]:
+# --- Detección estricta de secciones (C-04) -------------------------------------------
+# Un título solo se acepta si (a) coincide COMPLETO con una sección conocida (no basta que
+# la línea empiece igual: "concepto del Procurador." o "aclaración de voto basada en…" son
+# frases del texto) y (b) está en mayúsculas o lleva numeración ("I.", "2.", "B)").
+# Además se respeta el orden de la sentencia: un solo RESUELVE; tras la fórmula de cierre
+# ("Notifíquese…") el texto (firmas, anexos) queda sin etiqueta; los salvamentos y
+# aclaraciones de voto solo se reconocen después del RESUELVE y sus títulos internos no
+# cambian la sección. Ante la duda, sin etiqueta: una etiqueta falsa (p. ej. un argumento
+# marcado como [RESUELVE]) confunde más al modelo que ninguna.
+SALVAMENTO = "SALVAMENTO DE VOTO"
+ACLARACION = "ACLARACIÓN DE VOTO"
+RESUELVE = "RESUELVE"
+_TITULOS = (
+    ("SÍNTESIS", r"SINTESIS( DE LA (DECISION|PROVIDENCIA))?"),
+    ("ANTECEDENTES", r"ANTECEDENTES( PROCESALES)?"),
+    ("HECHOS", r"(LOS )?HECHOS( RELEVANTES)?"),
+    ("LA DEMANDA", r"(LA )?DEMANDA"),
+    ("NORMA DEMANDADA", r"(TEXTO DE )?(LA |LAS )?NORMAS? (DEMANDADAS?|ACUSADAS?)"),
+    ("INTERVENCIONES", r"INTERVENCIONES( CIUDADANAS)?"),
+    ("CONCEPTO DEL MINISTERIO PÚBLICO",
+     r"CONCEPTO DEL? (SENOR )?(PROCURADOR( GENERAL DE LA NACION)?|MINISTERIO PUBLICO)"),
+    ("PROBLEMA JURÍDICO", r"(EL )?PROBLEMAS? JURIDICOS?( Y METODOLOGIA( DE (LA )?DECISION)?)?"),
+    ("CONSIDERACIONES", r"CONSIDERACIONES( DE LA (CORTE( CONSTITUCIONAL)?|SALA( PLENA)?))?"
+                        r"( Y FUNDAMENTOS)?|"
+                        r"FUNDAMENTOS( JURIDICOS)?"),
+    ("COMPETENCIA", r"COMPETENCIA"),
+    ("CASO CONCRETO", r"(EL )?CASO CONCRETO|ANALISIS DEL CASO( CONCRETO)?"),
+    ("DECISIÓN", r"DECISION"),
+    (RESUELVE, r"RESUELVE"),
+)
+_TITULOS_RE = [(nombre, re.compile(patron)) for nombre, patron in _TITULOS]
+_VOTO_RE = re.compile(r"(SALVAMENTO|ACLARACION)( PARCIAL)? DE VOTO\b.*")
+_VOTO_PARTIDO_RE = re.compile(r"(SALVAMENTO|ACLARACION)( PARCIAL)?( DE)?")
+_NUMERACION_RE = re.compile(r"^(?:[IVXLC]{1,6}|\d{1,2}(?:\.\d{1,2})*|[A-H])\s*[\.\-\)]\s*")
+_CIERRE_RE = re.compile(r"^(notif[ií]quese|c[oó]piese|comun[ií]quese|publ[ií]quese|c[uú]mplase)",
+                        re.IGNORECASE)
+
+
+def _normal(s: str) -> str:
+    s = "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn")
+    return re.sub(r"\s+", " ", s).upper().strip(" .:;")
+
+
+def _mayusculas(s: str) -> bool:
+    letras = [c for c in s if c.isalpha()]
+    return bool(letras) and sum(c.isupper() for c in letras) / len(letras) >= 0.8
+
+
+def titulo_seccion(linea: str) -> str | None:
+    """Nombre canónico de la sección si `linea` es un título de sentencia; si no, None."""
+    s = linea.strip()
+    if not s or len(s) > 200:
+        return None
+    m = _NUMERACION_RE.match(s)
+    if m and "." in m.group(0).strip().rstrip(".-)"):
+        return None                        # "7.1. Decisión del juez…": subtítulo, no sección
+    numerada, resto = bool(m), s[m.end():] if m else s
+    norm = _normal(resto)
+    if _mayusculas(resto) and _VOTO_RE.fullmatch(norm):
+        return SALVAMENTO if norm.startswith("SALVAMENTO") else ACLARACION
+    if len(s) > 120 or not (numerada or _mayusculas(resto)):
+        return None
+    for nombre, patron in _TITULOS_RE:
+        if patron.fullmatch(norm):
+            return nombre
+    return None
+
+
+def secciones_sentencia(texto: str) -> list[tuple[str | None, list[str]]]:
+    """Bloques (sección, líneas) de una sentencia, respetando el orden del documento."""
     bloques: list[tuple[str | None, list[str]]] = [(None, [])]
-    for linea in texto.split("\n"):
-        s = linea.strip()
-        m = SECCION_SENTENCIA_RE.match(s) if s and len(s) <= 120 else None
-        if m:
-            bloques.append((m.group("nombre").upper().rstrip(":"), [s]))
+    estado = "cuerpo"                      # cuerpo → resuelve → cierre → voto
+    lineas = texto.split("\n")
+    for i, linea in enumerate(lineas):
+        t = titulo_seccion(linea)
+        if (t is None and estado != "cuerpo" and i + 1 < len(lineas)
+                and _VOTO_PARTIDO_RE.fullmatch(_normal(linea)) and _mayusculas(linea)):
+            # "ACLARACIÓN DE" / "VOTO A LA SENTENCIA…": título de voto partido en dos líneas.
+            t = titulo_seccion(f"{linea.strip()} {lineas[i + 1].strip()}")
+        if t in (SALVAMENTO, ACLARACION) and estado != "cuerpo":
+            bloques.append((t, [linea]))
+            estado = "voto"
+        elif estado == "cuerpo" and t and t not in (SALVAMENTO, ACLARACION):
+            bloques.append((t, [linea]))
+            if t == RESUELVE:
+                estado = "resuelve"
+        elif estado == "resuelve" and _CIERRE_RE.match(linea.strip()):
+            bloques.append((None, [linea]))   # firmas y anexos: sin etiqueta
+            estado = "cierre"
         else:
             bloques[-1][1].append(linea)
+    return bloques
+
+
+def segmentar_sentencia(texto: str) -> list[Segmento]:
+    bloques = secciones_sentencia(texto)
 
     segs: list[Segmento] = []
     for nombre, lineas in bloques:

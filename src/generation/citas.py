@@ -24,6 +24,8 @@ from src.oficial import citations as C
 
 MAX_EVIDENCIA = 10
 REEMPLAZO = "la normativa aplicable"
+SIN_JURISPRUDENCIA = "La evidencia recuperada no incluye jurisprudencia pertinente para el caso."
+SIN_RESPALDO_OPCION = "La evidencia recuperada no respalda esta opción."
 _ORACION = re.compile(r"(?<=[.;:!?])\s+(?=[A-ZÁÉÍÓÚÑ¿(\"“])")
 _SENTENCIA_PREVIA = re.compile(r"(?:\b(?:la|las|el)\s+)?\bsentencias?\s+(?:de\s+tutela\s+|de\s+unificaci[óo]n\s+)?$",
                                re.IGNORECASE)
@@ -196,8 +198,14 @@ def postprocesar(item: dict, datos: dict, pasajes, cfg: Config = config) -> Post
         just = limpio(datos.get("justificacion"))
         if refs:
             just = f"{just} Fundamento normativo: {'; '.join(refs)}.".strip()
-        descartes = {l: limpio(v) for l, v in (datos.get("descarte_opciones") or {}).items()
-                     if l != datos.get("respuesta_correcta")}
+        # Los descartes salen del análisis por opción (C-03); "descarte_opciones" queda como
+        # respaldo si una salida antigua o rescatada lo trae.
+        fuente = datos.get("analisis_opciones") or datos.get("descarte_opciones") or {}
+        descartes = {l: limpio(v) for l, v in fuente.items()
+                     if l != datos.get("respuesta_correcta") and str(v or "").strip()}
+        for l in sorted(item.get("opciones") or {}):
+            if l != datos.get("respuesta_correcta") and not descartes.get(l):
+                descartes[l] = SIN_RESPALDO_OPCION
         campos = {"respuesta_correcta": datos.get("respuesta_correcta"),
                   "justificacion": just, "descarte_opciones": descartes}
     elif f == "semi_open":
@@ -212,6 +220,12 @@ def postprocesar(item: dict, datos: dict, pasajes, cfg: Config = config) -> Post
         analisis = limitar(limpio(datos.get("analisis")), 8)
         juris = limpio(datos.get("jurisprudencia"))
         concl = limpio(datos.get("conclusion"))
+        # Respuesta rescatada de una salida cortada: completar lo que falte, sin inventar
+        # contenido jurídico (el evaluador da por fallida una línea con campos vacíos).
+        if analisis and not concl:
+            concl = limitar(analisis.split(". ")[-1], 1) or analisis
+        if (marco or analisis) and not juris:
+            juris = SIN_JURISPRUDENCIA
         ya = cuerpos(" ".join((marco, analisis, juris, concl)))
         faltan = [r for r in refs if not cuerpos(r) <= ya]
         if faltan:
