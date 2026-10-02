@@ -493,3 +493,4 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 - Informe y reporte: resultados presentados como del sistema de entrega (umbral 0,025), respaldado por la verificación sobre las trazas de v12 (ninguna respuesta cambia). PDF: reporte 1 pág., informe 3 págs.
 - corpus_manifest.json con equipo (Los PoliTICos) y enlace de OneDrive (TEAM_NAME en .env.example; CORPUS_ZIP_URL solo al generar, para no romper run.py). Zip regenerado como dist/corpus_los_politicos.zip, sha 8e458535…; README actualizado (nombre y sha); retirado dist/corpus_equipo.zip.
 - Segmentación descrita con precisión (revisión del equipo): 47.340 artículos, 23.472 secciones, 1.212 preámbulos, 4.990 notas; 17.618 fragmentos de textos subdivididos. Reporte (1 pág.), informe y README actualizados.
+- Reporte de avance: enlace de OneDrive (corpus e índice) bajo el del repositorio; vínculos clicables en el PDF (1 página).

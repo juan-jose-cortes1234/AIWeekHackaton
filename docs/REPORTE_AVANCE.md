@@ -3,7 +3,8 @@
 **Equipo:** Los PoliTICos
 **Integrantes:** Juan José Cortés Villamil · Pablo Medina Forero · Miguel Santiago Roa Vallejo
 **Fecha:** 2 de octubre de 2026  
-**Repositorio:** https://github.com/juan-jose-cortes1234/AIWeekHackaton
+**Repositorio:** https://github.com/juan-jose-cortes1234/AIWeekHackaton  
+**Corpus e índice (OneDrive, `corpus_los_politicos.zip`):** [https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk](https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk)
 
 ## 1. Puntaje sobre las preguntas de muestra
 
