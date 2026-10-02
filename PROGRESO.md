@@ -480,3 +480,8 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 - Ampliación de Pablo: 21 documentos nuevos verificados (número y año en el texto, articulado, sha igual a su nota, sin duplicados): 15 leyes de convenios tributarios (Cancillería), decretos del salario mínimo 2026 (1469/2025, suspendido provisionalmente, y 159/2026 transitorio) y auxilio de transporte 2023–2026. Ya estaban 8; excluidos Decreto 875/2008 y 2737/1989 (decisión del usuario). Validador: 650 documentos.
 - Corpus v6: 650 documentos, 77.014 fragmentos; anti-fuga sin graves; los 21 nuevos citables; muestra sin normas faltantes. Paquete 11:56, huella 4c1a571382e6 (C-16, C-17, C-18, corpus v6), sin índice.
 - `runs/muestra_v11` (paquete de las 10:05: C-16 + C-17, Gemma Q8 sin formateador, corpus 618): 49,58/80, MC 10/15 (gana 528, sin pérdidas), citas 38, RAGAS 0,4276, juez sin fallos. Índice de esa corrida no instalado (más viejo que los fragmentos locales). Siguiente: correr el paquete de las 11:56 (huella 4c1a571382e6: + formateador de Gemma C-18 y corpus de 650).
+
+## 2026-10-02 — `runs/muestra_v12` (paquete 11:56: C-16, C-17, C-18, corpus de 650) — NUEVO MEJOR
+- **53,09/80** (antes 49,64), juez sin fallos: cerradas **11/15** (14,67; gana la 748) · citas 40 (16,33; recall 0,816) · abstención 8,37 · RAGAS 0,4572 (13,72). Normas de referencia en la evidencia 46/49. 40 s por pregunta en T4 (MC 40, semiabiertas 34, abiertas 76).
+- Índice de Colab = fragmentos locales (77.014; 1.834 embeddings nuevos); instalado y verificado (reutilizado).
+- Actualizados con v12: informe técnico (PDF de 3 páginas), README, reporte de avance (PDF de 1 página). Zip oficial de corpus e índice regenerado con `src.corpus.empaquetar` (sha nuevo para el README y .env).

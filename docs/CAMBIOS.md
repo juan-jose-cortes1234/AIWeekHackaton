@@ -491,3 +491,8 @@ de tres. Decisión de C-09 y C-10 pendiente de recalificar con RAGAS.
   no pierde ninguna; la 58 y la 128 siguen en C y B: las reglas 1 y 2 no las movieron) · citas 38
   (15,51) · abstención 7,91 · RAGAS 0,4276 (12,83; v10 0,4335). Abiertas más largas (245–413
   palabras). 41 s por pregunta.
+
+## Resultado de `muestra_v12` (C-16, C-17, C-18; corpus de 650 documentos; Colab) — mejor corrida
+- **53,09/80**, juez sin fallos: cerradas 11/15 (14,67) · citas 40 (16,33) · abstención 8,37 ·
+  RAGAS 0,4572 (13,72). Frente a v11 (mismos prompts, sin C-18 y con 618 documentos): gana la 748
+  sin perder ninguna; citas +2; RAGAS 0,428 → 0,457. Fallan 58 y 128 (claves discutibles), 647 y 671.
