@@ -2,7 +2,7 @@
 
 **Equipo:** Los PoliTICos
 **Integrantes:** Juan José Cortés Villamil · Pablo Medina Forero · Miguel Santiago Roa Vallejo
-**Fecha:** 2 de octubre de 2026  
+**Fecha de la medición:** 2 de octubre de 2026  
 **Repositorio:** https://github.com/juan-jose-cortes1234/AIWeekHackaton  
 **Corpus e índice (OneDrive, `corpus_los_politicos.zip`):** [https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk](https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk)
 
@@ -31,7 +31,10 @@ muestra queda sin fundamento suficiente, por lo que no hubo abstenciones.
 | Documentos | 650: Constitución, 14 códigos, 149 leyes (16 convenios de doble imposición), 40 decretos, 30 resoluciones, 11 circulares, 2 decisiones andinas, 141 sentencias, 262 conceptos (DIAN, SIC, Supersociedades) |
 | Fragmentos indexados | 77.014: 47.340 de artículos, 23.472 de secciones, 1.212 de preámbulos y 4.990 de notas |
 | Áreas del banco cubiertas | Las 10 (de 43 documentos en penal a 252 en tributario) |
+| Áreas del banco sin cobertura | Ninguna |
 | Cobertura del listado inicial (seed) | 98 %–100 % de los ítems por área |
+
+Fuentes consultadas: Gestor Normativo de Función Pública, Secretaría del Senado, relatorías de la Corte Constitucional, la Corte Suprema y el Consejo de Estado, normogramas de la DIAN, Cancillería, MinTIC y Colpensiones, SIC, Supersociedades, Bogotá Jurídica y Comunidad Andina.
 
 
 ## 3. Arquitectura actual
