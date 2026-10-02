@@ -33,6 +33,10 @@ MODELOS_ABIERTOS = {
     "decoder": {
         "Qwen/Qwen3-8B": "Apache-2.0",
         "Qwen/Qwen3-8B-GGUF": "Apache-2.0",
+        # Gemma 4 E4B: 7.996.156.490 parámetros en total con las partes multimodales
+        # (safetensors de google/gemma-4-E4B-it), por debajo del límite de 8B del reto.
+        "google/gemma-4-E4B-it": "Apache-2.0",
+        "ggml-org/gemma-4-E4B-it-GGUF": "Apache-2.0",
         "BSC-LT/salamandra-7b-instruct": "Apache-2.0",
     },
     "encoder": {
@@ -87,21 +91,22 @@ class Config:
     rerank_candidatos_opcion: int = 8 # MC: candidatos que el reranker reordena por opción
     mc_analisis_previo: bool = False  # MC: True = analizar cada opción antes de elegir (C-03)
     mc_modo: str = "directo"           # MC: "directo" = elegir con las opciones a la vista; "abierta" = responder sin opciones y luego elegir (C-08, descartado por latencia)
-    mc_razonamiento_tokens: int = 1024  # MC: tope del modo de razonamiento de Qwen3 (C-09); 0 = sin razonamiento
+    mc_razonamiento_tokens: int = 0     # MC: tope del modo de razonamiento de Qwen3 (C-09; apagado: ganancia inestable, menos citas y el doble de tiempo); >0 lo activa
     mc_consulta_opcion: str = "clave"  # MC: "clave" = opción + palabras clave de la pregunta; "pregunta" = pregunta completa + opción (C-03)
     mc_palabras_clave: int = 10       # MC: palabras de la pregunta que acompañan a cada opción (modo "clave")
     max_por_documento: int = 4        # 0 = sin tope; no aplica a documentos mencionados
-    max_complementarios: int = 2      # pasajes de documentos complementarios entre los 10 (C-10); 0 = sin tope
+    cuota_normas: int = 4             # pasajes reservados a normas (no sentencias ni conceptos) entre los 10 (C-14); 0 = sin cupo
+    max_complementarios: int = 0      # pasajes de documentos complementarios entre los 10 (C-10; 0 = sin tope, decisión 2026-10-02)
     documentos_complementarios: Path = RAIZ / "config" / "documentos_complementarios.txt"
     umbral_cita: float = 0.5
     max_referencias: int = 6
-    umbral_abstencion: float = 0.05
-    umbral_abstencion_denso: float = 0.35
+    umbral_abstencion: float = 0.0     # texto libre: 0 = sin abstención por baja pertinencia (C-13, pesos oficiales)
+    umbral_abstencion_denso: float = 0.0  # ídem cuando no hay reranker (antes 0.35)
 
     decoder_backend: str = "llamacpp"
-    decoder_model: str = "Qwen/Qwen3-8B"
-    decoder_gguf_repo: str = "Qwen/Qwen3-8B-GGUF"
-    decoder_gguf_file: str = "Qwen3-8B-Q4_K_M.gguf"
+    decoder_model: str = "google/gemma-4-E4B-it"          # C-15 (antes Qwen/Qwen3-8B)
+    decoder_gguf_repo: str = "ggml-org/gemma-4-E4B-it-GGUF"  # antes Qwen/Qwen3-8B-GGUF
+    decoder_gguf_file: str = "gemma-4-E4B-it-Q8_0.gguf"      # antes Qwen3-8B-Q4_K_M.gguf
     decoder_device: str = "cpu"
     decoder_temperature: float = 0.0
     decoder_seed: int = 42

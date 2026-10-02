@@ -167,14 +167,8 @@ Para `--ragas` en local: `pip install -r scripts/requirements-evaluador.txt`. Ca
 juez consume la llave: úsela solo para mediciones que valgan la pena.
 
 **Si el reporte avisa "El juez no devolvió veredicto en N items"** (fallos de red entre la máquina
-y OpenRouter; cuentan como cero y falsean la comparación), repetir solo la calificación con el
-juez espaciado: es el mismo `scripts/evaluate.py` (sin copiarlo ni modificarlo) con 4 llamadas
-simultáneas en vez de 16, 600 s por ítem y reintentos. Solo para nuestras mediciones; el jurado
-usa el evaluador tal cual.
-```bash
-python -m src.eval.evaluar --submission runs/<TAG>/submissions.jsonl --split sample --ragas --out runs/<TAG>/reporte_ragas_espaciado.json
-```
-En los cuadernos es la celda 8b.
+y OpenRouter; cuentan como cero): repetir la evaluación con `--ragas`, preferiblemente desde Colab o el
+computador (en Kaggle los fallos de red fueron frecuentes).
 
 ### 5.5 Local (CPU; solo para pocas preguntas)
 ```bash

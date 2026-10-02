@@ -33,6 +33,7 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 | 2026-10-01 | muestra_v4 (Kaggle T4) | 338 | 68.603 | 13,33 | 13,88 | 7,67 | 5,23* | 40,11/80* | 39,7 | C-09 (razonamiento en MC) + C-10 (tope de complementarias). *El juez no dio veredicto en 21 de 33 |
 | 2026-10-01 | muestra_v6 (Kaggle T4) | 338 | 68.603 | 13,33 | 14,29 | 7,67 | 11,03* | 46,32/80* | — | C-11 (abiertas ≤ 200 palabras; no se acortaron por el postproceso). *7 de 33 sin veredicto del juez |
 | 2026-10-01 | muestra_v7 (Colab T4) | 338 | 68.603 | 13,33 | 14,29 | 7,67 | 13,28 | 48,57/80 | — | Igual que v6 + C-12; **juez con 0 fallos** (Colab) |
+| 2026-10-02 | muestra_v8 (Kaggle T4) | 618 | 75.204 | 12,00 | 14,29 | 7,44 | 13,07* | 46,80/80 | — | Corpus v4 (+280 conceptos, resoluciones y circulares). *1 de 33 sin veredicto |
 
 ---
 
@@ -453,3 +454,16 @@ Cada iteración del loop añade una entrada **al final** con esta plantilla:
 - Build corpus v4: **618 documentos, 75.204 fragmentos (+6.601)**, guardia anti-fuga sin graves, secciones OK, manifiesto y CORPUS.md regenerados. No citables: 262 conceptos (esperado) y las 5 partes de la Circular Única de la SIC (sin número; es la Circular Externa 10 de 2001: decisión del equipo). Resoluciones y demás circulares, citables.
 - `dist/paquete_colab.zip` (331,8 MB, 6.600 embeddings por calcular) para `notebooks/indice_en_colab.ipynb`, que ahora busca el zip en Drive si cambió de nombre e imprime `PAQUETE.txt`. Las 280 fuentes nuevas no están en `config/documentos_complementarios.txt` (son principales).
 - Circular Única de la SIC (5 títulos): `numero=10`, `anio=2001` (es la Circular Externa 10 de 2001) ⇒ citable; encabezado "… (Circular 10 de 2001)". Corpus reconstruido (618 documentos, 75.204 fragmentos). Tope de complementarias sin cambios (decisión del usuario: probar primero el corpus solo). `dist/paquete_colab_muestra.zip` sin índice (el cuaderno lo construye: ~7.000 embeddings), cuadernos `TAG = "muestra_v8"`. Se retira `dist/paquete_colab.zip` (quedaba con la circular sin número).
+
+## 2026-10-02 — `runs/muestra_v8` (corpus v4, Kaggle)
+- Índice de Kaggle = fragmentos locales (`sha256_chunks` e8f893…, 75.204; 6.600 embeddings en 561 s); instalado en `build/indice/` y `build/cache/emb/`; `src.index.build` → reutilizado.
+- **46,80/80** (v7, mismo sistema con el corpus anterior: 48,57): cerradas 9/15 (gana 58 → C? no: 58 B→C sigue mal; pierde 528 C→D) · citas 35 (= v7; gana 1073, pierde 247) · abstención 7,44 (247 ya no trae su norma) · RAGAS 0,4357 con 1 sin veredicto (calificadas 0,4765 vs 0,4696 de v7).
+- El razonamiento en MC (C-09) sigue activo: 15/15 con razonamiento. Con corpus v4 vuelve a 9/15 (la 528 que ganaba se pierde): ganancia inestable.
+- `dist/paquete_colab_muestra.zip` con `--con-indice` (666,5 MB, índice + caché + fragmentos) para compartir por OneDrive.
+- C-09 y C-10 apagados por defecto (decisión del usuario); cuadernos `TAG = "muestra_v9"`; paquete con índice regenerado.
+- C-13 (sin abstención por baja pertinencia en texto libre) + pruebas de abstención actualizadas (sin correr). Paquete v9 regenerado: C-09 off, C-10 off, C-13 on.
+- C-14 (cupo de 4 normas entre los 10) implementado + prueba (sin correr). v9 = corpus v4 + C-09 off + C-10 off + C-13 + C-14. Paquete regenerado.
+- Resultado v9 registrado (citas 38, sin juez 35,18). C-15: decoder Gemma 4 E4B (ggml-org GGUF Q8_0; Apache-2.0; 7.996.156.490 parámetros; gemma4 soportado por la llama.cpp instalada). El .env local del usuario aún fija Qwen (no se toca: contiene la llave). Cuadernos TAG muestra_v10. Paquete regenerado.
+- Prueba local de Gemma 4 E4B (Q8_0, CPU, `runs/gemma_local`, pregunta 748, con autorización): carga y plantilla de chat OK, JSON válido, respuesta en español, 209 s (160 s de generación, 277 tokens). Eligió D (correcta A), como Qwen. La evidencia ya traía 8 normas (el cupo de C-14 no cambia nada aquí), pero no el art. 137 del CPACA: la búsqueda no lo encuentra entre los candidatos.
+- `notebooks/muestra_en_colab_sin_juez.ipynb`: copia del cuaderno de Colab sin las celdas del juez (llave, RAGAS y RAGAS espaciado), para el compañero; conserva la evaluación oficial sin juez. TAG muestra_v10.
+- A pedido del usuario: eliminados `notebooks/muestra_en_colab_sin_juez.ipynb`, la celda 8b (juez espaciado) de los cuadernos y `src/eval/evaluar.py`; solo se usa `scripts/evaluate.py`. Guía §5.4 ajustada.

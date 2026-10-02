@@ -352,3 +352,73 @@ de tres. Decisión de C-09 y C-10 pendiente de recalificar con RAGAS.
   correr: el usuario pide que se le pregunte antes).
 - **Archivos:** `src/generation/citas.py`, `tests/test_citas.py`.
 - **Requiere reindexar:** no.
+
+## Decisión 2026-10-02 · C-09 y C-10 apagados por defecto
+- **C-09 (razonamiento en MC) → `MC_RAZONAMIENTO_TOKENS=0`.** Comparación limpia (juez sin fallos):
+  v7 10/15 en MC pero citas 39 → 35 frente a v2; con el corpus v4 (v8) volvió a 9/15 (pierde la
+  528 que había ganado). Ganancia inestable, menos normas citadas en las justificaciones y ~63 s
+  por MC frente a ~30 s.
+- **C-10 (tope de complementarias) → `MAX_COMPLEMENTARIOS=0` (sin tope).** Su premisa era errónea
+  (la caída de RAGAS de v3 eran fallos del juez) y no mostró beneficio.
+- El código de ambos queda; se reactivan con su variable. Medición: `muestra_v9` (corpus v4).
+
+## C-13 · 2026-10-02 · Sin abstención por baja pertinencia en texto libre
+- **Antes:** en texto libre, el sistema se abstenía si ningún pasaje superaba 0,05 de pertinencia
+  según el reranker (0,35 con el denso, si no hay reranker). En todas las corridas se abstuvo en dos
+  preguntas (513 y 697; posiciones 19 y 38), cuyo fundamento no es una norma del corpus.
+- **Ahora:** `UMBRAL_ABSTENCION=0` y `UMBRAL_ABSTENCION_DENSO=0`: solo se abstiene si el modelo no
+  produce una respuesta utilizable. Selección múltiple sigue sin abstenerse nunca. El mecanismo del
+  umbral queda (se reactiva con la variable).
+- **Por qué (regla general, derivada de la fórmula oficial, no de preguntas concretas):** en
+  `scripts/evaluate.py`, una abstención vale 0 en RAGAS (30 pts); en el componente de abstención (10
+  pts) vale medio acierto solo si la pregunta tiene fundamento citable y se habría fallado su norma,
+  y las preguntas de texto libre sin fundamento citable ni siquiera entran a ese componente.
+  Responder con una nota RAGAS modesta vale más que abstenerse.
+- **Evidencia:** pendiente (`muestra_v9`, junto con C-09 y C-10 apagados; solo afecta a las preguntas
+  donde antes se abstenía).
+- **Archivos:** `src/config.py`, `.env.example`, `tests/test_abstencion.py`.
+- **Requiere reindexar:** no.
+
+## C-14 · 2026-10-02 · Cupo de normas en la evidencia (hasta 4 de 10)
+- **Antes:** los 10 pasajes salían del orden del reranker sin distinguir tipo de documento. Los
+  fragmentos de sentencia (largos, argumentativos) desplazaban a los artículos de ley: en MC, la 748
+  (falsa motivación) nunca trajo el art. 137 del CPACA y la 647 (ayuda en el matrimonio) nunca trajo
+  el art. 176 del Código Civil, aunque ambos están en el corpus; la evidencia eran sentencias.
+- **Ahora:** `CUOTA_NORMAS=4`: si entre los 10 hay menos de 4 normas (Constitución, códigos, leyes,
+  decretos, decisiones andinas, resoluciones, circulares; no sentencias ni conceptos), las mejores
+  normas que siguen en la lista de candidatos (ya filtrada por los topes) reemplazan a los últimos
+  pasajes que no son normas, conservando el orden de pertinencia. Las búsquedas con menos pasajes
+  reservan la parte proporcional (por opción: 2 de 4; puestos de la pregunta en MC: 2 de 4). Si ya
+  hay suficientes normas o no hay candidatas, la evidencia queda idéntica a la de antes. `0` apaga.
+- **Por qué:** regla general (vale para las 992): las normas son lo que se cita y lo que el
+  evaluador reconoce; la diversidad por tipo evita que una sentencia larga acapare la evidencia.
+- **Evidencia:** pendiente (`muestra_v9`). Prueba `test_aplicar_cuota_de_normas` (sin correr).
+- **Archivos:** `src/retrieval/hibrido.py` (`TIPOS_NORMA`, `aplicar_cuota`, `cuota_para`,
+  `es_norma`), `src/generation/responder.py` (`recuperar_mc`), `src/config.py`, `.env.example`,
+  `tests/test_hibrido.py`.
+- **Requiere reindexar:** no.
+
+## Resultado de `muestra_v9` (C-09 y C-10 apagados, C-13, C-14; corpus v4; Kaggle)
+- Deterministas (el juez falló en 6 de 33 por la red de Kaggle; RAGAS sin comparar): cerradas 9/15
+  (= v8) · **citas 35 → 38 (15,51)** · abstención 7,44 → 7,67 · **sin juez 33,73 → 35,18**.
+  Sin abstenciones: las posiciones 19 y 38 (513 y 697) ahora se responden.
+
+## C-15 · 2026-10-02 · Decoder: Gemma 4 E4B en lugar de Qwen3-8B
+- **Antes:** `Qwen/Qwen3-8B-GGUF`, Q4_K_M, con `/no_think`.
+- **Ahora:** `ggml-org/gemma-4-E4B-it-GGUF`, `gemma-4-E4B-it-Q8_0.gguf` (~8 GB; cabe en una T4 con el
+  encoder y el reranker). Propuesto por el equipo por sus buenos resultados. Verificado contra el
+  reglamento: licencia **Apache-2.0** (ficha y metadatos de Hugging Face), **7.996.156.490
+  parámetros** en total incluyendo las partes multimodales (safetensors de `google/gemma-4-E4B-it`),
+  bajo el límite de 8B; no restringido. La llama.cpp de `llama-cpp-python==0.3.35` ya incluye la
+  arquitectura `gemma4`. Temperatura 0 y salida JSON por gramática, como antes. Sin razonamiento:
+  Gemma 4 solo razona con `<|think|>` en el prompt de sistema, que no se usa; `/no_think` y C-09 se
+  desactivan solos al no ser Qwen3. El formato de chat sale del GGUF.
+- **Por qué:** probar un decoder distinto en la misma clase de tamaño; la selección múltiple está
+  estancada en 9–10/15 con Qwen3.
+- **Riesgos sin verificar:** que la plantilla de chat del GGUF funcione con el formateador de
+  llama-cpp-python, y que los prompts (afinados para Qwen) rindan igual. Backend `transformers` no
+  probado con Gemma (es multimodal).
+- **Evidencia:** pendiente (`muestra_v10`: igual a v9 salvo el decoder).
+- **Archivos:** `src/config.py` (lista blanca y valores por defecto), `.env.example`,
+  `src/generation/llm.py` y `src/pipeline/main.py` (textos), cuadernos (celda 4, `TAG`).
+- **Requiere reindexar:** no.

@@ -136,9 +136,11 @@ def recuperar_mc(item: dict, rec: Recuperador, cfg: Config = config) -> list[Pas
         elegidos.append(p)
         return True
 
-    for p in base:
-        if len(elegidos) >= min(cfg.puestos_pregunta, k):
-            break
+    # Puestos de la pregunta: los mejores de su búsqueda, respetando el cupo de normas (C-14).
+    from src.retrieval.hibrido import aplicar_cuota, cuota_para
+
+    puestos = min(cfg.puestos_pregunta, k)
+    for p in aplicar_cuota(base, puestos, cuota_para(puestos, cfg), rec.es_norma):
         admitir(p)
     for ronda in range(cfg.pasajes_por_opcion + 2):
         for letra, candidatos in por_opcion.items():

@@ -6,7 +6,7 @@ Uso:
     python -m src.pipeline.main --split sample --ids 51,290 --no-cache --out runs/verif.jsonl
     python -m src.pipeline.main --split test --rango 1 250 --tag sabado_1   # preguntas 1.ª a 250.ª
 
-Por ítem: recuperar (híbrido + reranker) → generar (Qwen3-8B, temperatura 0) →
+Por ítem: recuperar (híbrido + reranker) → generar (decoder abierto, temperatura 0) →
 post-filtro de citas → abstención → validación contra el esquema → escritura
 inmediata (reanudable: los ids ya presentes en la salida se saltan).
 Trazas por ítem en `<dir>/trazas.jsonl` y tiempos en `<dir>/tiempos.json`.

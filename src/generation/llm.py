@@ -1,9 +1,10 @@
 """Decoder abierto en proceso, con pesos de Hugging Face (ARQUITECTURA §5).
 
 Backends (sin APIs ni servidores):
-- `llamacpp`: llama-cpp-python + GGUF oficial (`Qwen/Qwen3-8B-GGUF`). CPU o GPU.
+- `llamacpp`: llama-cpp-python + GGUF (por defecto `ggml-org/gemma-4-E4B-it-GGUF`, Q8_0;
+  antes `Qwen/Qwen3-8B-GGUF`). CPU o GPU. El formato de chat sale del propio GGUF.
   La salida JSON se fuerza con una gramática derivada del JSON schema.
-- `transformers`: `Qwen/Qwen3-8B` con transformers (GPU). Decodificación voraz
+- `transformers`: el modelo original con transformers (GPU; probado solo con Qwen3). Decodificación voraz
   y parser tolerante con un reintento.
 
 Siempre: temperatura 0 (decodificación voraz), semilla fija y lista blanca de modelos

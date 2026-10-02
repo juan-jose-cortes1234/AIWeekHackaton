@@ -91,3 +91,14 @@ def test_tope_de_complementarios_y_excepcion_si_se_menciona(rec, tmp_path):
     assert sum(p.doc_id == "ley_1150_2007" for p in sin_mencion) <= 1
     con_mencion = tope.buscar("plazo según la Ley 1150 de 2007 palabra1 palabra200 palabra400", k=10)
     assert sum(p.doc_id == "ley_1150_2007" for p in con_mencion) > 1    # mencionada: sin tope
+
+
+def test_aplicar_cuota_de_normas():
+    from src.retrieval.hibrido import aplicar_cuota
+
+    es = lambda x: x.startswith("N")
+    # Faltan normas entre los 4 primeros: las mejores normas siguientes reemplazan a los últimos.
+    assert aplicar_cuota(["S1", "S2", "N1", "S3", "S4", "N2", "N3"], 4, 2, es) == ["S1", "S2", "N1", "N2"]
+    # Ya hay suficientes, o no hay normas candidatas: queda igual.
+    assert aplicar_cuota(["N1", "N2", "S1", "S2", "S3"], 4, 2, es) == ["N1", "N2", "S1", "S2"]
+    assert aplicar_cuota(["S1", "S2", "S3", "S4", "S5"], 4, 2, es) == ["S1", "S2", "S3", "S4"]

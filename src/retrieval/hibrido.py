@@ -51,6 +51,39 @@ def _cuerpos(texto: str) -> set[tuple]:
 
 
 
+# Tipos de documento que cuentan como "norma" para el cupo de C-14 (no sentencias ni conceptos).
+TIPOS_NORMA = frozenset({"constitucion", "codigo", "ley", "decreto", "decreto_ley",
+                         "acto_legislativo", "decision_andina", "resolucion", "circular"})
+
+
+def aplicar_cuota(elegibles: list, k: int, cuota: int, es_norma) -> list:
+    """Los `k` primeros de `elegibles` (ya en orden de pertinencia) con al menos `cuota` normas.
+
+    Si entre los primeros `k` hay menos normas que `cuota`, las mejores normas que siguen en la
+    lista reemplazan a los últimos que no son normas. Si no hay normas suficientes, se usa lo que
+    haya. Conserva el orden de pertinencia original. Determinista.
+    """
+    cabeza = list(elegibles[:k])
+    faltan = cuota - sum(1 for x in cabeza if es_norma(x))
+    if faltan <= 0:
+        return cabeza
+    extra = [x for x in elegibles[k:] if es_norma(x)][:faltan]
+    if not extra:
+        return cabeza
+    quitar = [x for x in reversed(cabeza) if not es_norma(x)][:len(extra)]
+    extra = extra[:len(quitar)]
+    orden = {id(x): n for n, x in enumerate(elegibles)}
+    return sorted([x for x in cabeza if all(x is not q for q in quitar)] + extra,
+                  key=lambda x: orden[id(x)])
+
+
+def cuota_para(k: int, cfg: Config) -> int:
+    """Cupo de normas para una búsqueda de `k` pasajes (proporcional a `CUOTA_NORMAS` sobre 10)."""
+    if not cfg.cuota_normas or not cfg.top_k_pasajes:
+        return 0
+    return min(k, round(cfg.cuota_normas * k / cfg.top_k_pasajes))
+
+
 def leer_complementarios(ruta: Path | None) -> frozenset[str]:
     """doc_id de los documentos complementarios (C-10): uno por línea, `#` para comentarios.
 
@@ -210,6 +243,11 @@ class Recuperador:
                 score_bm25=s_bm25.get(i), score_rerank=s_rerank.get(i), origen=orig,
                 meta={k2: c.get(k2) for k2 in ("articulo", "seccion", "tipo_fragmento",
                                                "nombre_canonico", "areas", "url")}))
-            if len(res) >= k:
+            # Se sigue recorriendo más allá de k (hasta 3k) para tener normas con qué cumplir el
+            # cupo de C-14; los topes de arriba ya se aplicaron a todos estos.
+            if len(res) >= (3 * k if cfg.cuota_normas else k):
                 break
-        return res
+        return aplicar_cuota(res, k, cuota_para(k, cfg), self.es_norma)
+
+    def es_norma(self, p: "Pasaje") -> bool:
+        return self.chunks[p.id].get("tipo_norma") in TIPOS_NORMA
