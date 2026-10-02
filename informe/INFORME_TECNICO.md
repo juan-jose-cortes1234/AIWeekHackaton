@@ -1,108 +1,117 @@
-# Informe técnico — <Nombre del equipo>
+# Informe técnico — Los PoliTICos
 
 **Hackathon 2026 · Universidad de los Andes**
-**Integrantes:** <nombre 1> · <nombre 2> · <nombre 3>
-
-<!-- BORRADOR generado a partir del código y de las mediciones registradas en
-PROGRESO.md. Completar los marcadores <…> con las mediciones sobre la muestra y
-exportar a informe/INFORME_TECNICO.pdf (máximo 3 páginas). -->
+**Integrantes:** Juan José Cortés Villamil · Pablo Medina Forero · Miguel Santiago Roa Vallejo
 
 ---
 
 ## 1. Arquitectura del sistema
 
-Una pregunta recorre cinco etapas, todas deterministas y ejecutadas en proceso
-con modelos abiertos descargados de Hugging Face (ningún modelo cerrado ni API
-de terceros interviene; una lista blanca en la configuración lo impone):
+Una pregunta recorre cinco etapas deterministas, ejecutadas en proceso con modelos abiertos
+descargados de Hugging Face. Ningún modelo cerrado ni API de terceros interviene; una lista blanca
+de modelos abiertos en la configuración lo impone. El único servicio externo es el juez de RAGAS,
+que usa el evaluador oficial.
 
-1. **Ingesta (previa).** Cada documento del corpus (`fuentes.csv` + HTML/PDF/DOCX)
-   se limpia, se segmenta **por artículo** (sentencias: por secciones) y cada
-   fragmento se encabeza con el nombre canónico de su norma —«Ley 1150 de 2007,
-   artículo 11.»—, verificado con el mismo extractor de citas del evaluador. Una
-   guardia anti-fuga bloquea la indexación si detecta material del banco.
-2. **Indexación (previa).** Embeddings `bge-m3` en un índice FAISS exacto y un
-   índice BM25 con tokenizador jurídico; el índice se congela por sha256.
-3. **Recuperación.** Router de artículos citados en la pregunta + BM25 + denso,
-   fusionados con RRF, sesgo por área, diversidad por artículo y reordenamiento
-   con `bge-reranker-v2-m3`; en selección múltiple cada opción es una consulta
-   adicional. Salen 10 pasajes.
-4. **Generación.** Qwen3-8B recibe los pasajes numerados `[P1]…[P10]` completos
-   (si no caben en la ventana, se descartan pasajes enteros desde el final) y
-   produce el JSON del formato, forzado con una gramática.
-5. **Verificación.** Un post-filtro elimina toda cita que no figure en los 10
-   pasajes, las referencias se renderizan desde los metadatos de los pasajes
-   usados y se decide la abstención. La línea se valida contra el esquema oficial.
+1. **Ingesta.** 618 documentos oficiales (Constitución, códigos, leyes, decretos, resoluciones,
+   circulares, sentencias y conceptos de DIAN, SIC y Supersociedades) se limpian y se segmentan
+   **por artículo**; las sentencias, por secciones detectadas de forma estricta (antecedentes,
+   consideraciones, resuelve, salvamentos). Cada fragmento empieza con el nombre canónico de su
+   norma («Ley 1150 de 2007, artículo 11.»), verificado con el extractor de citas del evaluador.
+   Una guardia anti-fuga bloquea la indexación si detecta material del banco de preguntas.
+2. **Indexación.** 75.204 fragmentos: vectores `bge-m3` en FAISS exacto y BM25 con un tokenizador
+   jurídico que conserva números de artículo y de sentencia. El índice se congela por sha256.
+3. **Recuperación.** Router de artículos citados en la pregunta + BM25 + denso, fusionados con RRF,
+   sesgo por área, topes de diversidad (por artículo y 4 por documento), reordenamiento con
+   `bge-reranker-v2-m3` y un **cupo de 4 normas** entre los 10 pasajes para que los fragmentos de
+   sentencia no desplacen a los artículos. En selección múltiple, 4 puestos son para la pregunta
+   y el resto se reparte entre las opciones, cada una buscada con su texto más las palabras más
+   raras de la pregunta.
+4. **Generación.** El decoder recibe los 10 pasajes numerados `[P1]…[P10]` completos y produce el
+   JSON del formato, forzado con una gramática derivada del esquema.
+5. **Verificación.** Un post-filtro elimina toda cita que no figure en los 10 pasajes y las
+   referencias se renderizan desde los encabezados de los pasajes. La línea se valida contra el
+   esquema oficial.
 
 ## 2. Selección de encoder y decoder
 
-| Componente | Modelo | Motivo de la elección | Alternativas descartadas |
+| Componente | Modelo | Motivo | Alternativas |
 |---|---|---|---|
-| Encoder | `BAAI/bge-m3` (MIT) | Multilingüe con buen desempeño en español, 1.024 dimensiones, sin prefijos | `multilingual-e5-large` (alternativa en lista blanca); `jina-embeddings-v3` por licencia CC-BY-NC |
-| Decoder | `Qwen/Qwen3-8B` (Apache-2.0) | ≤ 8B, en la lista sugerida, buen español y salida estructurada fiable | `Llama-3.1-8B` (licencia comunitaria, no abierta en sentido estricto); `salamandra-7b-instruct` (alternativa en lista blanca) |
-| Reranker | `BAAI/bge-reranker-v2-m3` (Apache-2.0) | Cross-encoder multilingüe coherente con el encoder | Sin reranker (se mide en `<experimento>`) |
+| Encoder | `BAAI/bge-m3` (MIT) | Multilingüe, fuerte en español, 1.024 dimensiones (fragmentos de hasta 512 tokens) | `multilingual-e5-large` (en lista blanca); `jina-embeddings-v3` descartado por licencia CC-BY-NC |
+| Decoder | `google/gemma-4-E4B-it` (Apache-2.0), GGUF Q8_0 | 7.996.156.490 parámetros en total (bajo el límite de 8B); igualó a Qwen3-8B en la muestra con mejores citas | `Qwen/Qwen3-8B` (Apache-2.0, GGUF Q4_K_M): versión anterior del sistema |
+| Reranker | `BAAI/bge-reranker-v2-m3` (Apache-2.0) | Cross-encoder multilingüe, coherente con el encoder | Sin reranker |
 
-**Configuración de inferencia.** Temperatura 0 (decodificación voraz, top-k 1),
-semilla fija, modo sin razonamiento de Qwen3, ventana de 8.192 tokens. Backend
-`llamacpp` con GGUF Q4_K_M en CPU y `transformers` bf16 en GPU. Tiempo medido en
-CPU (Ryzen 7 8840HS): ~150 s por pregunta, 158 s con 10 pasajes completos
-(4.188 tokens de prompt); en GPU: `<medido en la sala Turing>` s por pregunta.
+**Inferencia.** Temperatura 0 (decodificación voraz), semilla fija, sin modo de razonamiento,
+ventana de 8.192 tokens, `llama.cpp` en GPU. Tiempo por pregunta en una T4: 39 s en promedio
+(selección múltiple 40 s, semiabiertas 35 s, abiertas 65 s). Para las 992 preguntas (~11 h en una
+GPU) el banco se reparte por rangos entre varias máquinas (`run.py --rango INICIO FIN`). La
+corrida es reproducible: dos ejecuciones en máquinas distintas produjeron respuestas idénticas.
 
 ## 3. Estrategia de recuperación
 
-- **Segmentación:** un fragmento por artículo (con parágrafos); artículos de más
-  de 300 palabras se parten repitiendo el encabezado; notas de vigencia del
-  Senado como fragmento aparte; sentencias por secciones en ventanas de ~300
-  palabras con 15 % de solape.
-- **Índices:** FAISS `IndexFlatIP` (exacto) sobre vectores normalizados; BM25
-  (`bm25s`) con tokenizador que conserva números de artículo y de sentencia.
-- **Fusión:** RRF (k = 60) de las listas densa y léxica (50 candidatos cada
-  una), + router directo por metadatos cuando la pregunta cita un artículo.
-- **Top-k:** reranker sobre los 20 mejores; 10 pasajes a la entrega y al prompt.
-- **Métrica guía:** acierto@10 de cuerpos normativos del fundamento de referencia
-  sobre la muestra: `<x %>` (`python -m src.eval.recuperacion`).
+- **Segmentación:** un fragmento por artículo (con parágrafos); artículos de más de 300 palabras se
+  parten repitiendo el encabezado; sentencias y conceptos en ventanas de ~300 palabras con 15 % de
+  solape.
+- **Fusión:** RRF (k = 60) de 50 candidatos densos y 50 léxicos; el reranker ordena los 20 mejores.
+- **Selección múltiple:** evidencia representativa por opción, marcada en el prompt («recuperado
+  para la opción B»).
+- **Medida guía:** las normas del fundamento de referencia aparecen en la evidencia en 44 de 49
+  casos (90 %), y en 38 de las 41 preguntas con fundamento citable hay al menos una.
 
 ## 4. Verificación de citas y abstención
 
-**Citas.** El evaluador compara normas a nivel de cuerpo y castiga con el doble
-cada cita que no figura en los primeros 10 pasajes. Por eso (i) cada pasaje
-empieza con el nombre canónico de su norma; (ii) el post-filtro localiza cada
-cita con las mismas expresiones regulares del evaluador y reemplaza las no
-respaldadas por «la normativa aplicable» (o descarta la oración); (iii) las
-leyes citadas sin año se completan cuando los pasajes lo resuelven de forma
-única; (iv) `referencia_legal` y el «Fundamento normativo» de la justificación se
-construyen desde los encabezados de los pasajes usados por el modelo y de los
-pertinentes según el reranker, lo que además hace reproducibles las citas en la
-verificación en vivo. Resultado: 0 citas sin respaldo según el evaluador.
+**Citas.** El evaluador compara normas a nivel de cuerpo y castiga con el doble toda cita ausente
+de los 10 pasajes. Por eso: (i) cada pasaje empieza con el nombre canónico de su norma; (ii) el
+post-filtro localiza cada cita con las mismas expresiones regulares del evaluador y reemplaza las
+no respaldadas por «la normativa aplicable»; (iii) las leyes citadas sin año se completan cuando
+los pasajes lo resuelven; (iv) el «Fundamento normativo» se construye desde los encabezados de los
+pasajes. Resultado: **0 citas sin respaldo** en todas las corridas.
 
-**Abstención.** Con los pesos oficiales, abstenerse en selección múltiple nunca
-conviene (responder aporta más incluso al azar), así que no se hace. En texto
-libre se declara solo si no hay pasajes, si el modelo no produjo una respuesta
-utilizable, o si la pertinencia máxima del reranker está bajo el umbral (0,05) y
-la pregunta no cita una norma presente en el corpus. Se conservan los pasajes.
+**Abstención.** Con los pesos oficiales, abstenerse casi nunca conviene: vale 0 en RAGAS (30
+puntos) y a lo sumo medio acierto en el componente de abstención (10 puntos). Por eso el sistema
+no se abstiene en selección múltiple ni por baja pertinencia; solo cuando el modelo no produce una
+respuesta utilizable.
 
 ## 5. Resultados sobre las preguntas de muestra
 
+Evaluador oficial (`scripts/evaluate.py --ragas`), corrida `muestra_v10`, juez sin fallos:
+
 | Componente | Puntos | Posibles |
 |---|---:|---:|
-| Exactitud en cerradas | `<x>` | 20 |
-| Calidad de citación | `<x>` | 20 |
-| Abstención calibrada | `<x>` | 10 |
-| **Total automático sin RAGAS** | `<x>` | **50** |
-| Corrección en texto libre (RAGAS) | `<x>` | 30 |
+| Exactitud en cerradas (9 de 15) | 12,00 | 20 |
+| Calidad de citación (recall 0,796; 0 sin respaldo) | 15,92 | 20 |
+| Abstención calibrada (0,767) | 7,67 | 10 |
+| **Total automático sin RAGAS** | **35,59** | **50** |
+| Corrección en texto libre — RAGAS (0,4335; referencia 0,451) | 13,00 | 30 |
+| **Total automático** | **48,59** | **80** |
 
-Análisis de los errores más frecuentes: `<a partir de runs/<tag>/trazas.jsonl:
-normas ausentes del corpus, recuperación de un artículo vecino, opciones MC que
-exigen conocimiento no normativo…>`
+**Evolución.** Línea base 48,67 → mejor resultado 49,64 (corpus de 238 documentos, Qwen3-8B).
+Cambios que aportaron: evidencia por opción en selección múltiple, cupo de normas (+3 citas
+acertadas) y no abstenerse (+2 preguntas respondidas). Cambios que no aportaron y se retiraron:
+el razonamiento de Qwen3 en selección múltiple (+1 acierto en una corrida y 0 en la siguiente, con
+el doble de tiempo y menos citas) y la respuesta en abierto antes de elegir (+1 acierto con el
+doble de latencia). Ampliar el corpus de 238 a 618 documentos no movió el texto libre de forma
+apreciable. Lección metodológica: varias caídas aparentes de RAGAS eran respuestas sin veredicto
+del juez por fallos de red, que el evaluador cuenta como cero.
+
+**Errores en selección múltiple (6 de 15).** Son de tres tipos:
+- **La norma está en el corpus pero no llega a la evidencia o no basta:** 748 (el art. 137 del
+  CPACA enumera las cuatro opciones como causales de nulidad) y 647.
+- **Falta información:** 528, porque el valor del salario mínimo no está en el corpus; 671, sobre
+  convenios de doble imposición.
+- **Claves discutibles:** 58, que pide la «Ley 1564 de 2002» (el Código General del Proceso es de
+  2012), y 128, que exige «Fintech» cuando la norma solo nombra bancos y compañías de
+  financiamiento.
 
 ## 6. Limitaciones
 
-1. **Dependencia del corpus:** si la norma aplicable no está en el corpus, el
-   sistema no puede citarla con respaldo; el filtro evita inventarla pero la
-   respuesta pierde fundamento. `<cobertura del seed: x %>`.
-2. **Citas a nivel de cuerpo:** la verificación garantiza que la norma citada
-   está en la evidencia, no que el artículo concreto sea el pertinente.
-3. **Costo de cómputo:** en CPU una respuesta tarda ~2,5 min; el sistema requiere
-   GPU para el banco completo.
-4. **Segmentación dependiente del formato de la fuente:** PDF escaneados sin OCR
-   o numeraciones atípicas pueden producir artículos mal cortados.
-5. `<limitaciones observadas en la muestra>`
+1. **Dependencia del corpus:** una norma ausente no se puede citar con respaldo; el filtro evita
+   inventarla, pero la respuesta pierde fundamento.
+2. **Citas a nivel de cuerpo:** la verificación garantiza que la norma citada está en la evidencia,
+   no que el artículo concreto sea el pertinente.
+3. **Razonamiento del modelo de 8B:** en selección múltiple, con la misma evidencia la letra elegida
+   varía según cómo se presentan las opciones. La exactitud (0,60) sigue lejos de la referencia
+   (0,905).
+4. **Costo de cómputo:** ~39 s por pregunta en GPU T4 y ~3,5 min en CPU; el banco completo
+   requiere varias GPU en paralelo.
+5. **Doctrina no normativa:** las preguntas cuyo fundamento es doctrina o derecho extranjero (p. ej.
+   el caso *Dow Chemical*) solo se responden con evidencia parcial.

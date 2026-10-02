@@ -1,6 +1,6 @@
-# <Nombre del equipo> — Hackathon 2026
+# Los PoliTICos — Hackathon 2026
 
-**Integrantes:** <nombre 1> · <nombre 2> · <nombre 3>
+**Integrantes:** Juan José Cortés Villamil · Pablo Medina Forero · Miguel Santiago Roa Vallejo
 **Universidad de los Andes** — AI Week 2026
 
 Sistema de respuesta a preguntas de derecho colombiano con un modelo abierto de
@@ -72,13 +72,13 @@ posiciones, para repartir entre máquinas), `--gpu` (todo en CUDA), `--indice-ex
 - **Tiempo en CPU** (medido en Ryzen 7 8840HS, 16 hilos): ~150 s por pregunta
   directamente en Python y ~250 s dentro de Docker (dominado por la lectura del
   prompt en el decoder). Las 50 preguntas de muestra tardan ~3,5 h en un contenedor
-  solo con CPU; con GPU, `<medido en GPU>`.
+  solo con CPU; con GPU T4, ~39 s por pregunta.
 - La ejecución de las 992 preguntas se hace en GPU: backend `transformers`
   (`DECODER_BACKEND=transformers`, `DECODER_DEVICE=cuda`) o llama.cpp con CUDA.
 
 Python ≥ 3.10 (probado con 3.11).
 
-**Tiempo estimado sobre las 50 preguntas de muestra:** `<medido en GPU>`.
+**Tiempo estimado sobre las 50 preguntas de muestra:** ~33 min en una GPU T4 (39 s por pregunta, corrida `muestra_v10`).
 
 ### Comandos por etapa
 
@@ -104,13 +104,13 @@ pregunta ──► router de citas explícitas ─┐
           ├► BM25 (tokenizador jurídico) ─┼─► fusión RRF ─► reranker ─► top-10 pasajes
           └► denso (bge-m3 + FAISS) ──────┘   (+ área)     (bge-v2-m3)       │
                                                                              ▼
-   submissions.jsonl ◄── abstención ◄── filtro de citas ◄── Qwen3-8B (JSON forzado, T=0)
+   submissions.jsonl ◄── abstención ◄── filtro de citas ◄── Gemma 4 E4B (JSON forzado, T=0)
 ```
 
 | Componente | Elección | Motivo |
 |---|---|---|
 | Encoder | `BAAI/bge-m3` (MIT), 1.024 dim, 512 tokens | Multilingüe, fuerte en español; licencia abierta |
-| Decoder | `Qwen/Qwen3-8B` (Apache-2.0), GGUF Q4_K_M con llama.cpp o bf16 con transformers; sin modo de razonamiento | ≤ 8B, en la lista sugerida, buen español y salida estructurada |
+| Decoder | `google/gemma-4-E4B-it` (Apache-2.0, 7.996.156.490 parámetros), GGUF Q8_0 con llama.cpp; sin modo de razonamiento | ≤ 8B; en la muestra igualó a Qwen3-8B (versión anterior, sigue en la lista blanca) con mejores citas |
 | Segmentación | Un fragmento por artículo (≤ 300 palabras; los largos se parten repitiendo el encabezado); sentencias por secciones en ventanas de ~300 palabras | El artículo es la unidad de sentido (enunciado B.2) |
 | Trazabilidad | Cada fragmento empieza con el nombre canónico de su norma (“Ley 1150 de 2007, artículo 11.”), verificado con el extractor de citas del evaluador | Sin eso las citas no cuentan como respaldadas |
 | Recuperación | Router de artículos citados en la pregunta + BM25 + denso con RRF, sesgo por área, diversidad por artículo; en MC, cada opción como consulta adicional | Los embeddings confunden números de artículo; BM25 no (B.3) |
@@ -142,10 +142,11 @@ tests/            pruebas con los modelos reales
 
 | Componente | Puntos | Posibles |
 |---|---:|---:|
-| Exactitud en cerradas | `<x>` | 20 |
-| Corrección en texto libre (RAGAS) | `<x>` | 30 |
-| Calidad de citación | `<x>` | 20 |
-| Abstención calibrada | `<x>` | 10 |
+| Exactitud en cerradas | 12,00 | 20 |
+| Corrección en texto libre (RAGAS) | 13,00 | 30 |
+| Calidad de citación | 15,92 | 20 |
+| Abstención calibrada | 7,67 | 10 |
+| **Total automático** | **48,59** | **80** |
 
 Evolución del puntaje según el corpus: ver [`CORPUS.md`](CORPUS.md) §4.
 
