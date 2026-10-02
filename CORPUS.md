@@ -263,7 +263,7 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 | `ley_1151_2007` | Ley 1151 de 2007 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=25932 | 2026-09-30 | 160 | 339 | Administrativo |
 | `decreto_780_2016` | Decreto 780 de 2016 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=77813 | 2026-09-30 | 2090 | 2811 | Administrativo, Laboral, Penal |
 | `ley_640_2001` | Ley 640 de 2001 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=6059 | 2026-09-30 | 50 | 53 | Mercados, Procesal |
-| `decreto_46_2024` | Decreto 46 de 2024 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=228530 | 2026-09-30 | 6 | 24 | Comercial |
+| `decreto_46_2024` | Decreto 046 de 2024 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=228530 | 2026-09-30 | 6 | 24 | Comercial |
 | `decreto_24_2016` | Decreto 24 de 2016 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=67536 | 2026-09-30 | 9 | 12 | Comercial |
 | `ley_1700_2013` | Ley 1700 de 2013 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=56283 | 2026-09-30 | 13 | 17 | Comercial, Mercados |
 | `ley_2251_2022` | Ley 2251 de 2022 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=189806 | 2026-09-30 | 28 | 34 | Civil |
@@ -636,6 +636,38 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 | `supersoc_oficio_220-330394_2025` | OFICIO 220-330394 16 DE ENERO DE 2025 | Superintendencia de Sociedades — repositorio oficial | https://supersociedades.gov.co/documents/107391/159040/OFICIO+220-330394+++16+DE+ENERO+DE+2025.pdf/8648e68d-406c-25df-1605-becc11cf379a?version=1.1&t=1743209052181 | 2026-10-01 | — | 8 | Comercial |
 | `supersoc_oficio_220-334036_2025` | OFICIO 220-334036 DEL 28 DE ENERO DE 2025 | Superintendencia de Sociedades — repositorio oficial | https://supersociedades.gov.co/documents/107391/159040/OFICIO+220-334036+DEL+28+DE+ENERO+DE+2025.pdf/7100ecc1-e3ca-aa38-f23e-58d1eb1aac2a?version=1.1&t=1743209052385 | 2026-10-01 | — | 17 | Comercial, Procesal, Civil |
 | `supersoc_oficio_220-335037_2025` | OFICIO 220-335037 DE 30 DE ENERO DE 2025 | Superintendencia de Sociedades — repositorio oficial | https://supersociedades.gov.co/documents/107391/159040/OFICIO+220-335037+DE+30+DE+ENERO+DE+2025.pdf/780bdf50-290a-37d1-4167-3ffcbd6c494f?version=1.1&t=1743209052585 | 2026-10-01 | — | 11 | Comercial, Procesal, Civil |
+| `ley_1473_2011` | Ley 1473 de 2011 | Secretaría General del Senado | http://www.secretariasenado.gov.co/senado/basedoc/ley_1473_2011.html | 2026-10-02 | 17 | 30 | Administrativo, Tributario |
+| `ley_1692_2013` | Ley 1692 de 2013 | Secretaría General del Senado | http://www.secretariasenado.gov.co/senado/basedoc/ley_1692_2013.html | 2026-10-02 | 30 | 72 | Tributario |
+| `sentencia_c-468_2024` | Sentencia C-468 de 2024 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2024/C-468-24.htm | 2026-10-02 | — | 85 | Constitucional |
+| `sentencia_su-16_2020` | Sentencia SU-016 de 2020 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2020/SU016-20.htm | 2026-10-02 | — | 299 | Constitucional |
+| `sentencia_su-277_2025` | Sentencia SU-277 de 2025 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2025/SU277-25.htm | 2026-10-02 | — | 171 | Administrativo |
+| `decreto_2613_2022` | Decreto 2613 de 2022 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=200172 | 2026-10-02 | 2 | 8 | Laboral, Procesal |
+| `decreto_2292_2023` | Decreto 2292 de 2023 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=227530 | 2026-10-02 | 2 | 9 | Laboral, Procesal |
+| `decreto_1572_2024` | Decreto 1572 de 2024 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=257156 | 2026-10-02 | 2 | 14 | Laboral, Procesal |
+| `dian_resolucion_187_2023` | Resolución DIAN 000187 de 2023 | Normograma DIAN | https://normograma.dian.gov.co/dian/compilacion/docs/resolucion_dian_0187_2023.htm | 2026-10-02 | 4 | 6 | Tributario |
+| `dian_resolucion_193_2024` | Resolución DIAN 000193 de 2024 | Normograma DIAN | https://normograma.dian.gov.co/dian/compilacion/docs/resolucion_dian_0193_2024.htm | 2026-10-02 | 4 | 6 | Tributario |
+| `dian_resolucion_238_2025` | Resolución DIAN 000238 de 2025 | Normograma DIAN | https://normograma.dian.gov.co/dian/compilacion/docs/resolucion_dian_0238_2025.htm | 2026-10-02 | 3 | 6 | Tributario |
+| `ley_1082_2006` | Ley 1082 de 2006 — convenio tributario con España | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1082_2006.htm | 2026-10-02 | 29 | 120 | Tributario |
+| `ley_1261_2008` | Ley 1261 de 2008 — convenio tributario con Chile | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1261_2008.htm | 2026-10-02 | 31 | 54 | Tributario |
+| `ley_1265_2008` | Ley 1265 de 2008 — convenio tributario con Panamá — transporte aéreo | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1265_2008.htm | 2026-10-02 | 9 | 13 | Tributario |
+| `ley_1344_2009` | Ley 1344 de 2009 — convenio tributario con Suiza | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1344_2009.htm | 2026-10-02 | 29 | 49 | Tributario |
+| `ley_1459_2011` | Ley 1459 de 2011 — convenio tributario con Canadá | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1459_2011.htm | 2026-10-02 | 30 | 76 | Tributario |
+| `ley_1568_2012` | Ley 1568 de 2012 — convenio tributario con México | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1568_2012.htm | 2026-10-02 | 30 | 60 | Tributario |
+| `ley_1667_2013` | Ley 1667 de 2013 — convenio tributario con Corea | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1667_2013.htm | 2026-10-02 | 30 | 67 | Tributario |
+| `ley_1668_2013` | Ley 1668 de 2013 — convenio tributario con India | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1668_2013.htm | 2026-10-02 | 31 | 69 | Tributario |
+| `ley_1690_2013` | Ley 1690 de 2013 — convenio tributario con República Checa | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1690_2013.htm | 2026-10-02 | 28 | 63 | Tributario |
+| `ley_1939_2018` | Ley 1939 de 2018 — convenio tributario con Reino Unido | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1939_2018.htm | 2026-10-02 | 29 | 79 | Tributario |
+| `ley_2004_2019` | Ley 2004 de 2019 — convenio tributario con Italia | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2004_2019.htm | 2026-10-02 | 30 | 101 | Tributario |
+| `ley_2061_2020` | Ley 2061 de 2020 — convenio tributario con Francia | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2061_2020.htm | 2026-10-02 | 31 | 104 | Tributario |
+| `ley_2095_2021` | Ley 2095 de 2021 — convenio tributario con Japón | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2095_2021.htm | 2026-10-02 | 31 | 99 | Tributario |
+| `ley_2105_2021` | Ley 2105 de 2021 — convenio tributario con Alianza del Pacífico | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2105_2021.htm | 2026-10-02 | 15 | 52 | Tributario |
+| `ley_71_1993` | Ley 71 de 1993 — convenio tributario con Brasil — empresas marítimas y aéreas | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_0071_1993.htm | 2026-10-02 | 3 | 11 | Tributario |
+| `decreto_1469_2025` | Decreto 1469 de 2025 — salario mínimo para 2026 | Normograma MINTIC | https://normograma.mintic.gov.co/mintic/compilacion/docs/decreto_1469_2025.htm | 2026-10-02 | 2 | 28 | Laboral, Procesal, Administrativo |
+| `decreto_159_2026` | Decreto 159 de 2026 — salario mínimo para 2026 | DAPRE — Presidencia de la República | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_0159_2026.htm | 2026-10-02 | 2 | 39 | Laboral, Procesal, Administrativo |
+| `decreto_2614_2022` | Decreto 2614 de 2022 — auxilio de transporte para 2023 | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_2614_2022.htm | 2026-10-02 | 2 | 4 | Laboral |
+| `decreto_2293_2023` | Decreto 2293 de 2023 — auxilio de transporte para 2024 | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_2293_2023.htm | 2026-10-02 | 2 | 4 | Laboral |
+| `decreto_1573_2024` | Decreto 1573 de 2024 — auxilio de transporte para 2025 | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_1573_2024.htm | 2026-10-02 | 2 | 4 | Laboral |
+| `decreto_1470_2025` | Decreto 1470 de 2025 — auxilio de transporte para 2026 | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_1470_2025.htm | 2026-10-02 | 2 | 8 | Laboral |
 <!-- /AUTO:inventario -->
 
 **Totales**
@@ -643,10 +675,10 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 <!-- AUTO:totales -->
 | Métrica | Valor |
 |---|---:|
-| Documentos incorporados | 618 |
-| Artículos indexados | 38157 |
-| Fragmentos en el índice | 75204 |
-| Tamaño del corpus procesado | 92.7 MB |
+| Documentos incorporados | 650 |
+| Artículos indexados | 38619 |
+| Fragmentos en el índice | 77014 |
+| Tamaño del corpus procesado | 95.5 MB |
 <!-- /AUTO:totales -->
 
 ## 2. Criterio de selección
@@ -654,15 +686,15 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 <!-- AUTO:cobertura -->
 | Área | Ítems en el banco | Documentos incorporados | Fragmentos | Cobertura del seed (ítems) |
 |---|---:|---:|---:|---|
-| Derecho constitucional | 134 | 92 | 12392 | 194/197 (98%) |
-| Derecho administrativo | 124 | 225 | 17579 | 128/131 (98%) |
+| Derecho constitucional | 134 | 94 | 12776 | 194/197 (98%) |
+| Derecho administrativo | 124 | 229 | 17847 | 128/131 (98%) |
 | Derecho penal | 123 | 43 | 10971 | 184/185 (99%) |
-| Derecho procesal | 111 | 219 | 13801 | 182/184 (99%) |
-| Derecho comercial y sociedades | 104 | 111 | 12688 | 202/204 (99%) |
+| Derecho procesal | 111 | 224 | 13899 | 182/184 (99%) |
+| Derecho comercial y sociedades | 104 | 111 | 12688 | 203/204 (100%) |
 | Derecho civil | 102 | 81 | 13771 | 151/151 (100%) |
 | Derecho de familia | 93 | 54 | 11254 | 197/197 (100%) |
-| Derecho tributario | 92 | 232 | 16695 | 210/212 (99%) |
-| Derecho laboral | 87 | 52 | 10530 | 177/180 (98%) |
+| Derecho tributario | 92 | 252 | 17832 | 211/212 (100%) |
+| Derecho laboral | 87 | 61 | 10648 | 177/180 (98%) |
 | Mercados | 72 | 71 | 7983 | 219/220 (100%) |
 
 _Cobertura del seed_: ítems del banco (según `items_del_banco` de `data/seed_targets.json`) cuyas normas ya están en el corpus. Es una cota inferior: el seed no es exhaustivo.

@@ -6,9 +6,9 @@ EVIDENCIA:
 CASO:
 {pregunta}
 
-Analiza el caso de forma concisa (sin repetir los hechos ni el texto de las normas). Entre todos los campos, máximo 200 palabras. Devuelve:
-- "marco_normativo": las normas aplicables de la evidencia (máximo 5), citadas con su nombre completo, cada una con una frase muy breve sobre lo que dispone.
-- "analisis": 3 o 4 oraciones que apliquen esas normas a los hechos del caso.
-- "jurisprudencia": las sentencias de la evidencia que resulten pertinentes (máximo 2), cada una con su regla en una frase; si la evidencia no trae sentencias pertinentes, escribe una sola frase indicándolo.
-- "conclusion": la respuesta al problema jurídico en una sola oración.
+Analiza el caso de forma concisa (sin repetir los hechos ni el texto de las normas) y devuelve:
+- "marco_normativo": las normas aplicables de la evidencia (máximo 5), citadas con su nombre completo y una sola frase breve sobre lo que disponen.
+- "analisis": entre 5 y 8 oraciones que apliquen esas normas a los hechos del caso, paso a paso.
+- "jurisprudencia": las sentencias de la evidencia que resulten pertinentes y su regla; si la evidencia no trae sentencias pertinentes, escribe una sola frase indicándolo.
+- "conclusion": la respuesta al problema jurídico en una o dos oraciones.
 - "pasajes_usados": números de los pasajes en que te apoyaste.

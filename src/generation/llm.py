@@ -163,6 +163,37 @@ class LLM:
                      "proceso ocupa la memoria (JAX/TensorFlow reservan el 75 % al importarse) "
                      "o baje DECODER_NUM_CTX.") if self.cfg.decoder_device == "cuda" else ""
             raise RuntimeError(f"No se pudo cargar {self.id_modelo}.{pista}") from exc
+        if self.modelo.metadata.get("general.architecture") == "gemma4":
+            self._formato_gemma4()
+
+    def _formato_gemma4(self) -> None:
+        """Plantilla de chat propia de Gemma 4 con el razonamiento apagado (C-18, aporte de Pablo).
+
+        Gemma 4 usa sus propios turnos y canales, no ChatML; el formateador genérico de
+        llama-cpp-python no le aplica `enable_thinking=False`, y con el canal de razonamiento
+        abierto la gramática JSON choca con lo que el modelo quiere escribir. Se arma el
+        formateador con la plantilla Jinja del propio GGUF, sus tokens de inicio/fin y el fin de
+        turno `<turn|>` como parada.
+        """
+        from functools import partial
+
+        from llama_cpp.llama_chat_format import (
+            Jinja2ChatFormatter, chat_formatter_to_chat_completion_handler,
+        )
+
+        plantilla = self.modelo.metadata.get("tokenizer.chat_template")
+        if not plantilla:
+            raise RuntimeError("El GGUF de Gemma 4 no trae su plantilla de chat.")
+        bos = self.modelo.detokenize([self.modelo.token_bos()], special=True).decode("utf-8")
+        eos = self.modelo.detokenize([self.modelo.token_eos()], special=True).decode("utf-8")
+        fin_turno = self.modelo.tokenize(b"<turn|>", add_bos=False, special=True)
+        if len(fin_turno) != 1:
+            raise RuntimeError("El tokenizer del GGUF no reconoce el fin de turno de Gemma 4.")
+        formateador = Jinja2ChatFormatter(template=plantilla, bos_token=bos, eos_token=eos,
+                                          stop_token_ids=[self.modelo.token_eos(), fin_turno[0]])
+        self._gemma_formateador = partial(formateador, enable_thinking=False)
+        self.modelo.chat_handler = chat_formatter_to_chat_completion_handler(self._gemma_formateador)
+        self.formato_chat = "gemma4-sin-razonamiento"
 
     def _cargar_transformers(self) -> None:
         import torch
@@ -184,6 +215,9 @@ class LLM:
     def contar_tokens(self, mensajes: list[dict]) -> int:
         """Tokens del prompt con la plantilla de chat (margen de 16 por mensaje en llamacpp)."""
         if self.backend == "llamacpp":
+            if getattr(self, "_gemma_formateador", None) is not None:   # conteo exacto (C-18)
+                prompt = self._gemma_formateador(messages=mensajes).prompt
+                return len(self.modelo.tokenize(prompt.encode("utf-8"), add_bos=False, special=True))
             texto = "\n".join(m["content"] for m in mensajes) + self.sufijo
             return len(self.modelo.tokenize(texto.encode("utf-8"), add_bos=False)) + 16 * len(mensajes)
         ids = self.tokenizer.apply_chat_template(mensajes, add_generation_prompt=True,
@@ -195,6 +229,7 @@ class LLM:
               razonamiento_tokens: int = 0) -> str:
         cuerpo = json.dumps({"backend": self.backend, "modelo": self.id_modelo,
                              "mensajes": mensajes, "esquema": esquema, "max_tokens": max_tokens,
+                             "formato_chat": getattr(self, "formato_chat", None),
                              **({"razonamiento_tokens": razonamiento_tokens}
                                 if razonamiento_tokens else {}),
                              "temperatura": 0, "semilla": self.cfg.decoder_seed,

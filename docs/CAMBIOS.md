@@ -422,3 +422,72 @@ de tres. Decisión de C-09 y C-10 pendiente de recalificar con RAGAS.
 - **Archivos:** `src/config.py` (lista blanca y valores por defecto), `.env.example`,
   `src/generation/llm.py` y `src/pipeline/main.py` (textos), cuadernos (celda 4, `TAG`).
 - **Requiere reindexar:** no.
+
+## C-16 · 2026-10-02 · Se revierte C-11: abiertas sin tope de palabras, análisis de 5 a 8 oraciones
+- **Antes (C-11):** el prompt de abiertas pedía máximo 200 palabras y un análisis de 3 o 4 oraciones.
+  Eso incumplía el enunciado (Paso 3: «analisis (de 5 a 8 oraciones)») y no acortó las respuestas
+  (el largo lo pone el «Normas aplicables» del postproceso) ni evitó los fallos del juez (eran de red).
+- **Ahora:** el prompt de C-01: análisis de 5 a 8 oraciones, marco normativo con hasta 5 normas,
+  conclusión en una o dos oraciones; sin tope de palabras (el enunciado no fija uno para abiertas).
+  El postproceso sigue cortando el análisis en 8 oraciones. Semiabiertas sin cambios: 5 oraciones y
+  150 palabras como máximo, como exige el enunciado.
+- **Evidencia:** pendiente (`muestra_v11`).
+- **Archivos:** `src/generation/prompts/open_ended.txt`.
+- **Requiere reindexar:** no.
+
+## C-17 · 2026-10-02 · Prompt de selección múltiple más flexible (equipo + reglas de elección)
+- **Antes:** «Elige la única opción correcta según la evidencia»; el mensaje de sistema (común a todos
+  los formatos) prohibía usar algo fuera de la evidencia. En v10 (Gemma) fallaron 58, 128, 528, 647,
+  671 y 748. En la 58 la justificación nombraba «Ley 1564 de 2012» y aun así descartó la opción
+  «Ley 1564 de 2002» (errata de la clave) y eligió la C.
+- **Ahora:** `prompts/multiple_choice_elegir.txt` con la instrucción del equipo («Primero mira la
+  evidencia… SIEMPRE MIRA LA EVIDENCIA PRIMERO») y cuatro reglas: (1) la opción que MEJOR coincide,
+  tolerando errores de digitación en años o números; (2) preferir la opción más completa que contiene
+  la evidencia y agrega elementos que esta no excluye, según la práctica colombiana actual; (3)
+  opciones combinadas («(a) y (b)», «Todas las anteriores»; «Ninguna» solo si la evidencia contradice
+  todas); (4) si la evidencia no basta, elegir según el conocimiento jurídico, citando solo normas de
+  la evidencia. Mensaje de sistema propio de MC (`prompts/sistema_multiple_choice.txt`) sin la
+  prohibición de usar conocimiento para elegir; abiertas y semiabiertas no cambian.
+- **Por qué:** subir la exactitud en MC (9/15). Riesgo reconocido: las reglas 1 y 2 se inspiraron en
+  la 58 y la 128 (claves con errata o más amplias que la norma); se redactaron como reglas generales,
+  pero pueden empeorar otras preguntas (p. ej. la 2 puede preferir una opción que agrega algo falso).
+  Las citas siguen protegidas por el filtro determinista.
+- **Evidencia:** pendiente (`muestra_v11`, junto con C-16).
+- **Archivos:** `src/generation/prompts/multiple_choice_elegir.txt`,
+  `src/generation/prompts/sistema_multiple_choice.txt` (nuevo), `src/generation/contexto.py`.
+- **Requiere reindexar:** no.
+- **Ajuste (mismo día, criterio del usuario):** la elección debe salir de la evidencia, no del
+  conocimiento propio del modelo (si eligiera con algo no citado y luego el filtro lo borrara, la
+  respuesta quedaría sin fundamento trazable). Se quitan la regla 4 y el mensaje de sistema propio
+  de MC (vuelve el común: «usa solo la información de la evidencia»), y la regla 2 queda en «si
+  varias opciones están respaldadas por la evidencia, prefiere la más completa». Quedan la
+  tolerancia a erratas (1) y las opciones combinadas (3). Se espera que la 128 y la 528 sigan
+  falladas (la evidencia no respalda «Fintech» ni trae el salario mínimo).
+- **Ajuste 2 (mismo día, a pedido del usuario):** regla 2 = «prefiere la opción más completa: si una
+  opción contiene todo lo que dice la evidencia y además agrega elementos que la evidencia no
+  menciona pero tampoco contradice, elígela… Descarta una opción solo si la evidencia la contradice,
+  no por traer un elemento adicional». No usa conocimiento externo (es una preferencia estructural).
+  Apunta a la 128; riesgo: distractores del tipo «lo correcto + un elemento de sobra». Se mide en v11
+  pregunta por pregunta.
+
+## C-18 · 2026-10-02 · Plantilla de chat propia de Gemma 4, sin razonamiento (aporte de Pablo)
+- **Antes (C-15):** con Gemma 4, `llama-cpp-python` armaba el prompt con su formateador genérico a
+  partir de la plantilla del GGUF, sin `enable_thinking=False`: el canal de razonamiento de Gemma
+  quedaba abierto y chocaba con la gramática JSON. El conteo de tokens del prompt era aproximado.
+- **Ahora:** si el GGUF es de arquitectura `gemma4`, `LLM._formato_gemma4` arma un
+  `Jinja2ChatFormatter` con la plantilla del propio GGUF, sus tokens de inicio/fin y el fin de turno
+  `<turn|>` como parada, con `enable_thinking=False`, y lo usa como manejador de chat; el conteo de
+  tokens usa ese mismo prompt. El formato entra en la clave de la caché. Se mantiene Q8_0.
+- **Por qué:** es el formato correcto del modelo. En la configuración de Pablo (Gemma Q4_0 con este
+  formateador, corpus de 338 documentos con tope de complementarias, prompt de MC original) la
+  muestra dio 11/15 en MC frente a 9/15 de nuestra v10.
+- **Evidencia:** pendiente (`muestra_v11`).
+- **Archivos:** `src/generation/llm.py`.
+- **Requiere reindexar:** no.
+
+## Resultado de `muestra_v11` (C-16 + C-17, Gemma Q8 sin el formateador de C-18, corpus de 618; Colab)
+- Corrió con el paquete de las 10:05 (índice de 75.204 fragmentos), no con el de las 11:56.
+- **49,58/80** (v10: 48,59; mejor histórico 49,64), juez sin fallos: cerradas **10/15** (gana la 528,
+  no pierde ninguna; la 58 y la 128 siguen en C y B: las reglas 1 y 2 no las movieron) · citas 38
+  (15,51) · abstención 7,91 · RAGAS 0,4276 (12,83; v10 0,4335). Abiertas más largas (245–413
+  palabras). 41 s por pregunta.

@@ -9,8 +9,13 @@ PREGUNTA DE SELECCIÓN MÚLTIPLE:
 OPCIONES:
 {opciones}
 
-Elige la única opción correcta según la evidencia. Devuelve, en este orden:
-- "respuesta_correcta": la letra de la opción correcta.
+Primero mira la evidencia y luego, con la evidencia, elige UNA opción. SIEMPRE MIRA LA EVIDENCIA PRIMERO. Para elegir:
+1. Elige la opción que MEJOR coincide con la evidencia, aunque no coincida palabra por palabra. Las opciones pueden tener errores de digitación: si una opción nombra la norma que aparece en la evidencia con un año o un número levemente distinto (por ejemplo "Ley 1564 de 2002" cuando la evidencia dice "Ley 1564 de 2012"), sigue siendo la opción de esa norma.
+2. Prefiere la opción más completa: si una opción contiene todo lo que dice la evidencia y además agrega elementos que la evidencia no menciona pero tampoco contradice, elígela frente a una opción que solo repite parte de la evidencia. Descarta una opción solo si la evidencia la contradice, no por traer un elemento adicional.
+3. Si más de una opción es correcta según la evidencia y existe una que las combina ("(a) y (b)", "Todas las anteriores"), elige esa. Elige "Ninguna de las anteriores" solo si la evidencia contradice todas las demás.
+
+Devuelve, en este orden:
+- "respuesta_correcta": la letra de la opción elegida.
 - "justificacion": dos o tres oraciones que expliquen por qué esa opción es correcta, citando la norma o sentencia aplicable de la evidencia.
 - "descarte_opciones": para cada una de las otras letras ({letras_descarte}), UNA sola frase breve que explique por qué es incorrecta, con el pasaje en que te apoyas, por ejemplo "[P3] establece otro plazo …".
 - "pasajes_usados": números de los pasajes en que te apoyaste.

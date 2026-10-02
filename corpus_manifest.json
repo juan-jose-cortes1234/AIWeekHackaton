@@ -1,7 +1,7 @@
 {
   "equipo": "<nombre del equipo>",
   "licencia": "CC-BY-4.0",
-  "fecha_generacion": "2026-10-01",
+  "fecha_generacion": "2026-10-02",
   "enlace_nube": "<URL del comprimido con el corpus y el indice>",
   "documentos": [
     {
@@ -4030,7 +4030,7 @@
     },
     {
       "doc_id": "decreto_46_2024",
-      "titulo": "Decreto 46 de 2024",
+      "titulo": "Decreto 046 de 2024",
       "fuente": "Departamento Administrativo de la Función Pública - Gestor Normativo",
       "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=228530",
       "fecha_consulta": "2026-09-30",
@@ -4042,7 +4042,7 @@
       "n_articulos": 6,
       "n_fragmentos": 24,
       "metodo_ingesta": "parser HTML + segmentacion por articulo",
-      "sha256": "7ed68e4264012a5ba6a4ff02cc064506ee02aebe5b0fed3fa4848e3b5cda34c8"
+      "sha256": "f3cccd29acda4ef4d897162144302c6998b27ee8ba6d800b81334fc099c0e2b3"
     },
     {
       "doc_id": "decreto_24_2016",
@@ -10453,6 +10453,526 @@
       "n_fragmentos": 11,
       "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
       "sha256": "65a1072d7f72ea5b2e8956ff71e47bf699bd927320d22b398eb42bc155cba8c6"
+    },
+    {
+      "doc_id": "ley_1473_2011",
+      "titulo": "Ley 1473 de 2011",
+      "fuente": "Secretaría General del Senado",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1473_2011.html",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho administrativo",
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 17,
+      "n_fragmentos": 30,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "73d52386038f5ddcc4da9631df134322d897153527070d60abff79b181d85fdc"
+    },
+    {
+      "doc_id": "ley_1692_2013",
+      "titulo": "Ley 1692 de 2013",
+      "fuente": "Secretaría General del Senado",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1692_2013.html",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 30,
+      "n_fragmentos": 72,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "a165cf255b36b5ba457d85853dfa1503757226ad0b93a3f6e71ab554eac84d21"
+    },
+    {
+      "doc_id": "sentencia_c-468_2024",
+      "titulo": "Sentencia C-468 de 2024",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2024/C-468-24.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 85,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "b86cab43308d7e986ad37e002fedd24a19d59d8f68de73129201da037432ebf8"
+    },
+    {
+      "doc_id": "sentencia_su-16_2020",
+      "titulo": "Sentencia SU-016 de 2020",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2020/SU016-20.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 299,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "2c718ae805cfb3203f78fe50f02b7353d16475841942e3ad554bb2c8e982112d"
+    },
+    {
+      "doc_id": "sentencia_su-277_2025",
+      "titulo": "Sentencia SU-277 de 2025",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2025/SU277-25.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 171,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "3ee7140fb1fa9fe35ef45963b97f56e67813d72485fcd454248abef371739155"
+    },
+    {
+      "doc_id": "decreto_2613_2022",
+      "titulo": "Decreto 2613 de 2022",
+      "fuente": "Departamento Administrativo de la Función Pública - Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=200172",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral",
+        "Derecho procesal"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 2,
+      "n_fragmentos": 8,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "a2c49732c4bec0eaf5b606dbe9643abc1d8be7fa5a8178bab5dff1be154fa3ad"
+    },
+    {
+      "doc_id": "decreto_2292_2023",
+      "titulo": "Decreto 2292 de 2023",
+      "fuente": "Departamento Administrativo de la Función Pública - Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=227530",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral",
+        "Derecho procesal"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 2,
+      "n_fragmentos": 9,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "d71a84bee83143fac188c95709e8c05f3ade502a7c981eb5c176036bb3587f21"
+    },
+    {
+      "doc_id": "decreto_1572_2024",
+      "titulo": "Decreto 1572 de 2024",
+      "fuente": "Departamento Administrativo de la Función Pública - Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=257156",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral",
+        "Derecho procesal"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 2,
+      "n_fragmentos": 14,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "975ddf65f0f19d27bb0d249bcfdf78f7c5564213c6c02df2d43eef9064c395ca"
+    },
+    {
+      "doc_id": "dian_resolucion_187_2023",
+      "titulo": "Resolución DIAN 000187 de 2023",
+      "fuente": "Normograma DIAN",
+      "url": "https://normograma.dian.gov.co/dian/compilacion/docs/resolucion_dian_0187_2023.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "resolucion",
+      "vigencia": null,
+      "n_articulos": 4,
+      "n_fragmentos": 6,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "40935bd5ff438eb912fa58490f037943f258c0378f3b3b95f354c17a1dbc1c14"
+    },
+    {
+      "doc_id": "dian_resolucion_193_2024",
+      "titulo": "Resolución DIAN 000193 de 2024",
+      "fuente": "Normograma DIAN",
+      "url": "https://normograma.dian.gov.co/dian/compilacion/docs/resolucion_dian_0193_2024.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "resolucion",
+      "vigencia": null,
+      "n_articulos": 4,
+      "n_fragmentos": 6,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "429b98739070d75b5605e079afcbaedf25c50b9895eb715358ea8c92c7946cfb"
+    },
+    {
+      "doc_id": "dian_resolucion_238_2025",
+      "titulo": "Resolución DIAN 000238 de 2025",
+      "fuente": "Normograma DIAN",
+      "url": "https://normograma.dian.gov.co/dian/compilacion/docs/resolucion_dian_0238_2025.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "resolucion",
+      "vigencia": null,
+      "n_articulos": 3,
+      "n_fragmentos": 6,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "b3d87aae4f072fdf07ceb7a37698290bbd0f98c6c6b2a7244ad4d4bcbceea7c3"
+    },
+    {
+      "doc_id": "ley_1082_2006",
+      "titulo": "Ley 1082 de 2006 — convenio tributario con España",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1082_2006.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 29,
+      "n_fragmentos": 120,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "a3f3013f168f53f43d5c88974cae0b3c61c4f890bbefec7fc4df3096c548a5ec"
+    },
+    {
+      "doc_id": "ley_1261_2008",
+      "titulo": "Ley 1261 de 2008 — convenio tributario con Chile",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1261_2008.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 31,
+      "n_fragmentos": 54,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "1efb457eaf0b20dc87fd05728f3bfd3eb43850f0fcc39cfd191cf6598050bb36"
+    },
+    {
+      "doc_id": "ley_1265_2008",
+      "titulo": "Ley 1265 de 2008 — convenio tributario con Panamá — transporte aéreo",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1265_2008.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 9,
+      "n_fragmentos": 13,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "ab4096a438a7d72f38096f1b525ad2fa6681a3768d2284c2cd4da261a645a216"
+    },
+    {
+      "doc_id": "ley_1344_2009",
+      "titulo": "Ley 1344 de 2009 — convenio tributario con Suiza",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1344_2009.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 29,
+      "n_fragmentos": 49,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "5a01587e2511f1526190ac5020f382fc99324754f31089c3154494dd768ad6d7"
+    },
+    {
+      "doc_id": "ley_1459_2011",
+      "titulo": "Ley 1459 de 2011 — convenio tributario con Canadá",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1459_2011.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 30,
+      "n_fragmentos": 76,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "d94220e0f53ac330bd8e764602ec35610dcfb43aa66d0d2b6064b1d6f1545f32"
+    },
+    {
+      "doc_id": "ley_1568_2012",
+      "titulo": "Ley 1568 de 2012 — convenio tributario con México",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1568_2012.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 30,
+      "n_fragmentos": 60,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "b8f3daae785ba6506e4db461ae63bd396f23d062cf1db541e54c29f824d1f9e4"
+    },
+    {
+      "doc_id": "ley_1667_2013",
+      "titulo": "Ley 1667 de 2013 — convenio tributario con Corea",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1667_2013.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 30,
+      "n_fragmentos": 67,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "82fbfca0d5f892089d00c7a70a9486277e387aab973c8d5b1056941cf505d15e"
+    },
+    {
+      "doc_id": "ley_1668_2013",
+      "titulo": "Ley 1668 de 2013 — convenio tributario con India",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1668_2013.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 31,
+      "n_fragmentos": 69,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "a80cf39efbfa36363b30910384d81a16099928882cbd44e151182057cd5b5dcb"
+    },
+    {
+      "doc_id": "ley_1690_2013",
+      "titulo": "Ley 1690 de 2013 — convenio tributario con República Checa",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1690_2013.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 28,
+      "n_fragmentos": 63,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "19cbf03651ac78b91f595c2a5bedfdb5d7733617a0741806414c33294f9e61cf"
+    },
+    {
+      "doc_id": "ley_1939_2018",
+      "titulo": "Ley 1939 de 2018 — convenio tributario con Reino Unido",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1939_2018.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 29,
+      "n_fragmentos": 79,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "26329ce139569655799bb9776938f346a76cc4c8c557a14519d5ce6cf3c45c66"
+    },
+    {
+      "doc_id": "ley_2004_2019",
+      "titulo": "Ley 2004 de 2019 — convenio tributario con Italia",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2004_2019.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 30,
+      "n_fragmentos": 101,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "e62e59eee0a3a64a44be0788ca88537aeb22b47ca8dd8b41d4ae0b877ff0c6a4"
+    },
+    {
+      "doc_id": "ley_2061_2020",
+      "titulo": "Ley 2061 de 2020 — convenio tributario con Francia",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2061_2020.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 31,
+      "n_fragmentos": 104,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "536f69bfcc8e4386a35a102f4e688cc41f53ccd28db020f8c7a961849ebf6979"
+    },
+    {
+      "doc_id": "ley_2095_2021",
+      "titulo": "Ley 2095 de 2021 — convenio tributario con Japón",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2095_2021.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 31,
+      "n_fragmentos": 99,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "cb356ccfbd1fa346b7a2896f4002762fd15ef6edd9f48243b6d8e8c4399db1e7"
+    },
+    {
+      "doc_id": "ley_2105_2021",
+      "titulo": "Ley 2105 de 2021 — convenio tributario con Alianza del Pacífico",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_2105_2021.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 15,
+      "n_fragmentos": 52,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "4726bd2bcc483d13d1b4edfbf06f1572f68f11dc3770e9ec8634a288224b1b0d"
+    },
+    {
+      "doc_id": "ley_71_1993",
+      "titulo": "Ley 71 de 1993 — convenio tributario con Brasil — empresas marítimas y aéreas",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_0071_1993.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 3,
+      "n_fragmentos": 11,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "ccfe8d00437eae5c73d0cf6a0c1b6d6ef8d86ec4be0efc7cacbeb7d2a10c18c5"
+    },
+    {
+      "doc_id": "decreto_1469_2025",
+      "titulo": "Decreto 1469 de 2025 — salario mínimo para 2026",
+      "fuente": "Normograma MINTIC",
+      "url": "https://normograma.mintic.gov.co/mintic/compilacion/docs/decreto_1469_2025.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral",
+        "Derecho procesal",
+        "Derecho administrativo"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 2,
+      "n_fragmentos": 28,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "114338895447ef1507174bb6b799e7505f587dadafbd9e34e1655a014c74c9ad"
+    },
+    {
+      "doc_id": "decreto_159_2026",
+      "titulo": "Decreto 159 de 2026 — salario mínimo para 2026",
+      "fuente": "DAPRE — Presidencia de la República",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_0159_2026.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral",
+        "Derecho procesal",
+        "Derecho administrativo"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 2,
+      "n_fragmentos": 39,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "0b270345ae29e3638ed6147056a7df05338b4bea4c803a69781178eb98f85e60"
+    },
+    {
+      "doc_id": "decreto_2614_2022",
+      "titulo": "Decreto 2614 de 2022 — auxilio de transporte para 2023",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_2614_2022.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "decreto",
+      "vigencia": "derogada",
+      "n_articulos": 2,
+      "n_fragmentos": 4,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "d80421d87d472037142a856dd51745d0cdbc68d4d2879613e5eb5e2c497ab7a6"
+    },
+    {
+      "doc_id": "decreto_2293_2023",
+      "titulo": "Decreto 2293 de 2023 — auxilio de transporte para 2024",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_2293_2023.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "decreto",
+      "vigencia": "derogada",
+      "n_articulos": 2,
+      "n_fragmentos": 4,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "4cc8d869ca904115dc6c2bd5c339a2f1a2d1659da7af97b4e19f3b9217fa2c8b"
+    },
+    {
+      "doc_id": "decreto_1573_2024",
+      "titulo": "Decreto 1573 de 2024 — auxilio de transporte para 2025",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_1573_2024.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "decreto",
+      "vigencia": "derogada",
+      "n_articulos": 2,
+      "n_fragmentos": 4,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "6324393c997cd9294e34df21f5d8f4cf63bd1a58c11d0959147cf292edae6b3f"
+    },
+    {
+      "doc_id": "decreto_1470_2025",
+      "titulo": "Decreto 1470 de 2025 — auxilio de transporte para 2026",
+      "fuente": "Compilación jurídica de Cancillería",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_1470_2025.htm",
+      "fecha_consulta": "2026-10-02",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 2,
+      "n_fragmentos": 8,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "cae124c6ec34629bc1e98ce06270d9d4aedae1d1a3ccd12c19a5c3214feca2ae"
     }
   ]
 }
