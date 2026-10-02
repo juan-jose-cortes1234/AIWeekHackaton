@@ -70,15 +70,20 @@ no respaldadas por «la normativa aplicable»; (iii) las leyes citadas sin año 
 los pasajes lo resuelven; (iv) el «Fundamento normativo» se construye desde los encabezados de los
 pasajes. Resultado: **0 citas sin respaldo** en todas las corridas.
 
-**Abstención.** Con los pesos oficiales, abstenerse casi nunca conviene: vale 0 en RAGAS (30
-puntos) y a lo sumo medio acierto en el componente de abstención (10 puntos). Por eso el sistema
-no se abstiene en selección múltiple ni por baja pertinencia; solo cuando el modelo no produce una
-respuesta utilizable. Las respuestas respetan los límites del enunciado: semiabiertas de 3 a 5
-oraciones y máximo 150 palabras; análisis de las abiertas de 5 a 8 oraciones.
+**Abstención.** El sistema registra `abstencion: true` en texto libre cuando el corpus no da
+fundamento suficiente —ningún pasaje supera 0,025 de pertinencia según el reranker y la pregunta
+no cita una norma presente en el corpus— o cuando el modelo no produce una respuesta utilizable.
+El umbral es bajo a propósito: con los pesos oficiales, una respuesta fundamentada vale más que la
+abstención. En selección múltiple siempre se elige una opción, porque responder aporta más que
+abstenerse incluso al azar. Las respuestas respetan los límites del enunciado: semiabiertas de 3 a
+5 oraciones y máximo 150 palabras; análisis de las abiertas de 5 a 8 oraciones, con un tope total
+de 500 palabras.
 
 ## 5. Resultados sobre las preguntas de muestra
 
-Evaluador oficial (`scripts/evaluate.py --ragas`), corrida `muestra_v12`, juez sin fallos:
+Evaluador oficial (`scripts/evaluate.py --ragas`), corrida `muestra_v12`, juez sin fallos. Esa corrida
+no aplicaba la abstención por evidencia insuficiente; con el umbral de 0,025 ninguna de sus
+respuestas cambiaría (la pertinencia mínima observada en la muestra fue 0,034):
 
 | Componente | Puntos | Posibles |
 |---|---:|---:|

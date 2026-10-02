@@ -496,3 +496,24 @@ de tres. Decisión de C-09 y C-10 pendiente de recalificar con RAGAS.
 - **53,09/80**, juez sin fallos: cerradas 11/15 (14,67) · citas 40 (16,33) · abstención 8,37 ·
   RAGAS 0,4572 (13,72). Frente a v11 (mismos prompts, sin C-18 y con 618 documentos): gana la 748
   sin perder ninguna; citas +2; RAGAS 0,428 → 0,457. Fallan 58 y 128 (claves discutibles), 647 y 671.
+
+## C-19 · 2026-10-02 · Abstención por evidencia insuficiente (umbral 0,025): corrige C-13
+- **Antes (C-13):** `UMBRAL_ABSTENCION=0`: en la práctica solo se abstenía si el modelo no producía
+  una respuesta utilizable. Eso incumple el requisito mínimo del Paso 4 del enunciado: «El sistema
+  debe disponer de un mecanismo de abstención, que registre abstencion: true cuando el corpus no
+  proporcione fundamento suficiente» (señalado en una revisión externa del reporte).
+- **Ahora:** `UMBRAL_ABSTENCION=0.025` (reranker) y `UMBRAL_ABSTENCION_DENSO=0.35`: en texto libre se
+  abstiene si ningún pasaje supera esa pertinencia y la pregunta no cita una norma presente en el
+  corpus. Umbral elegido por el usuario: bajo, porque con los pesos oficiales una respuesta
+  fundamentada vale más que la abstención. Selección múltiple sigue sin abstenerse.
+- **Evidencia:** en `muestra_v12` la pertinencia mínima en texto libre fue 0,034 (pregunta 513): con
+  0,025 ninguna respuesta de la muestra cambia. Pruebas de abstención actualizadas (19 passed).
+- **Archivos:** `src/config.py`, `.env.example`, `tests/test_abstencion.py`.
+- **Requiere reindexar:** no.
+
+## C-20 · 2026-10-02 · Tope de 500 palabras en las respuestas abiertas
+- **Antes:** sin tope de palabras (C-16); la más larga de la v12 tuvo 413.
+- **Ahora:** si los cuatro campos suman más de 500 palabras, el postproceso recorta el análisis a
+  las palabras disponibles (`citas.MAX_PALABRAS_ABIERTA`). Protección; no cambia la v12.
+- **Archivos:** `src/generation/citas.py`, `tests/test_citas.py`.
+- **Requiere reindexar:** no.

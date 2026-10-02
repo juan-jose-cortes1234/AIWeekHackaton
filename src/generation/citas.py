@@ -26,6 +26,7 @@ MAX_EVIDENCIA = 10
 REEMPLAZO = "la normativa aplicable"
 SIN_JURISPRUDENCIA = "La evidencia recuperada no incluye jurisprudencia pertinente para el caso."
 SIN_RESPALDO_OPCION = "La evidencia recuperada no respalda esta opción."
+MAX_PALABRAS_ABIERTA = 500   # tope de las respuestas abiertas (los cuatro campos juntos), C-20
 _ORACION = re.compile(r"(?<=[.;:!?])\s+(?=[A-ZÁÉÍÓÚÑ¿(\"“])")
 _SENTENCIA_PREVIA = re.compile(r"(?:\b(?:la|las|el)\s+)?\bsentencias?\s+(?:de\s+tutela\s+|de\s+unificaci[óo]n\s+)?$",
                                re.IGNORECASE)
@@ -241,6 +242,11 @@ def postprocesar(item: dict, datos: dict, pasajes, cfg: Config = config) -> Post
         faltan = [r for r in refs if not cuerpos(r) <= ya]
         if faltan:
             marco = f"{marco} Normas aplicables: {'; '.join(faltan)}.".strip()
+        # Tope de MAX_PALABRAS_ABIERTA para los cuatro campos juntos (C-20): si se pasa, se
+        # recorta el análisis (el campo más largo) a las palabras que queden disponibles.
+        resto = sum(len(t.split()) for t in (marco, juris, concl))
+        if resto + len(analisis.split()) > MAX_PALABRAS_ABIERTA:
+            analisis = limitar(analisis, 8, max(MAX_PALABRAS_ABIERTA - resto, 60))
         campos = {"marco_normativo": marco, "analisis": analisis,
                   "jurisprudencia": juris, "conclusion": concl}
     return Postproceso(campos=campos, eliminadas=elim, referencias=refs)

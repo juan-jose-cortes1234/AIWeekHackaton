@@ -117,7 +117,7 @@ pregunta ──► router de citas explícitas ─┐
 | Recuperación | Router de artículos citados en la pregunta + BM25 + denso con RRF, sesgo por área, diversidad por artículo; en MC, cada opción como consulta adicional | Los embeddings confunden números de artículo; BM25 no (B.3) |
 | Reordenamiento | `BAAI/bge-reranker-v2-m3` (Apache-2.0) sobre los 20 mejores | Precisión del cross-encoder sobre candidatos |
 | Citas | Post-filtro determinista con las expresiones del evaluador: se eliminan las citas no presentes en los 10 pasajes; referencias renderizadas desde los metadatos de los pasajes | Cero citas sin respaldo; reproducible en la verificación en vivo |
-| Mecanismo de abstención | Nunca en selección múltiple; en texto libre solo sin evidencia pertinente (reranker bajo el umbral y sin artículo citado) o sin respuesta utilizable | Con los pesos oficiales, abstenerse casi nunca conviene |
+| Mecanismo de abstención | Nunca en selección múltiple; en texto libre, cuando el corpus no da fundamento suficiente (ningún pasaje supera 0,025 de pertinencia del reranker y la pregunta no cita una norma del corpus) o sin respuesta utilizable | Requisito mínimo del enunciado; umbral bajo porque, con los pesos oficiales, una respuesta fundamentada vale más que abstenerse |
 | Determinismo | Temperatura 0, semilla fija, desempates por id, índice congelado por sha256 | Verificación en vivo |
 
 Solo se admiten modelos de licencia abierta: `src/config.py` mantiene una lista

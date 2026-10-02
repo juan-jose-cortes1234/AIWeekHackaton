@@ -18,8 +18,10 @@ Evaluador oficial (`scripts/evaluate.py --ragas`), GPU T4, juez sin fallos (corr
 | **Total automático** | **53,09** | **80** |
 
 Evolución: línea base 48,67 → 53,09. Ninguna norma citada carece de respaldo en la evidencia;
-las normas del fundamento de referencia llegan a la evidencia en 46 de 49 casos. En texto libre
-la corrección supera la referencia del estudio (0,451).
+las normas del fundamento de referencia llegan a la evidencia en 46 de 49 casos. En las 50
+preguntas de muestra, RAGAS alcanza 0,4572, por encima del valor de referencia 0,451; los conjuntos
+evaluados son distintos. Esta corrida se hizo sin abstención por baja pertinencia; la versión de
+entrega la reactiva (ver §3), lo que en la muestra no cambia ninguna respuesta.
 
 ## 2. Estado del corpus
 
@@ -39,13 +41,17 @@ la corrección supera la referencia del estudio (0,451).
 | Decoder | `google/gemma-4-E4B-it` (Apache-2.0, 7.996.156.490 parámetros), GGUF Q8_0 con su plantilla de chat, temperatura 0 |
 | Recuperación | Router de artículos citados + BM25 jurídico + denso (FAISS exacto), fusión RRF, reranker `bge-reranker-v2-m3`, cupo de 4 normas en los 10 pasajes, evidencia por opción en selección múltiple |
 | Segmentación | Por artículo con encabezado canónico de la norma; sentencias por secciones |
-| Abstención | Solo si el modelo no produce una respuesta utilizable (con los pesos oficiales, responder suma más) |
+| Abstención | En texto libre, `abstencion: true` cuando el corpus no da fundamento suficiente (ningún pasaje supera 0,025 de pertinencia según el reranker y la pregunta no cita una norma del corpus) o el modelo no produce una respuesta utilizable; en selección múltiple siempre se elige una opción |
 
 ## 4. Riesgos identificados
 
 1. **Exactitud en cerradas (73 %):** el modelo de 8B elige distinto según cómo se le presentan
    las opciones, aun con la norma en la evidencia; seguimos trabajando la selección de evidencia.
-2. **Tiempo de cómputo:** ~40 s por pregunta en una T4 (992 ≈ 11 h); el banco se repartirá por
-   rangos entre varias GPU de la sala Turing (`run.py --rango`).
-3. **Claves discutibles en la muestra:** 2 de las 4 preguntas de selección múltiple falladas tienen
-   una clave con errata o más amplia que la norma.
+2. **Tiempo de cómputo:** ~40 s por pregunta en una T4 (992 ≈ 11 h de cómputo). Plan: 6 equipos
+   en paralelo —3 de la sala Turing y 3 portátiles con Colab—, un rango de ~165 preguntas cada uno
+   (`run.py --rango INICIO FIN`), ≈ 2 h. Riesgos: la ejecución por consola aún no se ha ensayado en
+   Turing (ensayo previsto antes del sábado) y Colab puede negar GPU por cuota (respaldo: Kaggle).
+3. **Posibles inconsistencias en las claves de la muestra, pendientes de verificación:** en la
+   pregunta 58 la opción correcta dice «Ley 1564 de 2002», mientras que el Código General del
+   Proceso es la Ley 1564 de 2012; en la 128 la clave incluye a las Fintech, que el Decreto 2555 de
+   2010 no menciona entre quienes pueden celebrar leasing financiero.

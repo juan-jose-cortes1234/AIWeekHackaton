@@ -126,3 +126,15 @@ def test_citas_solapadas_no_corrompen_el_texto():
     limpio = _quitar_spans(t, [(i, f) for i, f, _ in localizar(t)])
     assert limpio.count(REEMPLAZO) == 1
     assert "garantiza el derecho a la salud" in limpio and "aplicla" not in limpio
+
+
+def test_abierta_no_pasa_de_500_palabras():
+    from src.generation.citas import MAX_PALABRAS_ABIERTA, postprocesar
+
+    item = {"id": 9, "formato": "open_ended", "pregunta": "Caso de prueba."}
+    largo = " ".join(f"Oración de análisis número {i} " + "palabra " * 70 + "." for i in range(8))
+    pp = postprocesar(item, {"marco_normativo": "Marco.", "analisis": largo,
+                             "jurisprudencia": "Juris.", "conclusion": "Conclusión."}, [])
+    total = sum(len(str(pp.campos[c]).split()) for c in ("marco_normativo", "analisis",
+                                                         "jurisprudencia", "conclusion"))
+    assert total <= MAX_PALABRAS_ABIERTA and pp.campos["analisis"]

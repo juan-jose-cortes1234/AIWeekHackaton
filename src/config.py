@@ -100,8 +100,8 @@ class Config:
     documentos_complementarios: Path = RAIZ / "config" / "documentos_complementarios.txt"
     umbral_cita: float = 0.5
     max_referencias: int = 6
-    umbral_abstencion: float = 0.0     # texto libre: 0 = sin abstención por baja pertinencia (C-13, pesos oficiales)
-    umbral_abstencion_denso: float = 0.0  # ídem cuando no hay reranker (antes 0.35)
+    umbral_abstencion: float = 0.025   # texto libre: se abstiene si ningún pasaje supera esta pertinencia del reranker (C-19; requisito mínimo del Paso 4)
+    umbral_abstencion_denso: float = 0.35  # ídem cuando no hay reranker (similitud densa)
 
     decoder_backend: str = "llamacpp"
     decoder_model: str = "google/gemma-4-E4B-it"          # C-15 (antes Qwen/Qwen3-8B)

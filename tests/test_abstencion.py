@@ -40,10 +40,11 @@ def test_umbral_rerank_y_denso():
     assert not decidir(SEMI, [P(denso=0.6)], OK_SEMI, cfg).abstener
 
 
-def test_por_defecto_no_se_abstiene_por_baja_pertinencia():
-    # C-13: con los pesos oficiales, responder suma en RAGAS; solo se abstiene sin respuesta.
-    assert not decidir(SEMI, [P(rerank=0.001)], OK_SEMI).abstener
-    assert not decidir(SEMI, [P(denso=0.01)], OK_SEMI).abstener
+def test_umbral_por_defecto_evidencia_insuficiente():
+    # C-19: requisito mínimo del Paso 4: abstenerse cuando el corpus no da fundamento suficiente.
+    assert decidir(SEMI, [P(rerank=0.01)], OK_SEMI).abstener           # < 0,025
+    assert not decidir(SEMI, [P(rerank=0.03)], OK_SEMI).abstener       # >= 0,025
+    assert decidir(SEMI, [P(denso=0.2)], OK_SEMI).abstener             # sin reranker: < 0,35
 
 
 def test_router_evita_abstencion():
@@ -67,7 +68,6 @@ def test_con_recuperador_real(indice_prueba):
 
     con_umbral = dataclasses.replace(config, umbral_abstencion=0.05, umbral_abstencion_denso=0.35)
     assert decidir({"id": 1, "formato": "semi_open"}, pasajes, OK_SEMI, con_umbral).abstener
-    assert not decidir({"id": 1, "formato": "semi_open"}, pasajes, OK_SEMI).abstener  # C-13
     assert not decidir({"id": 1, "formato": "multiple_choice"}, pasajes, None).abstener
     propia = rec.buscar("¿Qué es la sociedad conyugal según el Código Civil?", k=10)
     assert not decidir({"id": 2, "formato": "semi_open"}, propia, OK_SEMI).abstener
