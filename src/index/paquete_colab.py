@@ -50,6 +50,22 @@ def _indice_al_dia(chunks: Path) -> bool:
             and m.get("sha256_faiss") == sha256_archivo(d / "index.faiss"))
 
 
+def _huella() -> str:
+    """Fecha de generación y huella del código: el cuaderno la imprime para confirmar que
+    Colab/Kaggle usa el paquete recién subido (Kaggle ancla la versión del dataset)."""
+    import hashlib
+    from datetime import datetime
+
+    h = hashlib.sha256()
+    for carpeta in ("src", "config", "scripts"):
+        for f in sorted((RAIZ / carpeta).rglob("*")):
+            if f.is_file() and "__pycache__" not in f.parts:
+                h.update(f.relative_to(RAIZ).as_posix().encode("utf-8"))
+                h.update(f.read_bytes())
+    return (f"Paquete generado: {datetime.now():%Y-%m-%d %H:%M}\n"
+            f"Huella del código: {h.hexdigest()[:12]}\n")
+
+
 def crear(modo: str = "indice", destino: Path | None = None, con_cache: bool = True,
           con_indice: bool = False) -> Path:
     chunks = config.index_dir / "chunks.jsonl"
@@ -75,6 +91,7 @@ def crear(modo: str = "indice", destino: Path | None = None, con_cache: bool = T
                 z.write(p, f"build/cache/emb/{p.name}")
         if fuga.is_file():
             z.write(fuga, "build/corpus/_fuga.json")
+        z.writestr("PAQUETE.txt", _huella())
         if con_indice:
             d = config.index_dir
             z.write(d / "index.faiss", "build/indice/index.faiss")
@@ -96,6 +113,8 @@ def main(argv: list[str] | None = None) -> int:
     ruta = crear(args.modo, con_cache=not args.sin_cache, con_indice=args.con_indice)
     cuaderno = "indice_en_colab" if args.modo == "indice" else "muestra_en_colab"
     print(f"{ruta} ({ruta.stat().st_size / 1e6:.1f} MB). Úselo con notebooks/{cuaderno}.ipynb.")
+    with zipfile.ZipFile(ruta) as z:
+        print(z.read("PAQUETE.txt").decode("utf-8").strip())
     return 0
 
 

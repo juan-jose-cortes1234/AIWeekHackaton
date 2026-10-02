@@ -166,6 +166,16 @@ python scripts/evaluate.py --submission runs/<TAG>_50/submissions.jsonl --split 
 Para `--ragas` en local: `pip install -r scripts/requirements-evaluador.txt`. Cada corrida con
 juez consume la llave: úsela solo para mediciones que valgan la pena.
 
+**Si el reporte avisa "El juez no devolvió veredicto en N items"** (fallos de red entre la máquina
+y OpenRouter; cuentan como cero y falsean la comparación), repetir solo la calificación con el
+juez espaciado: es el mismo `scripts/evaluate.py` (sin copiarlo ni modificarlo) con 4 llamadas
+simultáneas en vez de 16, 600 s por ítem y reintentos. Solo para nuestras mediciones; el jurado
+usa el evaluador tal cual.
+```bash
+python -m src.eval.evaluar --submission runs/<TAG>/submissions.jsonl --split sample --ragas --out runs/<TAG>/reporte_ragas_espaciado.json
+```
+En los cuadernos es la celda 8b.
+
 ### 5.5 Local (CPU; solo para pocas preguntas)
 ```bash
 python -m src.pipeline.main --split sample --ids 51,290,748      # preguntas concretas
@@ -208,6 +218,7 @@ En contenedor: `docker build -t hackathon-rag .` y
 | Síntoma | Causa y solución |
 |---|---|
 | Colab: `CUDA_ERROR_OUT_OF_MEMORY` / "Failed to load model" | JAX de Colab reservaba la GPU. Ya se evita en `src/config.py`; si reaparece, revise `!nvidia-smi` |
+| `libcudart.so.12: cannot open shared object file` al importar llama_cpp | La imagen del entorno trae otra versión de CUDA (Colab pasó a CUDA 13 y Python 3.13). La celda 3c instala `nvidia-cuda-runtime-cu12` y `nvidia-cublas-cu12` y apunta a ellas; si aun así falla, compilar con la celda 3b (~15-20 min) y reiniciar la sesión |
 | Colab: celda con tick verde pero sin resultados | Los comandos `!` no marcan error: lea la salida y el "CÓDIGO DE SALIDA" |
 | Tras descomprimir, "No hay índice" | Windows creó una carpeta extra: mueva `build/` (o `runs/`) a la raíz del proyecto |
 | `.htm` con "�" al abrirlos | Están en windows-1252; el sistema los lee bien, no hay que corregirlos |

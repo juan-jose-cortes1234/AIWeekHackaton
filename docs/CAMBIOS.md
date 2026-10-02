@@ -309,3 +309,46 @@ Los cinco cambios se midieron juntos, en un solo viaje a Colab, contra la línea
   (`leer_complementarios`, tope en `buscar`), `src/generation/responder.py` (`recuperar_mc`),
   `src/config.py`, `.env.example`, `tests/test_hibrido.py`.
 - **Requiere reindexar:** no.
+
+### Corrección (2026-10-01, tras `runs/muestra_v4`)
+La premisa de C-10 era errónea: la caída de RAGAS de v3 (0,4605 → 0,3815) se debió a que el juez
+no devolvió veredicto en 6 de 33 respuestas (cuentan como cero; v2: 0 fallos). Sobre las respuestas
+con veredicto, v3 promedia 0,495 frente a 0,488 de v2. En v4 el juez falló en 21 de 33 (RAGAS
+oficial 0,1744; 0,509 sobre las 12 calificadas). C-09 en v4: MC 10/15 (gana 487 y 528, pierde 58),
+63 s por MC, citas en MC más escasas (358 pierde su norma). C-10 en v4: 879 pierde su cita, 253 una
+de tres. Decisión de C-09 y C-10 pendiente de recalificar con RAGAS.
+
+## C-11 · 2026-10-01 · Respuestas abiertas más cortas (máximo ~200 palabras)
+- **Antes (C-01):** las abiertas sumaban 196 a 323 palabras entre los cuatro campos (análisis de 5 a
+  8 oraciones). El juez de RAGAS descompone la respuesta en afirmaciones: más largo = más llamadas y
+  más riesgo de `TimeoutError`. En la recalificación de v4 fallaron 7 de 33 (5 timeouts, 2 cortes de
+  conexión); una de ellas, la abierta de 323 palabras (679). Las respuestas de referencia promedian
+  ~107 palabras.
+- **Ahora:** `prompts/open_ended.txt` pide máximo 200 palabras en total: marco normativo (hasta 5
+  normas, frase muy breve cada una), análisis de 3 o 4 oraciones, hasta 2 sentencias y conclusión de
+  una oración. `MAX_TOKENS` de abiertas sigue en 1400 para no truncar.
+- **Por qué:** menos riesgo de que el juez agote su tiempo (cuenta como 0) y respuestas más cercanas
+  al tamaño de las de referencia. Los fallos de red del juez no dependen de nosotros.
+- **Evidencia:** pendiente (`muestra_v5`: igual que v4 salvo este cambio).
+- **Archivos:** `src/generation/prompts/open_ended.txt`.
+- **Requiere reindexar:** no.
+- **Evidencia (`runs/muestra_v6`, paquete 9141cc86a064):** solo cambiaron las 4 abiertas
+  respondidas; el resto, idéntico a v4. Pero **no se acortaron** (196–323 → 212–293 palabras): el
+  modelo sí escribe menos (430–610 tokens de salida), y el largo lo pone nuestro postproceso, que
+  agrega al marco normativo "Normas aplicables: …" con hasta 6 normas de la evidencia que el modelo
+  no citó (40–60 palabras). Citas 34 → 35. El juez volvió a fallar en 7 de 33 (red); sobre las
+  calificadas, 0,495.
+
+## C-12 · 2026-10-01 · Arreglo: el filtro de citas corrompía el texto con citas solapadas
+- **Antes:** `_quitar_spans` reemplazaba cada cita sin respaldo por "la normativa aplicable" de
+  derecha a izquierda, pero con tramos solapados (un código dentro de una cita más larga, o la
+  extensión hacia "el artículo 5 del…") el segundo reemplazo cortaba el texto ya modificado. Caso
+  679 en `muestra_v6`: el marco normativo empezaba "la normativa aplicla normativa aplicablembia…".
+  Ese texto lo lee el juez de RAGAS.
+- **Ahora:** se calculan los tramos finales sobre el texto original, se unen los que se solapan y
+  luego se reemplazan. Mismo criterio de qué se elimina; solo cambia que el texto queda legible.
+- **Evidencia:** comprobado sobre el caso ("Artículo 49 de la Constitución Política de Colombia…" →
+  un solo reemplazo, resto intacto). Prueba `test_citas_solapadas_no_corrompen_el_texto` (sin
+  correr: el usuario pide que se le pregunte antes).
+- **Archivos:** `src/generation/citas.py`, `tests/test_citas.py`.
+- **Requiere reindexar:** no.

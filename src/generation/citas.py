@@ -99,11 +99,22 @@ def completar_anios(texto: str, soporte: set[tuple]) -> str:
 
 
 def _quitar_spans(texto: str, spans: list[tuple[int, int]]) -> str:
-    for ini, fin in sorted(spans, reverse=True):
+    # Tramos finales sobre el texto original (con "el artículo 5 del " o "la Sentencia " que
+    # los precede) y unidos si se solapan: reemplazar por separado dos tramos que se pisan
+    # (p. ej. un código dentro de una cita más larga) corrompía el texto ("la normativa
+    # aplicla normativa aplicable…", caso 679 en muestra_v6).
+    tramos = []
+    for ini, fin in spans:
         previo = (_CUERPO_ART.search(texto[:ini])       # “el artículo 5 del ” antes de la norma
                   or _SENTENCIA_PREVIA.search(texto[:ini]))  # “la Sentencia ” antes de “T-123…”
-        if previo:
-            ini = previo.start()
+        tramos.append((previo.start() if previo else ini, fin))
+    unidos: list[list[int]] = []
+    for ini, fin in sorted(tramos):
+        if unidos and ini <= unidos[-1][1]:
+            unidos[-1][1] = max(unidos[-1][1], fin)
+        else:
+            unidos.append([ini, fin])
+    for ini, fin in reversed(unidos):
         texto = texto[:ini] + REEMPLAZO + texto[fin:]
     return re.sub(rf"({re.escape(REEMPLAZO)})(\s*[,;y]\s*{re.escape(REEMPLAZO)})+", r"\1", texto)
 

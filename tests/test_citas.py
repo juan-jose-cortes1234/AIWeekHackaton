@@ -115,3 +115,14 @@ def test_abierta_rescatada_completa_campos_obligatorios():
     sub = {"id": 1, "formato": "open_ended", "abstencion": False, **pp.campos,
            "pasajes_recuperados": [p.a_entrega() for p in PASAJES]}
     assert evaluate.validate([sub], {1}) == []
+
+
+def test_citas_solapadas_no_corrompen_el_texto():
+    # Caso 679 (muestra_v6): un código dentro de una cita más larga se reemplazaba dos veces
+    # y quedaba "la normativa aplicla normativa aplicable…".
+    from src.generation.citas import REEMPLAZO, _quitar_spans, localizar
+
+    t = "Artículo 49 de la Constitución Política de Colombia, que garantiza el derecho a la salud."
+    limpio = _quitar_spans(t, [(i, f) for i, f, _ in localizar(t)])
+    assert limpio.count(REEMPLAZO) == 1
+    assert "garantiza el derecho a la salud" in limpio and "aplicla" not in limpio
