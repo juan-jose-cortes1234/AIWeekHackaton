@@ -5,6 +5,7 @@ Produce `dist/corpus_<equipo>.zip` con la estructura oficial
 
     LICENSE                  CC-BY-4.0 (texto legal completo, docs/LICENSE-CORPUS-CC-BY-4.0.txt)
     corpus_manifest.json     copia del manifiesto del repositorio
+    fuentes.csv              inventario de fuentes (URL, fecha de consulta, número, año, órgano)
     corpus/<doc_id>.txt      documentos procesados
     indice/                  index.faiss, chunks.jsonl, index_manifest.json, bm25/
 
@@ -73,6 +74,11 @@ def empaquetar(cfg: Config = config, destino: Path | None = None,
     destino.parent.mkdir(parents=True, exist_ok=True)
 
     entradas: list[tuple[str, Path]] = [("LICENSE", LICENCIA), ("corpus_manifest.json", manifiesto)]
+    # Inventario de fuentes (número, año, órgano emisor, URL, fecha y notas de verificación):
+    # trazabilidad para reconstruir el corpus desde las URL declaradas.
+    fuentes = cfg.corpus_raw_dir / "fuentes.csv"
+    if fuentes.is_file():
+        entradas.append(("fuentes.csv", fuentes))
     entradas += [(f"corpus/{p.name}", p) for p in cfg.corpus_out_dir.glob("*.txt")]
     entradas += [(f"indice/{p.relative_to(cfg.index_dir).as_posix()}", p)
                  for p in cfg.index_dir.rglob("*")

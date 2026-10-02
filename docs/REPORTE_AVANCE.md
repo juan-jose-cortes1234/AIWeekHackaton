@@ -2,7 +2,8 @@
 
 **Equipo:** Los PoliTICos
 **Integrantes:** Juan José Cortés Villamil · Pablo Medina Forero · Miguel Santiago Roa Vallejo
-**Fecha:** 2 de octubre de 2026
+**Fecha:** 2 de octubre de 2026  
+**Repositorio:** https://github.com/juan-jose-cortes1234/AIWeekHackaton
 
 ## 1. Puntaje sobre las preguntas de muestra
 

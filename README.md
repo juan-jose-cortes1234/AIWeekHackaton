@@ -14,14 +14,15 @@ pasajes recuperados del corpus; toda norma citada figura en esos pasajes.
 
 | Recurso | Enlace | Tamaño | Licencia |
 |---|---|---|---|
-| Corpus procesado e índice vectorial | `<URL pública del zip>` | `<tamaño>` | CC-BY-4.0 |
+| Corpus procesado e índice vectorial (`corpus_equipo.zip`, dentro de la carpeta compartida) | [carpeta en OneDrive](https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk) | 368,5 MB | CC-BY-4.0 |
 
-- sha256 del zip: `<CORPUS_ZIP_SHA256>`
-- El comprimido contiene `LICENSE`, `corpus_manifest.json`, `corpus/` con los
+- sha256 del zip: `47313ac08a2687406bdeb7e9684f6c08eb087739004bbf78cd6ae2d7a4b393a9`
+- El comprimido contiene `LICENSE`, `corpus_manifest.json`, `fuentes.csv` (inventario con URL y
+  fecha de consulta de cada fuente), `corpus/` con los
   documentos procesados (un `.txt` por norma, fragmentos con encabezado canónico)
   e `indice/` con el índice FAISS, el índice BM25, `chunks.jsonl` (fragmentos con
   `doc_id`, offsets y metadatos) e `index_manifest.json` (modelo, dimensión y hashes).
-- El enlace permanece activo hasta el `<fecha, treinta días después del evento>`.
+- El enlace permanece activo al menos hasta el 2 de noviembre de 2026 (treinta días después del evento).
 - Bitácora del corpus: [`CORPUS.md`](CORPUS.md) · manifiesto: [`corpus_manifest.json`](corpus_manifest.json).
 
 ## Reproducción
@@ -164,15 +165,20 @@ la identidad visual de Software Colombia.
 
 ## Limitaciones conocidas
 
-1. **Hardware:** en CPU una respuesta tarda ~2,5 minutos; la ejecución completa
+1. **Hardware:** en CPU una respuesta tarda ~3,5 minutos; la ejecución completa
    requiere GPU.
 2. **Cobertura del corpus:** una norma ausente del corpus no se puede citar con
-   respaldo; `docs/BRECHAS.md` lista las faltantes conocidas. `<completar>`
+   respaldo; `docs/BRECHAS.md` lista las faltantes conocidas. Al cierre: 544 de 559 ítems del
+   listado inicial cubiertos (97 %) y ninguna norma de la muestra faltante.
 3. **Segmentación:** el corte por artículo depende del formato de la fuente
    (HTML del Senado, SUIN, PDF); documentos escaneados requieren OCR.
 4. **Citas a nivel de cuerpo:** el filtro garantiza que toda norma citada esté en
    la evidencia, no que el artículo específico sea el pertinente.
-5. `<completar con lo observado en la muestra>`
+5. **Selección múltiple:** 11 de 15 en la muestra (0,73 frente a 0,905 de referencia). Con la
+   misma evidencia, el modelo de 8B puede elegir distinto según cómo se le presentan las opciones;
+   dos de las cuatro falladas tienen claves con errata o más amplias que la norma.
+6. **Tiempo:** ~40 s por pregunta en una GPU T4; las 992 preguntas requieren repartir el banco
+   entre varias GPU (`run.py --rango`).
 
 ## Uso de herramientas de IA en el desarrollo
 

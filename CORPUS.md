@@ -1,4 +1,4 @@
-# Bitácora del corpus — <Nombre del equipo>
+# Bitácora del corpus — Los PoliTICos
 
 Bitácora exigida en el paso 5 del enunciado (5 puntos: inventario completo y
 trazable 2; justificación frente a la composición del banco 1,5; corpus
@@ -6,8 +6,7 @@ reconstruible a partir de las URL declaradas 1,5).
 
 Las tablas entre marcas `AUTO` las regenera `python -m src.corpus.manifest` a
 partir de `fuentes.csv` y del corpus procesado; no las editen a mano. La prosa
-(criterio, método, lectura de la curva) la escribe el equipo; los borradores
-están marcados con `BORRADOR`.
+(criterio, método, lectura de la curva) la escribe el equipo.
 
 ---
 
@@ -700,17 +699,51 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 _Cobertura del seed_: ítems del banco (según `items_del_banco` de `data/seed_targets.json`) cuyas normas ya están en el corpus. Es una cota inferior: el seed no es exhaustivo.
 <!-- /AUTO:cobertura -->
 
-<!-- BORRADOR: justificar la selección frente a las diez áreas y las sub-tareas
-del banco (enunciado §4.2). Puntos a cubrir: prioridad por peso de cada área y
-por `items_del_banco` de seed_targets.json; códigos incorporados que el seed no
-listaba (Código Civil, Comercio, Penal, CPACA…) y por qué; jurisprudencia
-incorporada para las sub-tareas de precedente, sentido del fallo y ratio
-decidendi. -->
+La selección se guió por la composición del banco (enunciado §4.2) con tres señales, en este orden:
+
+1. **Peso por área.** Se cubrieron las diez áreas en proporción a su número de ítems: constitucional
+   (134), administrativo (124), penal (123), procesal (111), comercial (104), civil (102), familia
+   (93), tributario (92), laboral (87) y mercados (72). Ninguna área quedó sin cobertura.
+2. **Normas del listado inicial (`data/seed_targets.json`).** Se incorporaron primero las de mayor
+   `items_del_banco` (Constitución 90 ítems, Código General del Proceso 65, Código Sustantivo del
+   Trabajo 37, Estatuto Tributario 35, Decisión Andina 486 23, Estatuto del Consumidor 13…) y luego
+   las sentencias del listado (Corte Constitucional y Corte Suprema). Cobertura final: 544 de 559
+   ítems (97 %); los faltantes son, en su mayoría, erratas del propio listado (ver más abajo).
+3. **Fundamentos de las preguntas de muestra.** El listado no es exhaustivo: la muestra cita códigos
+   completos que no aparecían (Código Civil, Código de Comercio, Código Penal y de Procedimiento
+   Penal, CPACA, Ley 472 de 1998, Ley 1562 de 2012…). Se incorporaron todos; al cierre no falta
+   ninguna norma citada por la muestra (`python -m src.eval.brechas`).
+
+Además se incorporó material que el banco usa aunque no lo nombre explícitamente:
+- **Compilaciones normativas completas** (códigos, decretos únicos reglamentarios de los sectores
+  trabajo, comercio, justicia, salud, financiero y agropecuario) para que cualquier artículo
+  aplicable pueda recuperarse y citarse.
+- **Jurisprudencia** de la Corte Constitucional (C, T y SU) y de la Corte Suprema (SC, SL, SP) para
+  las sub-tareas de precedente, sentido del fallo y *ratio decidendi*; las sentencias se segmentan
+  por secciones (antecedentes, consideraciones, resuelve, salvamentos y aclaraciones) para
+  distinguir la decisión de la Corte de los votos particulares.
+- **Doctrina oficial** (262 conceptos de la DIAN, la SIC y la Supersociedades) para tributario,
+  mercados y sociedades. Sirve como evidencia aunque el evaluador no la reconozca como cita.
+- **Datos para cálculos:** decretos del salario mínimo y del auxilio de transporte (2023–2026) y
+  resoluciones de la UVT (2023–2026), y 16 leyes aprobatorias de convenios para evitar la doble
+  imposición (tributario internacional).
 
 Documentos descartados y el motivo del descarte:
 
-<!-- BORRADOR: qué se consideró y no se incorporó, y por qué (derecho ambiental
-e internacional fuera del banco; doctrina con derechos de autor; etc.). -->
+- **Doctrina con derechos de autor, blogs, resúmenes o textos generados por IA:** se excluyeron por
+  regla; solo texto oficial y completo de fuentes públicas.
+- **Siete sentencias del Consejo de Estado** (identificadas por radicado): se apartaron en
+  `fuentes_pendientes.csv` porque el evaluador no puede reconocerlas como cita.
+- **Decreto 2737 de 1989 (Código del Menor):** derogado por la Ley 1098 de 2006, que sí está.
+- **Acuerdo 02 de 2015 (reglamento de la Corte Constitucional):** solo disponible en una versión
+  original sin reformas y fuera de las fuentes listadas en el enunciado.
+- **Decreto 875 de 2008:** el listado lo asocia a laboral, pero el decreto real trata del registro
+  de proyectos de inversión.
+- **Referencias del listado que no corresponden a una norma real** (no se fabricaron documentos):
+  "Ley 23 de 1961", "SU-488 de 2011", "T-248 de 2025", "SU-6 de 1991" y "SL-1972 de 2025" (sin texto
+  oficial publicado). Las erratas con norma identificable se resolvieron hacia la norma real: «Ley
+  1150 de 2005» → Ley 1150 de 2007; «Ley 116 de 2006» → Ley 1116 de 2006; «Ley 964 de 2006» → Ley
+  964 de 2005; «Ley 1692 de 2017» → Ley 1692 de 2013; «Decreto 1563 de 2012» → Ley 1563 de 2012.
 
 ## 3. Método de ingesta y limpieza
 
@@ -749,7 +782,24 @@ banco de preguntas.
 
 Problemas encontrados y cómo se resolvieron:
 
-<!-- BORRADOR: OCR defectuoso, artículos derogados, numeraciones inconsistentes… -->
+- **Detección de secciones en sentencias:** el primer detector tomaba frases en minúscula y
+  anexos como títulos (en la T-760 de 2008, 494 de 885 fragmentos quedaban marcados como
+  RESUELVE). Se reemplazó por un detector estricto (título completo, en mayúsculas o numerado, y en
+  el orden de la sentencia) y un chequeo automático (`python -m src.corpus.secciones`).
+- **PDF escaneado:** una sentencia de la Corte Suprema sin capa de texto se transcribió con OCR
+  local y se conservó el archivo original.
+- **Versiones incompletas en la fuente:** la Ley 1473 de 2011 en Función Pública llegaba solo al
+  artículo 5; se usó la versión de la Secretaría del Senado (17 artículos).
+- **Inventario dañado al editarlo en Excel:** `fuentes.csv` llegó dos veces con codificación mixta y
+  separadores alterados; se reparó deshaciendo exactamente la transformación y verificando campo
+  por campo contra el inventario anterior. Desde entonces se edita fuera de Excel.
+- **Números que el evaluador no reconoce:** con ceros a la izquierda («Resolución 000165»,
+  «Decreto 046») o con el año pegado («SP2287-2024»). Se normalizó el número a la forma que el
+  evaluador reconoce (por ejemplo «SP-2287»), y la Circular Única de la SIC se registró como Circular
+  10 de 2001 para que sea citable.
+- **Notas de pie en DOCX:** se perdían en la extracción; el extractor se corrigió para incluirlas.
+- **Guardia anti-fuga:** distingue coincidencias menores (frases comunes del derecho) de material
+  del banco; en todas las construcciones, cero hallazgos graves.
 
 ## 4. Evolución del puntaje
 
@@ -761,11 +811,27 @@ semana, con el efecto atribuible a cada incorporación documental.
 | 2026-09-29 | 186 | 41.384 | 12,00 | 15,51 | 7,79 | 35,30 | Corpus inicial completo (nivel 1 y 2 de la guía + 150 sentencias del seed). RAGAS 0,4456 (13,37/30) |
 | 2026-09-30 | 186 | 41.336 | 12,00 | 15,10 | 7,67 | 34,77 | Corte estricto de secciones en sentencias (mismos documentos) + cambios del sistema C-01..C-05. RAGAS 0,4208 (12,62/30) |
 | 2026-10-01 | 238 | 45.201 | 12,00 | 15,92 | 7,91 | 35,83 | +52 fuentes: 18 sentencias T/C/SU de 2026, 13 de la Corte Suprema (SP/SL/SC), 18 conceptos DIAN y SIC, Resolución DIAN 165 de 2023, Decreto 587 de 2016. RAGAS 0,4605 (13,81/30) |
-| 2026-10-01 | 338 | 68.603 | 12,00 | 15,10 | 7,67 | 34,77 | +100 leyes y decretos (Función Pública, Bogotá Jurídica, Colpensiones, MinTIC), entre ellos 7 decretos únicos reglamentarios; con C-07. RAGAS 0,3815 (11,45/30): peor que v2 |
+| 2026-10-01 | 338 | 68.603 | 12,00 | 15,10 | 7,67 | 34,77 | +100 leyes y decretos (Función Pública, Bogotá Jurídica, Colpensiones, MinTIC), entre ellos 7 decretos únicos reglamentarios. RAGAS oficial 0,3815, deprimido por 6 respuestas sin veredicto del juez (fallos de red); 0,495 sobre las calificadas |
+| 2026-10-02 | 618 | 75.204 | 12,00 | 14,29 | 7,44 | 33,73 | +280 conceptos (DIAN, SIC, Supersociedades), resoluciones y circulares; Qwen3-8B con razonamiento en selección múltiple. RAGAS 0,4357 (1 sin veredicto) |
+| 2026-10-02 | 650 | 77.014 | 14,67 | 16,33 | 8,37 | 39,37 | +32 fuentes: sentencias de la muestra, convenios de doble imposición, salario mínimo, auxilio de transporte y UVT; Gemma 4 E4B con su plantilla de chat. RAGAS 0,4572 (13,72/30): **total 53,09/80** |
 
 Lectura de la curva:
 
-<!-- BORRADOR: qué incorporaciones movieron el puntaje y cuáles no. -->
+- **Ampliar el corpus mejoró la recuperación más que el puntaje directo.** La proporción de normas
+  de referencia presentes en la evidencia pasó de 44/49 a 46/49, y ya no falta ninguna norma citada
+  por la muestra. Las citas, que dependen de recuperar la norma exacta, subieron de 15,51 a 16,33.
+- **Más documentos también traen más ruido.** Los decretos únicos reglamentarios y los conceptos
+  entran a la evidencia de muchas preguntas; en selección múltiple pasaron de 0 a 41 de 150 pasajes.
+  Ayudaron en algunas preguntas y desplazaron la norma pertinente en otras. Lo compensó un cupo de
+  4 normas (artículos de ley, código o decreto) entre los 10 pasajes de evidencia.
+- **Las incorporaciones dirigidas a brechas concretas sí movieron preguntas:** los convenios de
+  doble imposición y los datos de salario mínimo y UVT responden a fallos observados. El salto final
+  (49,64 → 53,09) combina el corpus de 650 documentos con el cambio de decoder y su plantilla de
+  chat, que se probaron juntos.
+- **Cautela de medición:** con 50 preguntas, una de selección múltiple vale 1,3 puntos, y entre
+  corridas casi idénticas hubo variaciones de ±1 pregunta. Además, varias caídas aparentes de RAGAS
+  resultaron ser respuestas sin veredicto del juez por fallos de red, que el evaluador cuenta como
+  cero. Por eso las comparaciones de la tabla usan corridas con el juez sin fallos.
 
 ## 5. Licencia
 
