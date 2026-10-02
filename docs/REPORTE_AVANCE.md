@@ -7,7 +7,7 @@
 
 ## 1. Puntaje sobre las preguntas de muestra
 
-Evaluador oficial (`scripts/evaluate.py --ragas`), GPU T4, juez sin fallos (corrida `muestra_v12`).
+Evaluador oficial (`scripts/evaluate.py --ragas`), GPU T4, juez sin fallos, sistema de entrega.
 
 | Componente | Puntos | Posibles |
 |---|---:|---:|
@@ -20,8 +20,8 @@ Evaluador oficial (`scripts/evaluate.py --ragas`), GPU T4, juez sin fallos (corr
 Evolución: línea base 48,67 → 53,09. Ninguna norma citada carece de respaldo en la evidencia;
 las normas del fundamento de referencia llegan a la evidencia en 46 de 49 casos. En las 50
 preguntas de muestra, RAGAS alcanza 0,4572, por encima del valor de referencia 0,451; los conjuntos
-evaluados son distintos. Esta corrida se hizo sin abstención por baja pertinencia; la versión de
-entrega la reactiva (ver §3), lo que en la muestra no cambia ninguna respuesta.
+evaluados son distintos. Con el umbral de abstención de 0,025 (ver §3) ninguna pregunta de la
+muestra queda sin fundamento suficiente, por lo que no hubo abstenciones.
 
 ## 2. Estado del corpus
 

@@ -517,3 +517,6 @@ de tres. Decisión de C-09 y C-10 pendiente de recalificar con RAGAS.
   las palabras disponibles (`citas.MAX_PALABRAS_ABIERTA`). Protección; no cambia la v12.
 - **Archivos:** `src/generation/citas.py`, `tests/test_citas.py`.
 - **Requiere reindexar:** no.
+- **Verificación (2026-10-02):** aplicando la regla de abstención con 0,025 a las trazas de
+  `muestra_v12`, ninguna de las 50 respuestas cambia (pertinencia mínima en texto libre 0,034;
+  ninguna abstención). Los resultados de v12 son, por tanto, los del sistema de entrega.

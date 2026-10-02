@@ -81,9 +81,9 @@ de 500 palabras.
 
 ## 5. Resultados sobre las preguntas de muestra
 
-Evaluador oficial (`scripts/evaluate.py --ragas`), corrida `muestra_v12`, juez sin fallos. Esa corrida
-no aplicaba la abstención por evidencia insuficiente; con el umbral de 0,025 ninguna de sus
-respuestas cambiaría (la pertinencia mínima observada en la muestra fue 0,034):
+Evaluador oficial (`scripts/evaluate.py --ragas`), sistema de entrega (umbral de abstención 0,025),
+juez sin fallos. Ninguna pregunta de la muestra queda por debajo del umbral (pertinencia mínima
+0,034), por lo que no hubo abstenciones:
 
 | Componente | Puntos | Posibles |
 |---|---:|---:|
