@@ -14,9 +14,9 @@ pasajes recuperados del corpus; toda norma citada figura en esos pasajes.
 
 | Recurso | Enlace | Tamaño | Licencia |
 |---|---|---|---|
-| Corpus procesado e índice vectorial (`corpus_equipo.zip`, dentro de la carpeta compartida) | [carpeta en OneDrive](https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk) | 368,5 MB | CC-BY-4.0 |
+| Corpus procesado e índice vectorial (`corpus_los_politicos.zip`, dentro de la carpeta compartida) | [carpeta en OneDrive](https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk) | 368,5 MB | CC-BY-4.0 |
 
-- sha256 del zip: `47313ac08a2687406bdeb7e9684f6c08eb087739004bbf78cd6ae2d7a4b393a9`
+- sha256 del zip: `8e458535d846333da1b1f50c6af375304b961b76c51fcfd7c4d18396cfc28c40`
 - El comprimido contiene `LICENSE`, `corpus_manifest.json`, `fuentes.csv` (inventario con URL y
   fecha de consulta de cada fuente), `corpus/` con los
   documentos procesados (un `.txt` por norma, fragmentos con encabezado canónico)
@@ -112,7 +112,7 @@ pregunta ──► router de citas explícitas ─┐
 |---|---|---|
 | Encoder | `BAAI/bge-m3` (MIT), 1.024 dim, 512 tokens | Multilingüe, fuerte en español; licencia abierta |
 | Decoder | `google/gemma-4-E4B-it` (Apache-2.0, 7.996.156.490 parámetros), GGUF Q8_0 con llama.cpp, con su plantilla de chat y sin modo de razonamiento | ≤ 8B; en la muestra superó a Qwen3-8B (versión anterior, sigue en la lista blanca) |
-| Segmentación | Un fragmento por artículo (≤ 300 palabras; los largos se parten repitiendo el encabezado); sentencias por secciones en ventanas de ~300 palabras | El artículo es la unidad de sentido (enunciado B.2) |
+| Segmentación | Por artículo y por secciones en sentencias y conceptos, con subdivisión de textos extensos (≤ 300 palabras, repitiendo el encabezado) e inclusión de preámbulos y notas de vigencia. 77.014 fragmentos: 47.340 de artículos, 23.472 de secciones, 1.212 de preámbulos y 4.990 de notas | El artículo es la unidad de sentido (enunciado B.2) |
 | Trazabilidad | Cada fragmento empieza con el nombre canónico de su norma (“Ley 1150 de 2007, artículo 11.”), verificado con el extractor de citas del evaluador | Sin eso las citas no cuentan como respaldadas |
 | Recuperación | Router de artículos citados en la pregunta + BM25 + denso con RRF, sesgo por área, diversidad por artículo; en MC, cada opción como consulta adicional | Los embeddings confunden números de artículo; BM25 no (B.3) |
 | Reordenamiento | `BAAI/bge-reranker-v2-m3` (Apache-2.0) sobre los 20 mejores | Precisión del cross-encoder sobre candidatos |

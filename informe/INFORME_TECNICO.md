@@ -14,12 +14,14 @@ que usa el evaluador oficial.
 
 1. **Ingesta.** 650 documentos oficiales (Constitución, códigos, leyes —incluidos 16 convenios
    para evitar la doble imposición—, decretos, resoluciones, circulares, sentencias y conceptos de
-   DIAN, SIC y Supersociedades) se limpian y se segmentan
-   **por artículo**; las sentencias, por secciones detectadas de forma estricta (antecedentes,
-   consideraciones, resuelve, salvamentos). Cada fragmento empieza con el nombre canónico de su
+   DIAN, SIC y Supersociedades) se limpian y se segmentan **por artículo** y **por secciones** en
+   sentencias y conceptos (en sentencias, detectadas de forma estricta: antecedentes,
+   consideraciones, resuelve, salvamentos), con subdivisión de textos extensos e inclusión de
+   preámbulos y notas de vigencia. Cada fragmento empieza con el nombre canónico de su
    norma («Ley 1150 de 2007, artículo 11.»), verificado con el extractor de citas del evaluador.
    Una guardia anti-fuga bloquea la indexación si detecta material del banco de preguntas.
-2. **Indexación.** 77.014 fragmentos: vectores `bge-m3` en FAISS exacto y BM25 con un tokenizador
+2. **Indexación.** 77.014 fragmentos (47.340 de artículos, 23.472 de secciones, 1.212 de preámbulos y
+   4.990 de notas): vectores `bge-m3` en FAISS exacto y BM25 con un tokenizador
    jurídico que conserva números de artículo y de sentencia. El índice se congela por sha256.
 3. **Recuperación.** Router de artículos citados en la pregunta + BM25 + denso, fusionados con RRF,
    sesgo por área, topes de diversidad (por artículo y 4 por documento), reordenamiento con
@@ -53,8 +55,8 @@ corrida es reproducible: dos ejecuciones en máquinas distintas produjeron respu
 ## 3. Estrategia de recuperación
 
 - **Segmentación:** un fragmento por artículo (con parágrafos); artículos de más de 300 palabras se
-  parten repitiendo el encabezado; sentencias y conceptos en ventanas de ~300 palabras con 15 % de
-  solape.
+  parten repitiendo el encabezado; sentencias y conceptos por secciones, en ventanas de ~300 palabras
+  con 15 % de solape; preámbulos y notas de vigencia como fragmentos propios ligados a su norma.
 - **Fusión:** RRF (k = 60) de 50 candidatos densos y 50 léxicos; el reranker ordena los 20 mejores.
 - **Selección múltiple:** evidencia representativa por opción, marcada en el prompt («recuperado
   para la opción B»).

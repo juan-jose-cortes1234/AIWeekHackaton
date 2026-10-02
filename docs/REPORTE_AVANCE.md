@@ -28,7 +28,7 @@ muestra queda sin fundamento suficiente, por lo que no hubo abstenciones.
 | Métrica | Valor |
 |---|---|
 | Documentos | 650: Constitución, 14 códigos, 149 leyes (16 convenios de doble imposición), 40 decretos, 30 resoluciones, 11 circulares, 2 decisiones andinas, 141 sentencias, 262 conceptos (DIAN, SIC, Supersociedades) |
-| Fragmentos indexados | 77.014 (por artículo; sentencias por secciones) |
+| Fragmentos indexados | 77.014: 47.340 de artículos, 23.472 de secciones, 1.212 de preámbulos y 4.990 de notas |
 | Áreas del banco cubiertas | Las 10 (de 43 documentos en penal a 252 en tributario) |
 | Cobertura del listado inicial (seed) | 98 %–100 % de los ítems por área |
 
@@ -40,7 +40,7 @@ muestra queda sin fundamento suficiente, por lo que no hubo abstenciones.
 | Encoder | `BAAI/bge-m3` (MIT) |
 | Decoder | `google/gemma-4-E4B-it` (Apache-2.0, 7.996.156.490 parámetros), GGUF Q8_0 con su plantilla de chat, temperatura 0 |
 | Recuperación | Router de artículos citados + BM25 jurídico + denso (FAISS exacto), fusión RRF, reranker `bge-reranker-v2-m3`, cupo de 4 normas en los 10 pasajes, evidencia por opción en selección múltiple |
-| Segmentación | Por artículo con encabezado canónico de la norma; sentencias por secciones |
+| Segmentación | Por artículo y por secciones en sentencias y conceptos, con subdivisión de textos extensos e inclusión de preámbulos y notas; cada fragmento lleva el encabezado canónico de su norma |
 | Abstención | En texto libre, `abstencion: true` cuando el corpus no da fundamento suficiente (ningún pasaje supera 0,025 de pertinencia según el reranker y la pregunta no cita una norma del corpus) o el modelo no produce una respuesta utilizable; en selección múltiple siempre se elige una opción |
 
 ## 4. Riesgos identificados

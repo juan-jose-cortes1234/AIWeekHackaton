@@ -1,8 +1,8 @@
 {
-  "equipo": "<nombre del equipo>",
+  "equipo": "Los PoliTICos",
   "licencia": "CC-BY-4.0",
   "fecha_generacion": "2026-10-02",
-  "enlace_nube": "<URL del comprimido con el corpus y el indice>",
+  "enlace_nube": "https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk",
   "documentos": [
     {
       "doc_id": "constitucion_1991",
