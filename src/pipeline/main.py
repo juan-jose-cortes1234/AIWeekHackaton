@@ -59,10 +59,16 @@ def responder_item(item: dict, rec, llm, cfg: Config = config, usar_cache: bool 
     t1 = time.perf_counter()
     g, n_leidos, extra = generar_respuesta(item, pasajes, llm, cfg, usar_cache,
                                            encoder=getattr(rec, "encoder", None))
+    if item["formato"] == "multiple_choice" and cfg.mc_revision_evidencia:
+        from src.generation.revision_mc import revisar
+        pasajes, g, n_leidos, extra = revisar(
+            item, pasajes, g, n_leidos, extra, rec, llm, cfg, usar_cache)
     t2 = time.perf_counter()
 
     datos = dict(g.datos or {})
-    if item["formato"] == "multiple_choice" and datos.get("respuesta_correcta") not in LETRAS:
+    fallback_mc = item["formato"] == "multiple_choice" and datos.get("respuesta_correcta") not in (
+        item.get("opciones") or {})
+    if fallback_mc:
         datos["respuesta_correcta"] = respaldo_mc(item, pasajes, rec)
         datos.setdefault("justificacion", "")
         datos.setdefault("descarte_opciones", {})
@@ -82,14 +88,30 @@ def responder_item(item: dict, rec, llm, cfg: Config = config, usar_cache: bool 
         "motivo": decision.motivo, "pertinencia_max": decision.pertinencia_max,
         "pasajes": [{"chunk_id": p.chunk_id, "score": round(p.score, 5),
                      "rerank": p.score_rerank, "denso": p.score_denso, "bm25": p.score_bm25,
-                     "origen": p.origen} for p in pasajes],
+                     "origen": p.origen, "doc_id": p.doc_id,
+                     "articulo": p.meta.get("articulo"), "seccion": p.meta.get("seccion"),
+                     "opciones": p.meta.get("opciones") or ([p.meta["opcion"]]
+                                  if p.meta.get("opcion") else []),
+                     "rangos_opcion": p.meta.get("rangos_opcion", {}),
+                     "rango_consenso": p.meta.get("rango_consenso"),
+                     "score_consenso": p.meta.get("score_consenso"),
+                     "rrf_consenso": p.meta.get("rrf_consenso")} for p in pasajes],
+        "config_mc": {k: getattr(cfg, k) for k in (
+            "puestos_pregunta", "rerank_candidatos_opcion", "mc_rerank_candidatos_pregunta",
+            "mc_reparto_equilibrado", "mc_contexto_cobertura", "mc_marcas_evidencia",
+            "mc_prompt_preciso", "mc_citas_visibles", "mc_rerank_consenso",
+            "mc_incluir_area", "mc_gemma_pensamiento_tokens", "mc_revision_evidencia",
+            "mc_verificacion_independiente")}
+            if item["formato"] == "multiple_choice" else None,
         "pasajes_leidos": n_leidos,
         "pasajes_usados": (g.datos or {}).get("pasajes_usados"),
         "citas_eliminadas": pp.eliminadas if pp else [],
         "referencias": pp.referencias if pp else [],
         "json_valido": g.datos is not None, "desde_cache": g.desde_cache,
+        "fallback_mc": fallback_mc,
         "tokens_prompt": g.tokens_prompt, "tokens_salida": g.tokens_salida,
-        "s_recuperacion": round(t1 - t0, 3), "s_generacion": round(t2 - t1, 3),
+        "s_recuperacion": round(t1 - t0 + extra.get("s_recuperacion_revision", 0), 3),
+        "s_generacion": round(t2 - t1 - extra.get("s_recuperacion_revision", 0), 3),
         "s_total": round(time.perf_counter() - t0, 3),
         **extra,
     }
@@ -133,6 +155,9 @@ def ejecutar(preguntas: list[dict], rec, llm, salida: Path, dir_trazas: Path,
     validador = jsonschema.Draft202012Validator(esquema_oficial())
     salida.parent.mkdir(parents=True, exist_ok=True)
     dir_trazas.mkdir(parents=True, exist_ok=True)
+    from src.pipeline.identidad import identidad, verificar_identidad
+
+    verificar_identidad(salida, identidad(cfg, getattr(llm, "id_modelo", None)), reanudar)
     hechos = {r["id"] for r in leer_jsonl(salida)} if (reanudar and salida.is_file()) else set()
     if not reanudar and salida.exists():
         salida.unlink()
@@ -159,6 +184,7 @@ def ejecutar(preguntas: list[dict], rec, llm, salida: Path, dir_trazas: Path,
                 traza["errores_esquema"] = problemas
                 pasajes = recuperar(item, rec, cfg)
                 if item["formato"] == "multiple_choice":
+                    traza["fallback_mc"] = True
                     linea = {"id": item["id"], "formato": item["formato"], "abstencion": False,
                              "respuesta_correcta": respaldo_mc(item, pasajes, rec),
                              "justificacion": "", "descarte_opciones": {},
@@ -189,6 +215,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--split", choices=("sample", "test"), default="sample")
+    from src.pipeline.perfiles_mc import PERFILES, configurar
+    ap.add_argument("--perfil-mc", choices=sorted(PERFILES), default=None,
+                    help="fija todas las perillas MC para una comparación controlada")
     ap.add_argument("--input", type=Path, default=None, help="JSONL de preguntas (anula --split)")
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--tag", default=None, help="nombre de la corrida en runs/")
@@ -203,12 +232,13 @@ def main(argv: list[str] | None = None) -> int:
                     help="k/n: procesa solo la parte k de n (repartir entre varias máquinas)")
     args = ap.parse_args(argv)
 
-    config.validar_final()
+    cfg_run = configurar(config, args.perfil_mc) if args.perfil_mc else config
+    cfg_run.validar_final()
     entrada = args.input or ENTRADAS[args.split]
     if not entrada.is_file():
         print(f"No existe {entrada}.")
         return 1
-    if not (config.index_dir / "index_manifest.json").is_file():
+    if not (cfg_run.index_dir / "index_manifest.json").is_file():
         print("No hay índice. Con corpus local: `python -m src.corpus.build` y "
               "`python -m src.index.build`; con el corpus de la nube: `python -m src.corpus.nube`.")
         return 1
@@ -235,9 +265,9 @@ def main(argv: list[str] | None = None) -> int:
     from src.retrieval.hibrido import Recuperador
 
     print(f"Cargando índice y modelos… ({len(preguntas)} preguntas → {salida})", flush=True)
-    rec = Recuperador.cargar()
-    llm = LLM()
-    res = ejecutar(preguntas, rec, llm, salida, dir_run, usar_cache=not args.no_cache,
+    rec = Recuperador.cargar(cfg=cfg_run)
+    llm = LLM(cfg_run)
+    res = ejecutar(preguntas, rec, llm, salida, dir_run, cfg=cfg_run, usar_cache=not args.no_cache,
                    reanudar=not args.desde_cero)
     t = res["tiempos"].get("s_total", {})
     print(f"\nListo: {res['respondidas_ahora']} nuevas, {res['ya_existentes']} ya existentes, "

@@ -667,6 +667,84 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 | `decreto_2293_2023` | Decreto 2293 de 2023 — auxilio de transporte para 2024 | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_2293_2023.htm | 2026-10-02 | 2 | 4 | Laboral |
 | `decreto_1573_2024` | Decreto 1573 de 2024 — auxilio de transporte para 2025 | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_1573_2024.htm | 2026-10-02 | 2 | 4 | Laboral |
 | `decreto_1470_2025` | Decreto 1470 de 2025 — auxilio de transporte para 2026 | Compilación jurídica de Cancillería | https://www.cancilleria.gov.co/normograma/compilacion/docs/decreto_1470_2025.htm | 2026-10-02 | 2 | 8 | Laboral |
+| `sentencia_t-256_2025` | Sentencia T-256 de 2025 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2025/t-256-25.htm | 2026-10-03 | — | 245 | Constitucional, Laboral |
+| `sentencia_c-581_2001` | Sentencia C-581 de 2001 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2001/c-581-01.htm | 2026-10-03 | — | 50 | Penal |
+| `sentencia_t-202_2018` | Sentencia T-202 de 2018 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2018/t-202-18.htm | 2026-10-03 | — | 118 | Familia |
+| `sentencia_t-202_2024` | Sentencia T-202 de 2024 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2024/t-202-24.htm | 2026-10-03 | — | 186 | Laboral, Penal |
+| `sentencia_c-148_2025` | Sentencia C-148 de 2025 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2025/c-148-25.htm | 2026-10-03 | — | 629 | Tributario |
+| `sentencia_c-029_2009` | Sentencia C-029 de 2009 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2009/c-029-09.htm | 2026-10-03 | — | 313 | Familia |
+| `sentencia_c-317_2025` | Sentencia C-317 de 2025 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2025/c-317-25.htm | 2026-10-03 | — | 87 | Constitucional |
+| `sentencia_c-075_2007` | Sentencia C-075 de 2007 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2007/c-075-07.htm | 2026-10-03 | — | 160 | Familia |
+| `sentencia_su-140_2019` | Sentencia SU-140 de 2019 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2019/su140-19.htm | 2026-10-03 | — | 413 | Laboral |
+| `sentencia_su-292_2025` | Sentencia SU-292 de 2025 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2025/su292-25.htm | 2026-10-03 | — | 193 | Constitucional |
+| `sentencia_su-040_2018` | Sentencia SU-040 de 2018 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2018/su040-18.htm | 2026-10-03 | — | 86 | Laboral |
+| `sentencia_t-277_2018` | Sentencia T-277 de 2018 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2018/t-277-18.htm | 2026-10-03 | — | 101 | Constitucional |
+| `sentencia_t-287_2022` | Sentencia T-287 de 2022 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2022/t-287-22.htm | 2026-10-03 | — | 75 | Constitucional |
+| `sentencia_t-426_2003` | Sentencia T-426 de 2003 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2003/t-426-03.htm | 2026-10-03 | — | 29 | Constitucional |
+| `sentencia_sl-3871_2021` | Sentencia SL-3871 de 2021 | Corte Suprema de Justicia - Relatoría | https://www.cortesuprema.gov.co/corte/wp-content/uploads/relatorias/la/bnov2021/SL3871-2021.pdf | 2026-10-03 | — | 18 | Laboral |
+| `ley_2274_2022` | Ley 2274 de 2022 | Secretaría General del Senado | http://www.secretariasenado.gov.co/senado/basedoc/ley_2274_2022.html | 2026-10-03 | 20 | 55 | Constitucional |
+| `sentencia_c-448_2020` | Sentencia C-448 de 2020 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2020/c-448-20.htm | 2026-10-03 | — | 159 | Tributario |
+| `sentencia_c-465_2008` | Sentencia C-465 de 2008 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2008/c-465-08.htm | 2026-10-03 | — | 61 | Laboral |
+| `sentencia_c-539_2016` | Sentencia C-539 de 2016 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2016/c-539-16.htm | 2026-10-03 | — | 165 | Penal |
+| `sentencia_c-878_2011` | Sentencia C-878 de 2011 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2011/c-878-11.htm | 2026-10-03 | — | 50 | Tributario |
+| `sentencia_su-041_2022` | Sentencia SU-041 de 2022 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2022/su041-22.htm | 2026-10-03 | — | 64 | Civil |
+| `sentencia_su-054_2015` | Sentencia SU-054 de 2015 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2015/su054-15.htm | 2026-10-03 | — | 174 | Civil |
+| `sentencia_su-167_2023` | Sentencia SU-167 de 2023 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2023/su167-23.htm | 2026-10-03 | — | 167 | Administrativo |
+| `sentencia_su-237_2019` | Sentencia SU-237 de 2019 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2019/su237-19.htm | 2026-10-03 | — | 66 | Administrativo |
+| `sentencia_su-288_2015` | Sentencia SU-288 de 2015 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2015/su288-15.htm | 2026-10-03 | — | 83 | Administrativo, Constitucional |
+| `sentencia_su-336_2017` | Sentencia SU-336 de 2017 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2017/su336-17.htm | 2026-10-03 | — | 256 | Administrativo |
+| `sentencia_su-452_2024` | Sentencia SU-452 de 2024 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2024/su452-24.htm | 2026-10-03 | — | 136 | Administrativo |
+| `sentencia_su-499_2024` | Sentencia SU-499 de 2024 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2024/su499-24.htm | 2026-10-03 | — | 164 | Administrativo |
+| `sentencia_su-575_2019` | Sentencia SU-575 de 2019 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2019/su575-19.htm | 2026-10-03 | — | 135 | Administrativo |
+| `sentencia_su-691_2017` | Sentencia SU-691 de 2017 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2017/su691-17.htm | 2026-10-03 | — | 252 | Administrativo |
+| `sentencia_t-004_2016` | Sentencia T-004 de 2016 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2016/t-004-16.htm | 2026-10-03 | — | 29 | Familia |
+| `sentencia_t-008_2026` | Sentencia T-008 de 2026 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2026/t-008-26.htm | 2026-10-03 | — | 184 | Administrativo |
+| `sentencia_t-254_2006` | Sentencia T-254 de 2006 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2006/t-254-06.htm | 2026-10-03 | — | 76 | Civil |
+| `sentencia_t-284_2025` | Sentencia T-284 de 2025 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2025/t-284-25.htm | 2026-10-03 | — | 76 | Penal |
+| `sentencia_t-456_2024` | Sentencia T-456 de 2024 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2024/t-456-24.htm | 2026-10-03 | — | 80 | Laboral |
+| `sentencia_t-617_2010` | Sentencia T-617 de 2010 | Corte Constitucional - Relatoría | https://www.corteconstitucional.gov.co/relatoria/2010/t-617-10.htm | 2026-10-03 | — | 168 | Constitucional |
+| `ley_0045_1990` | Ley 45 de 1990 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=77540 | 2026-10-03 | 99 | 105 | Comercial |
+| `ley_0099_1993` | Ley 99 de 1993 | Secretaría General del Senado | http://www.secretariasenado.gov.co/senado/basedoc/ley_0099_1993.html | 2026-10-03 | 43 | 121 | Administrativo |
+| `decreto_678_2020` | Decreto 678 de 2020 | Departamento Administrativo de la Función Pública - Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=124662 | 2026-10-03 | 10 | 34 | Tributario |
+| `decreto_4302_2008` | Decreto 4302 de 2008 | Superintendencia de Industria y Comercio (copia del Diario Oficial 47.172) | https://www.sic.gov.co/sites/default/files/normatividad/Decreto_4302_2008.pdf | 2026-10-03 | 9 | 10 | Mercados |
+| `minambiente_resolucion_368_2014` | Resolución 368 de 2014 — competencia sobre recuperación ambiental del relleno sanitario El Carrasco | MinAmbiente — archivo normativo | https://www.minambiente.gov.co/wp-content/uploads/2021/10/Resolucon-0368-de-2014.pdf | 2026-10-03 | 10 | 50 | Administrativo, Constitucional |
+| `minambiente_resolucion_1684_2008` | Resolución 1684 de 2008 — disposición transitoria de residuos sólidos | Régimen Legal de Bogotá — Alcaldía Mayor | https://www.bogotajuridica.gov.co/sisjur/normas/Norma1.jsp?i=33203 | 2026-10-03 | 3 | 5 | Administrativo |
+| `minambiente_proyecto_restitucion_carrasco_2021` | Proyecto de resolución de MinAmbiente (2021) que restituye a la CDMB la competencia sobre el relleno sanitario El Carrasco (versión publicada, sin número) | MinAmbiente — archivo normativo | https://www.minambiente.gov.co/wp-content/uploads/2021/10/Resolucion-1036-de-2021.pdf | 2026-10-03 | — | 45 | Administrativo |
+| `ley_1333_2009` | Ley 1333 de 2009 — procedimiento sancionatorio ambiental | Función Pública — Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=36879 | 2026-10-03 | 70 | 88 | Administrativo |
+| `ley_2387_2024` | Ley 2387 de 2024 — modificación del procedimiento sancionatorio ambiental | Función Pública — Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=246696 | 2026-10-03 | 36 | 47 | Administrativo |
+| `decreto_3570_2011` | Decreto Ley 3570 de 2011 — objetivos y estructura de MinAmbiente | Función Pública — Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65328 | 2026-10-03 | 40 | 64 | Administrativo |
+| `decreto_3573_2011` | Decreto Ley 3573 de 2011 — Autoridad Nacional de Licencias Ambientales | Función Pública — Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=64920 | 2026-10-03 | 24 | 32 | Administrativo |
+| `ley_267_1996` | Ley 267 de 1996 — Convenio CIADI | Cancillería — compilación jurídica | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_0267_1996.htm | 2026-10-03 | 78 | 113 | Administrativo, Procesal |
+| `ley_170_1994` | Ley 170 de 1994 — Acuerdo OMC, incluido ADPIC | Función Pública — Gestor Normativo | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=37805 | 2026-10-03 | 73 | 585 | Mercados, Comercial |
+| `ley_1143_2007` | Ley 1143 de 2007 — TLC Colombia–Estados Unidos y documentos anexos oficiales | Cancillería y MINCIT — TLC | https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1143_2007.htm | 2026-10-03 | 283 | 566 | Administrativo, Comercial, Mercados |
+| `bogota_decreto_271_2002` | Decreto Distrital 271 de 2002 — retenciones de ICA en Bogotá | Régimen Legal de Bogotá | https://www.bogotajuridica.gov.co/sisjur/normas/Norma1.jsp?dt=S&i=5139 | 2026-10-03 | 15 | 17 | Tributario |
+| `bogota_decreto_807_1993` | Decreto Distrital 807 de 1993 — procedimiento tributario distrital | Régimen Legal de Bogotá | https://www.bogotajuridica.gov.co/sisjur/normas/Norma1.jsp?i=1637 | 2026-10-03 | 244 | 392 | Tributario |
+| `bogota_decreto_639_2025` | Decreto Distrital 639 de 2025 — Decreto Único del Sector Tributario | Secretaría Distrital de Hacienda — compilación jurídica | https://compilacionjuridica.shd.gov.co/compilacion/docs/d_alcabog_0639_2025.htm | 2026-10-03 | 265 | 302 | Tributario |
+| `onu_principios_rectores_empresas_ddhh_2011` | Principios Rectores sobre las Empresas y los Derechos Humanos | ACNUDH | https://www.ohchr.org/sites/default/files/Documents/Publications/GuidingPrinciplesBusinessHR_SP.pdf | 2026-10-03 | — | 48 | Constitucional, Mercados, Comercial |
+| `ocde_guia_debida_diligencia_2018` | Guía de la OCDE de Debida Diligencia para una Conducta Empresarial Responsable | OCDE | https://www.oecd.org/content/dam/oecd/es/publications/reports/2018/02/oecd-due-diligence-guidance-for-responsible-business-conduct_c669bd57/14922561-es.pdf | 2026-10-03 | — | 143 | Constitucional, Mercados, Comercial |
+| `ripd_guia_ccm_2022` | Guía de implementación de cláusulas contractuales modelo para la transferencia internacional de datos personales | RIPD | https://www.redipd.org/documento/guia-implementacion-clausulas-contractuales-modelo-tidp-es.pdf | 2026-10-03 | — | 46 | Constitucional, Mercados, Comercial |
+| `ripd_anexo_ccm_2022` | Anexo — Modelos de cláusulas contractuales de la RIPD | RIPD | https://www.redipd.org/documento/anexo-modelos-clausulas-contractuales-es.pdf | 2026-10-03 | — | 47 | Constitucional, Mercados, Comercial |
+| `consejo_europa_ccm_modulo_1_2023` | Convention 108+ — Model Contractual Clauses, Module 1: Controller to Controller | Consejo de Europa | https://rm.coe.int/t-pd-2022-1rev10-en-final/1680abc6b4 | 2026-10-03 | — | 29 | Constitucional, Mercados, Comercial |
+| `acto_legislativo_01_2017` | Acto Legislativo 01 de 2017 | Congreso de la República | https://fcp.gov.co/wp-content/uploads/2023/01/ACTO_LEGISLATIVO_01_2017.pdf | 2026-10-03 | 32 | 53 | Constitucional |
+| `sentencia_c-167_2014` | Sentencia C-167 de 2014 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2014/c-167-14.htm | 2026-10-03 | — | 61 | Tributario |
+| `sentencia_c-294_2021` | Sentencia C-294 de 2021 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2021/c-294-21.htm | 2026-10-03 | — | 454 | Penal |
+| `sentencia_c-543_1996` | Sentencia C-543 de 1996 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/1996/c-543-96.htm | 2026-10-03 | — | 42 | Constitucional |
+| `sentencia_c-591_2005` | Sentencia C-591 de 2005 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2005/c-591-05.htm | 2026-10-03 | — | 293 | Penal |
+| `sentencia_c-005_2017` | Sentencia C-005 de 2017 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2017/c-005-17.htm | 2026-10-03 | — | 136 | Constitucional |
+| `sentencia_c-927_2006` | Sentencia C-927 de 2006 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2006/c-927-06.htm | 2026-10-03 | — | 69 | Constitucional, Tributario |
+| `sentencia_su-768_2014` | Sentencia SU-768 de 2014 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2014/su768-14.htm | 2026-10-03 | — | 95 | Procesal |
+| `sentencia_t-225_1993` | Sentencia T-225 de 1993 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/1993/t-225-93.htm | 2026-10-03 | — | 31 | Constitucional |
+| `sentencia_t-057_2025` | Sentencia T-057 de 2025 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2025/t-057-25.htm | 2026-10-03 | — | 161 | Constitucional |
+| `sentencia_t-854_2012` | Sentencia T-854 de 2012 | Corte Constitucional | https://www.corteconstitucional.gov.co/relatoria/2012/t-854-12.htm | 2026-10-03 | — | 42 | Familia |
+| `ce_sentencia_21410_2011` | Consejo de Estado, Sección Tercera, sentencia del 15 de noviembre de 2011, expediente 21410 | Consejo de Estado | https://www.consejodeestado.gov.co/documentos/boletines/95/S3/19001-23-31-000-1999-01134-01(21410).pdf | 2026-10-03 | — | 61 | Administrativo |
+| `ce_acuerdo_080_2019` | Acuerdo 080 de 2019 del Consejo de Estado (reglamento), con sus modificaciones | Consejo de Estado | https://www.consejodeestado.gov.co/wp-content/uploads/2025/ACUERDO%20No%20080%20de%202019%20con%20sus%20modificaciones%20VF.pdf | 2026-10-03 | — | 59 | Procesal |
+| `sentencia_sc-5679_2018` | Sentencia SC-5679 de 2018 | Corte Suprema de Justicia | https://www.cortesuprema.gov.co/corte/wp-content/uploads/2019/01/SC5679-2018.pdf | 2026-10-03 | — | 40 | Comercial |
+| `decreto_255_2022` | Decreto 255 de 2022 | Presidencia de la República | https://www1.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=179087 | 2026-10-03 | 10 | 15 | Mercados |
+| `decreto_4121_2011` | Decreto Ley 4121 de 2011 | Presidencia de la República | https://normativa.colpensiones.gov.co/colpens/compilacion/docs/decreto_4121_2011.htm | 2026-10-03 | 8 | 11 | Administrativo |
+| `decreto_913_1993` | Decreto 913 de 1993 | Presidencia de la República | https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=7093 | 2026-10-03 | 8 | 9 | Civil, Comercial |
+| `ley_51_1918` | Ley 51 de 1918 | Congreso de la República | https://gestornormativo.creg.gov.co/gestor/entorno/docs/ley_0051_1918.htm | 2026-10-03 | 27 | 28 | Comercial |
+| `ley_731_2002` | Ley 731 de 2002 | Congreso de la República | https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?dt=S&i=52105 | 2026-10-03 | 41 | 63 | Familia |
+| `ley_95_1890` | Ley 95 de 1890 | Congreso de la República | https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=12387 | 2026-10-03 | 30 | 34 | Civil |
 <!-- /AUTO:inventario -->
 
 **Totales**
@@ -674,10 +752,10 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 <!-- AUTO:totales -->
 | Métrica | Valor |
 |---|---:|
-| Documentos incorporados | 650 |
-| Artículos indexados | 38619 |
-| Fragmentos en el índice | 77014 |
-| Tamaño del corpus procesado | 95.5 MB |
+| Documentos incorporados | 728 |
+| Artículos indexados | 40097 |
+| Fragmentos en el índice | 86963 |
+| Tamaño del corpus procesado | 112.5 MB |
 <!-- /AUTO:totales -->
 
 ## 2. Criterio de selección
@@ -685,16 +763,16 @@ Un registro por documento incorporado. Coincide con `corpus_manifest.json`.
 <!-- AUTO:cobertura -->
 | Área | Ítems en el banco | Documentos incorporados | Fragmentos | Cobertura del seed (ítems) |
 |---|---:|---:|---:|---|
-| Derecho constitucional | 134 | 94 | 12776 | 194/197 (98%) |
-| Derecho administrativo | 124 | 229 | 17847 | 128/131 (98%) |
-| Derecho penal | 123 | 43 | 10971 | 184/185 (99%) |
-| Derecho procesal | 111 | 224 | 13899 | 182/184 (99%) |
-| Derecho comercial y sociedades | 104 | 111 | 12688 | 203/204 (100%) |
-| Derecho civil | 102 | 81 | 13771 | 151/151 (100%) |
-| Derecho de familia | 93 | 54 | 11254 | 197/197 (100%) |
-| Derecho tributario | 92 | 252 | 17832 | 211/212 (100%) |
-| Derecho laboral | 87 | 61 | 10648 | 177/180 (98%) |
-| Mercados | 72 | 71 | 7983 | 219/220 (100%) |
+| Derecho constitucional | 134 | 115 | 14667 | 194/197 (98%) |
+| Derecho administrativo | 124 | 250 | 20493 | 128/131 (98%) |
+| Derecho penal | 123 | 49 | 12195 | 184/185 (99%) |
+| Derecho procesal | 111 | 227 | 14166 | 182/184 (99%) |
+| Derecho comercial y sociedades | 104 | 122 | 14334 | 203/204 (100%) |
+| Derecho civil | 102 | 86 | 14128 | 151/151 (100%) |
+| Derecho de familia | 93 | 60 | 11979 | 197/197 (100%) |
+| Derecho tributario | 92 | 261 | 19545 | 211/212 (100%) |
+| Derecho laboral | 87 | 68 | 11737 | 177/180 (98%) |
+| Mercados | 72 | 80 | 9472 | 219/220 (100%) |
 
 _Cobertura del seed_: ítems del banco (según `items_del_banco` de `data/seed_targets.json`) cuyas normas ya están en el corpus. Es una cota inferior: el seed no es exhaustivo.
 <!-- /AUTO:cobertura -->
@@ -727,6 +805,26 @@ Además se incorporó material que el banco usa aunque no lo nombre explícitame
 - **Datos para cálculos:** decretos del salario mínimo y del auxilio de transporte (2023–2026) y
   resoluciones de la UVT (2023–2026), y 16 leyes aprobatorias de convenios para evitar la doble
   imposición (tributario internacional).
+- **Normas nombradas en los enunciados del banco (sábado 3 de octubre):** con las 992 preguntas
+  entregadas se cruzaron las normas que sus enunciados nombran expresamente con las del corpus
+  (solo nombres de normas; las preguntas no se indexan). Se incorporaron las 40 que faltaban y
+  tienen texto oficial: 34 sentencias de la Corte Constitucional, la SL3871 de 2021 de la Corte
+  Suprema, las leyes 45 de 1990, 99 de 1993 y 2274 de 2022 y los decretos 678 de 2020 y 4302 de
+  2008. No se incorporaron, por no existir en la relatoría, la SU-279 de 2019 y la SU-488 de 2011,
+  ni la Resolución 368 de 2014 del Ministerio de Ambiente, sin texto oficial accesible.
+  El equipo aportó luego 38 fuentes más, también nombradas o requeridas por esos enunciados: la
+  Resolución 368 de 2014 (PDF escaneado del archivo de MinAmbiente con su transcripción OCR) y
+  normas ambientales conexas (Ley 1333 de 2009, Ley 2387 de 2024, decretos ley 3570 y 3573 de 2011,
+  Resolución 1684 de 2008); leyes aprobatorias del CIADI (Ley 267 de 1996), la OMC (Ley 170 de 1994)
+  y el TLC con Estados Unidos (Ley 1143 de 2007, con sus anexos oficiales); decretos distritales
+  tributarios de Bogotá; el Acto Legislativo 01 de 2017, las leyes 95 de 1890, 51 de 1918 y 731 de
+  2002 y los decretos 913 de 1993, 4121 de 2011 y 255 de 2022; 10 sentencias de la Corte
+  Constitucional, una de la Corte Suprema y una providencia y el reglamento del Consejo de Estado;
+  y cinco orientaciones oficiales no vinculantes
+  (Principios Rectores de la ONU, Guía de debida diligencia de la OCDE, cláusulas contractuales
+  modelo de la RIPD y del Consejo de Europa), registradas como `concepto` porque no son norma
+  colombiana. El PDF publicado de la «Resolución 1036 de 2021» tiene el número en blanco: se
+  registró como proyecto, sin número, para no atribuir citas a un borrador.
 
 Documentos descartados y el motivo del descarte:
 

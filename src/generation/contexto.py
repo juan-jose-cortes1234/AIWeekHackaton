@@ -42,10 +42,16 @@ def recortar(texto: str, max_palabras: int) -> str:
     return f"{cabeza}\n{' '.join(palabras[:max_palabras])} […]"
 
 
-def evidencia(pasajes, cfg: Config = config, marcas: bool = True) -> str:
+def evidencia(pasajes, cfg: Config = config, marcas: bool = True,
+              numeros_pasajes: list[int] | None = None) -> str:
     partes = []
-    for n, p in enumerate(pasajes[:cfg.pasajes_prompt], start=1):
-        opcion = (getattr(p, "meta", None) or {}).get("opcion") if marcas else None
+    numeros = numeros_pasajes if numeros_pasajes is not None else list(range(1, len(pasajes) + 1))
+    if len(numeros) != len(pasajes) or len(set(numeros)) != len(numeros):
+        raise ValueError("La numeración debe corresponder a cada pasaje sin duplicados.")
+    for n, p in list(zip(numeros, pasajes))[:cfg.pasajes_prompt]:
+        meta = getattr(p, "meta", None) or {}
+        opciones = meta.get("opciones") or ([meta["opcion"]] if meta.get("opcion") else [])
+        opcion = ", ".join(opciones) if marcas else None
         marca = f"(recuperado para la opción {opcion}) " if opcion else ""
         partes.append(f"[P{n}] {marca}{recortar(p.texto, cfg.palabras_por_pasaje)}")
     return "\n\n".join(partes)
@@ -58,19 +64,22 @@ def letras_de(item: dict) -> list[str]:
 def plantilla_de(item: dict, cfg: Config = config) -> str:
     """Nombre de la plantilla del prompt para el formato del ítem."""
     if item["formato"] == "multiple_choice" and not cfg.mc_analisis_previo:
-        return "multiple_choice_elegir"
+        return "multiple_choice_precisa" if cfg.mc_prompt_preciso else "multiple_choice_elegir"
     return item["formato"]
 
 
-def esquema(item: dict, cfg: Config = config) -> dict:
+def esquema(item: dict, cfg: Config = config, numeros_pasajes: list[int] | None = None) -> dict:
     """JSON schema de la salida del decoder para el formato del ítem."""
     usados = {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 20},
               "maxItems": 10}
+    if numeros_pasajes is not None:
+        usados = {"type": "array", "maxItems": min(10, len(numeros_pasajes)),
+                  "items": {"type": "integer", "enum": numeros_pasajes or [1]}}
     f = item["formato"]
     if f == "multiple_choice" and (not cfg.mc_analisis_previo or cfg.mc_modo == "abierta"):
         letras = letras_de(item) or list(LETRAS)
         # Elegir primero (C-06): la letra, la justificación y luego un descarte por cada otra
-        # opción; la evidencia sigue llegando marcada por opción (C-03).
+        # opción; las marcas de procedencia son opcionales (C-21).
         return {
             "type": "object",
             "properties": {
@@ -131,9 +140,9 @@ def esquema(item: dict, cfg: Config = config) -> dict:
     }
 
 
-def esquema_mc_abierta() -> dict:
+def esquema_mc_abierta(numeros_pasajes: list[int] | None = None) -> dict:
     """Paso 1 de MC en modo "abierta" (C-08): respuesta libre, sin opciones."""
-    return {
+    resultado = {
         "type": "object",
         "properties": {
             "respuesta": {"type": "string"},
@@ -142,10 +151,15 @@ def esquema_mc_abierta() -> dict:
         },
         "required": ["respuesta", "pasajes_usados"],
     }
+    if numeros_pasajes is not None:
+        resultado["properties"]["pasajes_usados"] = {
+            "type": "array", "maxItems": min(10, len(numeros_pasajes)),
+            "items": {"type": "integer", "enum": numeros_pasajes or [1]}}
+    return resultado
 
 
 def mensajes(item: dict, pasajes, cfg: Config = config, etapa: str | None = None,
-             respuesta_abierta: str = "") -> list[dict]:
+             respuesta_abierta: str = "", numeros_pasajes: list[int] | None = None) -> list[dict]:
     """Mensajes system + user para un ítem del banco y sus pasajes recuperados.
 
     `etapa` solo aplica a MC en modo "abierta" (C-08): "abierta" = paso 1 (la pregunta sin
@@ -156,7 +170,9 @@ def mensajes(item: dict, pasajes, cfg: Config = config, etapa: str | None = None
     campos = {
         "area": item.get("area") or "no indicada",
         "sub_tarea": item.get("sub_tarea") or "no indicada",
-        "evidencia": evidencia(pasajes, cfg, marcas=etapa != "abierta")
+        "evidencia": evidencia(pasajes, cfg, marcas=etapa != "abierta"
+                               and (f != "multiple_choice" or cfg.mc_marcas_evidencia),
+                               numeros_pasajes=numeros_pasajes)
                      or "(no se recuperó evidencia)",
         "pregunta": (item.get("pregunta") or "").strip(),
     }
@@ -166,7 +182,9 @@ def mensajes(item: dict, pasajes, cfg: Config = config, etapa: str | None = None
         campos["letras_descarte"] = ", ".join(letras)
         campos["respuesta_abierta"] = respuesta_abierta.strip() or "(sin respuesta preliminar)"
     nombre = {"abierta": "multiple_choice_abierta",
-              "desde_abierta": "multiple_choice_desde_abierta"}.get(etapa) or plantilla_de(item, cfg)
+              "desde_abierta": "multiple_choice_desde_abierta",
+              "contraste": "multiple_choice_contraste",
+              "revision": "multiple_choice_revision"}.get(etapa) or plantilla_de(item, cfg)
     usuario = plantilla(nombre).format(**campos)
     return [{"role": "system", "content": plantilla("sistema")},
             {"role": "user", "content": usuario}]

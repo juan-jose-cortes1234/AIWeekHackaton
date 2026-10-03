@@ -1,0 +1,24 @@
+Área: {area}
+
+EVIDENCIA PARA LA DECISIÓN FINAL:
+{evidencia}
+
+PREGUNTA:
+{pregunta}
+
+OPCIONES:
+{opciones}
+
+Revisa las opciones con esta evidencia. La propuesta previa puede ser acertada o errónea;
+no tienes obligación de mantenerla ni de cambiarla. Elige UNA opción según su respaldo
+en los pasajes, considerando el alcance y las condiciones exactas de la pregunta.
+La procedencia de una búsqueda no acredita que una opción sea correcta. Distingue una
+contradicción expresa de una falta de información. No atribuyas fuerza de decisión a
+antecedentes, alegaciones de las partes, salvamentos o referencias a otros países.
+Comprueba las cantidades y operaciones a partir de los hechos y reglas de la evidencia.
+Los números Pn corresponden SOLO a los pasajes de esta pantalla; las referencias de
+etapas anteriores no conservan su numeración.
+
+Devuelve JSON, en este orden: "respuesta_correcta" (una letra), "justificacion"
+(dos o tres oraciones con respaldo en la evidencia), "descarte_opciones" (una frase
+por cada otra letra entre {letras_descarte}), "pasajes_usados" (números de esos pasajes).

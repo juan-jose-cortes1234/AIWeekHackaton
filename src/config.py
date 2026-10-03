@@ -86,9 +86,20 @@ class Config:
     boost_area: float = 0.002
     boost_cuerpo: float = 0.01
     max_por_articulo: int = 3
-    puestos_pregunta: int = 4         # MC: puestos para la pregunta; el resto, por opción
+    puestos_pregunta: int = 4         # restaurado: cuatro pasajes de pregunta (v12, 11/15)
     pasajes_por_opcion: int = 2       # MC: pasajes de cada opción a considerar por ronda
-    rerank_candidatos_opcion: int = 8 # MC: candidatos que el reranker reordena por opción
+    rerank_candidatos_opcion: int = 8  # restaurado: candidatos por opción de v12
+    mc_rerank_candidatos_pregunta: int = 20 # solo MC; texto libre conserva RERANK_CANDIDATOS
+    mc_reparto_equilibrado: bool = False # C-21 (9/15 verificado): solo experimento
+    mc_contexto_cobertura: bool = False # independiente del selector para medir su efecto
+    mc_marcas_evidencia: bool = True
+    mc_prompt_preciso: bool = False
+    mc_citas_visibles: bool = False    # conserva la gramática JSON de v12
+    mc_rerank_consenso: bool = False   # segunda consulta sobre el pool, solo experimento
+    mc_incluir_area: bool = False     # incorpora el área declarada a las consultas MC
+    mc_gemma_pensamiento_tokens: int = 0 # canal nativo de Gemma 4; independiente de Qwen
+    mc_revision_evidencia: bool = False # propuesta, contraste, recuperación y revisión
+    mc_verificacion_independiente: bool = True  # C-25 (12/15): cuatro auditorías independientes y selección; False = v12
     mc_analisis_previo: bool = False  # MC: True = analizar cada opción antes de elegir (C-03)
     mc_modo: str = "directo"           # MC: "directo" = elegir con las opciones a la vista; "abierta" = responder sin opciones y luego elegir (C-08, descartado por latencia)
     mc_razonamiento_tokens: int = 0     # MC: tope del modo de razonamiento de Qwen3 (C-09; apagado: ganancia inestable, menos citas y el doble de tiempo); >0 lo activa
@@ -141,6 +152,26 @@ class Config:
             raise ValueError("CORPUS_SOURCE debe ser auto, nube o local.")
         if self.decoder_backend not in BACKENDS_DECODER:
             raise ValueError(f"DECODER_BACKEND debe ser uno de {BACKENDS_DECODER}.")
+        if not 1 <= self.pasajes_prompt <= self.top_k_pasajes <= 10:
+            raise ValueError("Se requiere 1 <= PASAJES_PROMPT <= TOP_K_PASAJES <= 10.")
+        if self.puestos_pregunta < 0 or self.pasajes_por_opcion < 1:
+            raise ValueError("PUESTOS_PREGUNTA >= 0 y PASAJES_POR_OPCION >= 1.")
+        if min(self.rerank_candidatos_opcion, self.mc_rerank_candidatos_pregunta) < 1:
+            raise ValueError("Los topes de reranking MC deben ser positivos.")
+        if self.mc_rerank_consenso and not self.use_reranker:
+            raise ValueError("MC_RERANK_CONSENSO requiere USE_RERANKER=1.")
+        if self.mc_gemma_pensamiento_tokens < 0:
+            raise ValueError("MC_GEMMA_PENSAMIENTO_TOKENS debe ser >= 0.")
+        if self.mc_gemma_pensamiento_tokens and (
+                self.decoder_backend != "llamacpp" or "gemma-4" not in self.decoder_gguf_repo):
+            raise ValueError("El pensamiento nativo requiere Gemma 4 GGUF con llamacpp.")
+        if self.mc_revision_evidencia and self.mc_modo != "directo":
+            raise ValueError("La revisión con evidencia requiere MC_MODO=directo.")
+        if self.mc_verificacion_independiente and (
+                self.mc_modo != "directo" or self.mc_revision_evidencia
+                or self.mc_analisis_previo or self.mc_gemma_pensamiento_tokens
+                or self.mc_razonamiento_tokens):
+            raise ValueError("La verificación independiente requiere modo directo sin otras etapas MC.")
         self.validar_modelos()
 
     def validar_modelos(self) -> None:

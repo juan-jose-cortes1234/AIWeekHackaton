@@ -39,6 +39,16 @@ class Generacion:
     desde_cache: bool = False
     truncada: bool = False
     razonamiento: str | None = None
+    razonamiento_truncado: bool = False
+
+
+def prefijo_pensamiento_gemma(prompt: str) -> str:
+    """Abre el canal nativo sobre la plantilla del propio GGUF, nunca sobre ChatML."""
+    if "<|turn>system\n<|think|>" not in prompt:
+        raise ValueError("La plantilla de Gemma no activó enable_thinking=True.")
+    if not prompt.endswith("<|turn>model\n"):
+        raise ValueError("La plantilla de Gemma no abrió el turno del modelo esperado.")
+    return prompt + "<|channel>thought\n"
 
 
 # --------------------------------------------------------------------------- JSON
@@ -192,6 +202,7 @@ class LLM:
         formateador = Jinja2ChatFormatter(template=plantilla, bos_token=bos, eos_token=eos,
                                           stop_token_ids=[self.modelo.token_eos(), fin_turno[0]])
         self._gemma_formateador = partial(formateador, enable_thinking=False)
+        self._gemma_formateador_pensando = partial(formateador, enable_thinking=True)
         self.modelo.chat_handler = chat_formatter_to_chat_completion_handler(self._gemma_formateador)
         self.formato_chat = "gemma4-sin-razonamiento"
 
@@ -212,9 +223,13 @@ class LLM:
     def n_ctx(self) -> int:
         return self.cfg.decoder_num_ctx
 
-    def contar_tokens(self, mensajes: list[dict]) -> int:
+    def contar_tokens(self, mensajes: list[dict], gemma_pensamiento_tokens: int = 0) -> int:
         """Tokens del prompt con la plantilla de chat (margen de 16 por mensaje en llamacpp)."""
         if self.backend == "llamacpp":
+            if gemma_pensamiento_tokens:
+                prompt = prefijo_pensamiento_gemma(
+                    self._gemma_formateador_pensando(messages=mensajes).prompt)
+                return len(self.modelo.tokenize(prompt.encode("utf-8"), add_bos=False, special=True))
             if getattr(self, "_gemma_formateador", None) is not None:   # conteo exacto (C-18)
                 prompt = self._gemma_formateador(messages=mensajes).prompt
                 return len(self.modelo.tokenize(prompt.encode("utf-8"), add_bos=False, special=True))
@@ -226,12 +241,15 @@ class LLM:
 
     # ---- caché
     def _clave(self, mensajes: list[dict], esquema: dict | None, max_tokens: int,
-              razonamiento_tokens: int = 0) -> str:
+              razonamiento_tokens: int = 0, gemma_pensamiento_tokens: int = 0) -> str:
         cuerpo = json.dumps({"backend": self.backend, "modelo": self.id_modelo,
                              "mensajes": mensajes, "esquema": esquema, "max_tokens": max_tokens,
                              "formato_chat": getattr(self, "formato_chat", None),
                              **({"razonamiento_tokens": razonamiento_tokens}
                                 if razonamiento_tokens else {}),
+                             **({"gemma_pensamiento_tokens": gemma_pensamiento_tokens,
+                                 "canal_gemma": "thought-json-v1"}
+                                if gemma_pensamiento_tokens else {}),
                              "temperatura": 0, "semilla": self.cfg.decoder_seed,
                              "ctx": self.cfg.decoder_num_ctx},
                             ensure_ascii=False, sort_keys=True)
@@ -240,29 +258,37 @@ class LLM:
     # ---- generación
     def generar(self, mensajes: list[dict], esquema: dict | None = None, max_tokens: int = 700,
                 usar_cache: bool = True, dir_cache: Path | None = None,
-                razonamiento_tokens: int = 0) -> Generacion:
+                razonamiento_tokens: int = 0, gemma_pensamiento_tokens: int = 0) -> Generacion:
         """Genera con temperatura 0. Si `esquema` se da, la salida es un objeto JSON.
 
         `razonamiento_tokens` > 0 activa el modo de razonamiento de Qwen3 con ese tope (C-09).
         """
         mensajes = [dict(m) for m in mensajes]
+        if gemma_pensamiento_tokens and (
+                self.backend != "llamacpp" or not hasattr(self, "_gemma_formateador_pensando")):
+            raise ValueError("El pensamiento nativo requiere un GGUF de arquitectura gemma4.")
         if not self.es_qwen3:
             razonamiento_tokens = 0
         if (self.sufijo and not razonamiento_tokens and mensajes and mensajes[-1]["role"] == "user"
                 and self.sufijo not in mensajes[-1]["content"]):
             mensajes[-1]["content"] += self.sufijo
         directorio = dir_cache or DIR_CACHE
-        ruta = directorio / f"{self._clave(mensajes, esquema, max_tokens, razonamiento_tokens)}.json"
+        ruta = directorio / f"{self._clave(mensajes, esquema, max_tokens, razonamiento_tokens, gemma_pensamiento_tokens)}.json"
         if usar_cache and ruta.is_file():
             d = json.loads(ruta.read_text(encoding="utf-8"))
             return Generacion(d["texto"], d["datos"], 0.0, d.get("tokens_prompt"),
                               d.get("tokens_salida"), desde_cache=True,
                               truncada=d.get("truncada", False),
-                              razonamiento=d.get("razonamiento"))
+                              razonamiento=d.get("razonamiento"),
+                              razonamiento_truncado=d.get("razonamiento_truncado", False))
 
         t0 = time.perf_counter()
         razonamiento = None
-        if razonamiento_tokens:
+        pensamiento_cortado = False
+        if gemma_pensamiento_tokens:
+            razonamiento, texto, tp, ts, cortada, pensamiento_cortado = self._generar_gemma_razonando(
+                mensajes, esquema, max_tokens, gemma_pensamiento_tokens)
+        elif razonamiento_tokens:
             razonamiento, texto, tp, ts, cortada = self._generar_razonando(
                 mensajes, esquema, max_tokens, razonamiento_tokens)
         else:
@@ -286,9 +312,60 @@ class LLM:
         directorio.mkdir(parents=True, exist_ok=True)
         ruta.write_text(json.dumps({"texto": texto, "datos": datos, "tokens_prompt": tp,
                                     "tokens_salida": ts, "truncada": cortada,
-                                    "razonamiento": razonamiento, "modelo": self.id_modelo},
+                                    "razonamiento": razonamiento, "modelo": self.id_modelo,
+                                    "razonamiento_truncado": pensamiento_cortado},
                                    ensure_ascii=False), encoding="utf-8")
-        return Generacion(texto, datos, seg, tp, ts, truncada=cortada, razonamiento=razonamiento)
+        return Generacion(texto, datos, seg, tp, ts, truncada=cortada, razonamiento=razonamiento,
+                          razonamiento_truncado=pensamiento_cortado)
+
+    def _generar_gemma_razonando(self, mensajes, esquema, max_tokens, presupuesto):
+        """Pensamiento libre acotado; después, JSON forzado en el canal de respuesta.
+
+        Tokens y plantilla nativos del GGUF. Se conserva el texto EXACTO del primer
+        tramo al continuar; la gramática solo rige tras cerrar <channel|>.
+        El tope reserva siempre espacio para el JSON y se registra si corta el pensamiento.
+        """
+        from llama_cpp import LlamaGrammar
+
+        prefijo = prefijo_pensamiento_gemma(
+            self._gemma_formateador_pensando(messages=mensajes).prompt)
+        tokenizar = lambda t: self.modelo.tokenize(t.encode("utf-8"), add_bos=False, special=True)
+        entrada = tokenizar(prefijo)
+        if len(entrada) + presupuesto + max_tokens + 16 > self.n_ctx:
+            raise ValueError("El prompt no deja espacio para pensamiento y respuesta de Gemma.")
+        comunes = dict(temperature=0.0, top_p=1.0, top_k=1, min_p=0.0,
+                       repeat_penalty=1.0, seed=self.cfg.decoder_seed)
+        cierres = [tokenizar(t) for t in ("<channel|>", "<turn|>")]
+        if any(len(ids) != 1 for ids in cierres):
+            raise ValueError("Gemma no reconoce los tokens nativos de cierre de canal y turno.")
+        fin = {ids[0] for ids in cierres} | {self.modelo.token_eos()}
+        generados, cerrado = [], False
+        self.modelo.set_seed(self.cfg.decoder_seed)
+        # Parar por IDs: create_completion puede ocultar los tokens especiales al
+        # decodificar texto, por lo que un stop de cadena no basta para <channel|>.
+        for token in self.modelo.generate(entrada, temp=0.0, top_p=1.0, top_k=1,
+                                           min_p=0.0, repeat_penalty=1.0, reset=True):
+            if token in fin:
+                cerrado = True
+                break
+            generados.append(int(token))
+            if len(generados) >= presupuesto:
+                break
+        pensamiento = self.modelo.detokenize(generados, prev_tokens=entrada,
+                                             special=True).decode("utf-8", errors="replace")
+        gramatica = (LlamaGrammar.from_json_schema(json.dumps(esquema), verbose=False)
+                     if esquema is not None else None)
+        final = entrada + generados + cierres[0]
+        if len(final) + max_tokens > self.n_ctx:
+            raise ValueError("La continuación de Gemma excede la ventana reservada.")
+        r2 = self.modelo.create_completion(prompt=final, max_tokens=max_tokens,
+                                           stop=["<turn|>"], grammar=gramatica, **comunes)
+        u2 = r2.get("usage") or {}
+        return (pensamiento, r2["choices"][0]["text"] or "",
+                len(entrada) + (u2.get("prompt_tokens") or 0),
+                len(generados) + (u2.get("completion_tokens") or 0),
+                r2["choices"][0].get("finish_reason") == "length",
+                not cerrado)
 
     def _generar_razonando(self, mensajes, esquema, max_tokens, razonamiento_tokens):
         """Modo de razonamiento (C-09): (razonamiento, texto, tokens_prompt, tokens_salida, cortada).

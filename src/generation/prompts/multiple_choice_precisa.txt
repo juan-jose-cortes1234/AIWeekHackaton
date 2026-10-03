@@ -1,0 +1,24 @@
+Área: {area}
+
+EVIDENCIA:
+{evidencia}
+
+PREGUNTA DE SELECCIÓN MÚLTIPLE:
+{pregunta}
+
+OPCIONES:
+{opciones}
+
+Compara las opciones con la evidencia y elige UNA. Antes de escribir la letra:
+1. Identifica exactamente qué se pregunta y si solicita la opción correcta, incorrecta, una excepción o una definición específica.
+2. Distingue qué afirmaciones están respaldadas, contradichas o no determinadas por los pasajes. La coincidencia de palabras no prueba una afirmación. La ausencia de información tampoco demuestra que sea falsa o verdadera.
+3. Compara los elementos que diferencian las opciones: sujetos, requisitos, plazos, alcance y excepciones. Una definición precisa y respaldada tiene prioridad sobre una frase genérica relacionada.
+4. Si una opción contiene varias afirmaciones, verifica cada una. No prefieras una opción por ser más larga o por agregar elementos sin respaldo. Una combinación o "Todas las anteriores" requiere respaldo para todas las afirmaciones que combina. No inventes el significado de referencias ambiguas como "(a) y (b)".
+5. No intercambies normas por semejanza de números o fechas. Solo considera una posible errata si los pasajes y el objeto de la pregunta identifican inequívocamente la misma disposición y ninguna alternativa corresponde mejor.
+6. La procedencia de una búsqueda no indica que el pasaje respalde una opción. Si la evidencia es parcial, selecciona la alternativa mejor fundamentada y declara la limitación en la justificación, sin inventar datos.
+
+Devuelve, en este orden, únicamente el objeto JSON:
+- "respuesta_correcta": la letra elegida.
+- "justificacion": dos o tres oraciones que respondan directamente y expliquen la diferencia decisiva, citando la norma de la evidencia y su [Pn].
+- "descarte_opciones": para cada otra letra ({letras_descarte}), una frase breve con el motivo concreto y el pasaje pertinente; si falta evidencia, indícalo sin inventar una contradicción.
+- "pasajes_usados": solo los números [Pn] visibles que fundamentan tu respuesta.

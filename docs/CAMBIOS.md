@@ -520,3 +520,20 @@ de tres. Decisión de C-09 y C-10 pendiente de recalificar con RAGAS.
 - **Verificación (2026-10-02):** aplicando la regla de abstención con 0,025 a las trazas de
   `muestra_v12`, ninguna de las 50 respuestas cambia (pertinencia mínima en texto libre 0,034;
   ninguna abstención). Los resultados de v12 son, por tanto, los del sistema de entrega.
+
+## C-25 · 2026-10-03 · Verificación independiente de alternativas en selección múltiple (Miguel)
+- **Antes (v12):** Gemma elegía la letra con las cuatro opciones a la vista y después la justificaba;
+  podía defender una elección equivocada. 11/15 en la muestra.
+- **Ahora:** para cada alternativa, una llamada independiente devuelve `respaldada`, `contradicha` o
+  `evidencia_insuficiente`, con hasta dos citas que se comprueban literalmente contra el pasaje (una
+  cita alterada o ausente degrada la conclusión a evidencia insuficiente). Una quinta llamada recibe
+  los cuatro informes comprobados y los pasajes, y elige. No decide por mayoría ni por reglas por id.
+  Misma recuperación, mismos pasajes y mismo decoder (Gemma 4 E4B Q8, temperatura 0, semilla 42).
+- **Resultado reportado por el equipo:** 12/15 en las preguntas de selección múltiple de la muestra.
+- **Costo:** cinco llamadas al decoder por pregunta de selección múltiple (290 de las 992).
+- **Activación:** `MC_VERIFICACION_INDEPENDIENTE=1` (por defecto). Con `0` vuelve exactamente a la v12.
+  Detalle en `docs/MEJORAS_MC.md`. Semiabiertas y abiertas no cambian.
+- **Archivos:** `src/config.py`, `src/generation/{verificacion_mc,seleccion_mc,revision_mc,consenso_mc,responder,contexto,llm}.py`,
+  `src/pipeline/{main,perfiles_mc,identidad}.py`, `src/eval/{multiple_choice,experimentos_mc,recuperacion}.py`,
+  `src/index/{paquete_colab,verificar_colab}.py`, prompts `multiple_choice_{verificar,decidir_verificacion,contraste,precisa,revision}.txt`.
+- **Requiere reindexar:** no.

@@ -8,13 +8,10 @@
   embeddings (`build/cache/emb/`), para que Colab calcule **solo los fragmentos nuevos o
   modificados** (extensión incremental). `--sin-cache` fuerza el cálculo completo. Se usa con
   `notebooks/indice_en_colab.ipynb`.
-- **muestra** → `dist/paquete_colab_muestra.zip`: lo anterior más `data/` y `schema/`. El
-  cuaderno `notebooks/muestra_en_colab.ipynb` primero actualiza el índice en la GPU (con la
-  caché, solo recalcula los fragmentos que cambiaron) y luego responde y evalúa la muestra: un
-  solo viaje a Colab devuelve índice + resultados. No hace falta tener el índice local al día.
-  Con `--con-indice` lleva además el índice ya construido (FAISS, BM25 y manifiesto), siempre
-  que corresponda a estos fragmentos: el cuaderno lo reutiliza en segundos en lugar de rehacer
-  BM25 en CPU, y el zip sirve para compartir el índice con el equipo (Drive).
+- **muestra** → `dist/paquete_colab_muestra.zip`: código, `data/`, `schema/`, instrucciones
+  MC y el cuaderno `notebooks/muestra_en_colab.ipynb`. El cuaderno requiere `--con-indice`:
+  comprueba y reutiliza FAISS/BM25/manifiesto congelados, sin reconstruirlos. Compara perfiles
+  MC y guarda resultados en Drive. Para responder las 50, desactivar COMPARAR_MC.
 
 Nunca incluye `.env` (la llave del juez) ni los documentos originales.
 """
@@ -27,6 +24,7 @@ from pathlib import Path
 
 from src.config import RAIZ, config
 from src.index.build import sha256_archivo
+from src.index.verificar_colab import ARCHIVOS_BM25
 
 def _codigo(z: zipfile.ZipFile, carpetas: tuple[str, ...]) -> None:
     for carpeta in carpetas:
@@ -46,7 +44,12 @@ def _indice_al_dia(chunks: Path) -> bool:
     if not (manifiesto.is_file() and (d / "index.faiss").is_file() and (d / "bm25").is_dir()):
         return False
     m = json.loads(manifiesto.read_text(encoding="utf-8"))
-    return (m.get("sha256_chunks") == sha256_archivo(chunks)
+    if not all((d / "bm25" / n).is_file() for n in ARCHIVOS_BM25):
+        return False
+    params = json.loads((d / "bm25" / "params.index.json").read_text(encoding="utf-8"))
+    return (m.get("modelo") == config.encoder_model
+            and params.get("num_docs") == m.get("n_fragmentos")
+            and m.get("sha256_chunks") == sha256_archivo(chunks)
             and m.get("sha256_faiss") == sha256_archivo(d / "index.faiss"))
 
 
@@ -59,7 +62,7 @@ def _huella() -> str:
     h = hashlib.sha256()
     for carpeta in ("src", "config", "scripts"):
         for f in sorted((RAIZ / carpeta).rglob("*")):
-            if f.is_file() and "__pycache__" not in f.parts:
+            if f.is_file() and "__pycache__" not in f.parts and f.name != ".env":
                 h.update(f.relative_to(RAIZ).as_posix().encode("utf-8"))
                 h.update(f.read_bytes())
     return (f"Paquete generado: {datetime.now():%Y-%m-%d %H:%M}\n"
@@ -82,6 +85,9 @@ def crear(modo: str = "indice", destino: Path | None = None, con_cache: bool = T
     with zipfile.ZipFile(destino, "w", zipfile.ZIP_DEFLATED) as z:
         _codigo(z, ("src", "scripts", "config") if modo == "indice"
                 else ("src", "scripts", "config", "data", "schema"))
+        if modo == "muestra":
+            z.write(RAIZ / "notebooks" / "muestra_en_colab.ipynb", "notebooks/muestra_en_colab.ipynb")
+            z.write(RAIZ / "docs" / "MEJORAS_MC.md", "docs/MEJORAS_MC.md")
         z.write(chunks, "build/indice/chunks.jsonl")
         # Caché de embeddings: con ella Colab solo calcula los fragmentos nuevos o
         # modificados (extensión incremental del índice) en lugar de todo el corpus.

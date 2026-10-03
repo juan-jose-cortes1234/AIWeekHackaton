@@ -1,0 +1,24 @@
+Área: {area}
+
+EVIDENCIA INICIAL:
+{evidencia}
+
+PREGUNTA:
+{pregunta}
+
+OPCIONES:
+{opciones}
+
+Actúa como revisor de una propuesta preliminar. Identifica qué dato concreto permitiría
+distinguir la opción propuesta de sus alternativas más plausibles. Comprueba diferencias
+de alcance, sujetos, condiciones, excepciones, fechas y cantidades cuando sean relevantes.
+No confundas que un elemento no aparezca en un pasaje con que esté jurídicamente excluido.
+No cambies aún la respuesta. Formula hasta DOS consultas breves para buscar en el corpus
+el respaldo o la contradicción que falta. Incluye en cada consulta el contexto de la pregunta
+y del área, para que una expresión ambigua no lleve a documentos sobre otro asunto.
+No inventes hechos, normas o números de artículos. Si ya hay respaldo suficiente y no
+necesitas buscar, devuelve consultas vacías. Tu diagnóstico es una hipótesis de revisión,
+no una fuente jurídica ni evidencia para la respuesta final.
+
+Devuelve JSON con "alternativas" (hasta dos letras distintas de la propuesta),
+"dato_discriminante" (una frase), "consultas" (hasta dos cadenas).

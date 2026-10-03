@@ -20,19 +20,36 @@ from src.generation.responder import recuperar
 from src.oficial import AREA_SLUG, citations
 
 
+def cobertura_citas(citas_ref, pasajes):
+    """Coincidencias de cuerpo y artículo; no evalúa suficiencia semántica."""
+    encontradas = set().union(*(citations.extract(p.texto) for p in pasajes))
+    ref = citations.bodies(citas_ref)
+    cuerpos_cubiertos = ref & citations.bodies(encontradas)
+    articulos_ref = {c for c in citas_ref if c[3] is not None}
+    return ref, cuerpos_cubiertos, articulos_ref, articulos_ref & encontradas
+
+
 def evaluar(recuperador, preguntas: list[dict], k: int | None = None) -> dict:
     k = k or config.top_k_pasajes
     detalle = []
+    sin_fundamento_citable = []
+    articulos_evaluados = articulos_cubiertos = 0
     por_area: dict[str, list[int]] = defaultdict(lambda: [0, 0, 0, 0])  # hits, n, cuerpos_ok, cuerpos
     for it in preguntas:
-        ref = citations.bodies(citations.extract(it.get("legal_basis") or ""))
-        if not ref:
-            continue
+        citas_ref = citations.extract(it.get("legal_basis") or "")
+        ref = citations.bodies(citas_ref)
         pasajes = recuperar(it, recuperador)[:k]
-        encontrados = set()
-        for p in pasajes:
-            encontrados |= citations.bodies(citations.extract(p.texto))
-        cubiertos = ref & encontrados
+        if not ref:
+            sin_fundamento_citable.append({
+                "id": it["id"], "formato": it.get("formato"), "area": it.get("area"),
+                "motivo": "fundamento_no_extraible; requiere_revision_de_suficiencia",
+                "pasajes": [p.chunk_id for p in pasajes],
+                "top": [p.texto.split("\n", 1)[0] for p in pasajes[:3]],
+            })
+            continue
+        ref, cubiertos, ref_articulos, cubiertos_articulos = cobertura_citas(citas_ref, pasajes)
+        articulos_evaluados += len(ref_articulos)
+        articulos_cubiertos += len(cubiertos_articulos)
         a = por_area[it.get("area") or "sin área"]
         a[0] += bool(cubiertos)
         a[1] += 1
@@ -42,9 +59,12 @@ def evaluar(recuperador, preguntas: list[dict], k: int | None = None) -> dict:
             "id": it["id"], "formato": it.get("formato"), "area": it.get("area"),
             "acierto": bool(cubiertos),
             "ref": sorted(map(list, ref)), "cubiertos": sorted(map(list, cubiertos)),
-            "faltantes": sorted(map(list, ref - encontrados)),
+            "faltantes": sorted(map(list, ref - cubiertos)),
             "top": [p.texto.split("\n", 1)[0] for p in pasajes[:3]],
             "max_mismo_documento": max(Counter(p.doc_id for p in pasajes).values(), default=0),
+            "articulos_ref": sorted(map(list, ref_articulos)),
+            "articulos_cubiertos": sorted(map(list, cubiertos_articulos)),
+            "suficiencia_evidencia": "requiere_revision; coincidencia_de_cita_no_demuestra_respuesta",
         })
     n = sum(v[1] for v in por_area.values())
     hits = sum(v[0] for v in por_area.values())
@@ -55,6 +75,10 @@ def evaluar(recuperador, preguntas: list[dict], k: int | None = None) -> dict:
         "max_mismo_documento": dict(sorted(Counter(d["max_mismo_documento"] for d in detalle).items())),
         "acierto_at_k": round(hits / n, 4) if n else 0.0,
         "recall_cuerpos_at_k": round(cu / tot, 4) if tot else 0.0,
+        "articulos_evaluados": articulos_evaluados,
+        "recall_articulos_at_k": (round(articulos_cubiertos / articulos_evaluados, 4)
+                                  if articulos_evaluados else None),
+        "sin_fundamento_citable": sin_fundamento_citable,
         "por_area": {a: {"items": v[1], "acierto_at_k": round(v[0] / v[1], 4),
                          "recall_cuerpos": round(v[2] / v[3], 4) if v[3] else 0.0}
                      for a, v in sorted(por_area.items())},

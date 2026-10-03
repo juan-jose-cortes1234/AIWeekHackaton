@@ -1,8 +1,8 @@
 {
-  "equipo": "Los PoliTICos",
+  "equipo": "<nombre del equipo>",
   "licencia": "CC-BY-4.0",
-  "fecha_generacion": "2026-10-02",
-  "enlace_nube": "https://uniandes-my.sharepoint.com/:f:/r/personal/ms_roa_uniandes_edu_co/Documents/hackatonDocumentos/corpus_raw?d=w8ad662970efc439780d7bdb7eef0bd66&csf=1&web=1&e=JJbzGk",
+  "fecha_generacion": "2026-10-03",
+  "enlace_nube": "<URL del comprimido con el corpus y el indice>",
   "documentos": [
     {
       "doc_id": "constitucion_1991",
@@ -10973,6 +10973,1274 @@
       "n_fragmentos": 8,
       "metodo_ingesta": "parser HTML + segmentacion por articulo",
       "sha256": "cae124c6ec34629bc1e98ce06270d9d4aedae1d1a3ccd12c19a5c3214feca2ae"
+    },
+    {
+      "doc_id": "sentencia_t-256_2025",
+      "titulo": "Sentencia T-256 de 2025",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2025/t-256-25.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional",
+        "Derecho laboral"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 245,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "ca4dbe28e218394fc518eb7001192c0a1bcd3fdd8231de6ec0615d405cd3d534"
+    },
+    {
+      "doc_id": "sentencia_c-581_2001",
+      "titulo": "Sentencia C-581 de 2001",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2001/c-581-01.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho penal"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 50,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "de09d6a433c9a63b67b90e9ca60542705446a8db8d789b3e21dcba494ef0c45e"
+    },
+    {
+      "doc_id": "sentencia_t-202_2018",
+      "titulo": "Sentencia T-202 de 2018",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2018/t-202-18.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de familia"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 118,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "94b18ed2bd64cace40548ef3d2daa8c11c041233afeff69e74fbce62189440e8"
+    },
+    {
+      "doc_id": "sentencia_t-202_2024",
+      "titulo": "Sentencia T-202 de 2024",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2024/t-202-24.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho laboral",
+        "Derecho penal"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 186,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "680bc01a602970e5086d98fe2c8ee3b29c6ea619d3641e467e2ff0f9c21b0876"
+    },
+    {
+      "doc_id": "sentencia_c-148_2025",
+      "titulo": "Sentencia C-148 de 2025",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2025/c-148-25.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 629,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "a90626ebc736155fb0b6dcd0f21df0fed341c20ee5353dacb52b3a83a9511d6b"
+    },
+    {
+      "doc_id": "sentencia_c-029_2009",
+      "titulo": "Sentencia C-029 de 2009",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2009/c-029-09.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de familia"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 313,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "1c8ab8b9f98391089d38e66ef02a3bf0789c141745c1e73ec10a6ea2d8966730"
+    },
+    {
+      "doc_id": "sentencia_c-317_2025",
+      "titulo": "Sentencia C-317 de 2025",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2025/c-317-25.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 87,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "c69e4d3d86988f9eaa1af3cf17bd8055f1981656a2029b5ab09a3ba7c2fa90ad"
+    },
+    {
+      "doc_id": "sentencia_c-075_2007",
+      "titulo": "Sentencia C-075 de 2007",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2007/c-075-07.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de familia"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 160,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "3b9d855fe7caed9564da4c83a32e957a69ea1cfece8160f7b437c4f1fcea015f"
+    },
+    {
+      "doc_id": "sentencia_su-140_2019",
+      "titulo": "Sentencia SU-140 de 2019",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2019/su140-19.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 413,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "991273b970e218bef123573885bca0b0f41279454e359ca70f268984a518a10e"
+    },
+    {
+      "doc_id": "sentencia_su-292_2025",
+      "titulo": "Sentencia SU-292 de 2025",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2025/su292-25.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 193,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "affbe443f25e307e8cf76f97ac8f4b8b188b1d1af4e9540506639c48c9a2e05b"
+    },
+    {
+      "doc_id": "sentencia_su-040_2018",
+      "titulo": "Sentencia SU-040 de 2018",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2018/su040-18.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 86,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "d16ab8ef0b84264f2cd4b57ed816e8d27841c0cf75e0a454e43eb74c114a1eb4"
+    },
+    {
+      "doc_id": "sentencia_t-277_2018",
+      "titulo": "Sentencia T-277 de 2018",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2018/t-277-18.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 101,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "b5cb3e4b6c972ec5260c178677731e16a0b4bf8bef7982f9a0cf16d9d9407adb"
+    },
+    {
+      "doc_id": "sentencia_t-287_2022",
+      "titulo": "Sentencia T-287 de 2022",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2022/t-287-22.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 75,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "e723f5ad82b3f07c1d3979cf959a4f26eb1d5487a1ee3a6609a0388c6f388b60"
+    },
+    {
+      "doc_id": "sentencia_t-426_2003",
+      "titulo": "Sentencia T-426 de 2003",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2003/t-426-03.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 29,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "a875de7c50d2067bac8f889ef8b0f544f37a1d16853b65b610fd2b2c0c6b4af5"
+    },
+    {
+      "doc_id": "sentencia_sl-3871_2021",
+      "titulo": "Sentencia SL-3871 de 2021",
+      "fuente": "Corte Suprema de Justicia - Relatoría",
+      "url": "https://www.cortesuprema.gov.co/corte/wp-content/uploads/relatorias/la/bnov2021/SL3871-2021.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 18,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "5ddcd206d29c0ea0471f2609c10e7697012b29e23f6c202f2b990974abee63ec"
+    },
+    {
+      "doc_id": "ley_2274_2022",
+      "titulo": "Ley 2274 de 2022",
+      "fuente": "Secretaría General del Senado",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_2274_2022.html",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 20,
+      "n_fragmentos": 55,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "b064b5bcaea9d632a05b1e5e94cd369e4da7c1afeef74ec81fa08cd54e08216b"
+    },
+    {
+      "doc_id": "sentencia_c-448_2020",
+      "titulo": "Sentencia C-448 de 2020",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2020/c-448-20.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 159,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "50b04fd6ffcae4f36fa2276712f37b019a5b17ee33cefb4c4d660e1e3f34fda0"
+    },
+    {
+      "doc_id": "sentencia_c-465_2008",
+      "titulo": "Sentencia C-465 de 2008",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2008/c-465-08.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 61,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "1fd7600c9f1f7017a4712128181c73c12dbfe1740eb7b7d4e7514ed62de84e02"
+    },
+    {
+      "doc_id": "sentencia_c-539_2016",
+      "titulo": "Sentencia C-539 de 2016",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2016/c-539-16.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho penal"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 165,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "c5a11c847aec9105db8ad885cd719d631ba27d5fbe68e5a3dc34883fe6acdee1"
+    },
+    {
+      "doc_id": "sentencia_c-878_2011",
+      "titulo": "Sentencia C-878 de 2011",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2011/c-878-11.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 50,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "0d6c014f68b17990df3c2f31494fcfd8bd6fe01d07f08b25c339233b53918a9d"
+    },
+    {
+      "doc_id": "sentencia_su-041_2022",
+      "titulo": "Sentencia SU-041 de 2022",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2022/su041-22.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho civil"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 64,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "852c60e70a63071db39315264df98f8c4e83eb63ea386a76fb990de7cae32e20"
+    },
+    {
+      "doc_id": "sentencia_su-054_2015",
+      "titulo": "Sentencia SU-054 de 2015",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2015/su054-15.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho civil"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 174,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "9bd6d87bca04b097ae0b353159686146c714c4232cce2b5c87f9498d07755f46"
+    },
+    {
+      "doc_id": "sentencia_su-167_2023",
+      "titulo": "Sentencia SU-167 de 2023",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2023/su167-23.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 167,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "9a25b7b657e9f33b35626bc32b89b94f63732c995b0aa2a3d48df3e50daac7b7"
+    },
+    {
+      "doc_id": "sentencia_su-237_2019",
+      "titulo": "Sentencia SU-237 de 2019",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2019/su237-19.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 66,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "92266d6bf325e168e46155026ecc15025e8bd49ce3f2cb083bd4c286a333d2ea"
+    },
+    {
+      "doc_id": "sentencia_su-288_2015",
+      "titulo": "Sentencia SU-288 de 2015",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2015/su288-15.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo",
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 83,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "27108a7e9c9539c4a309467c629dced8a05fcf658e478dac4b70dc561924d8bb"
+    },
+    {
+      "doc_id": "sentencia_su-336_2017",
+      "titulo": "Sentencia SU-336 de 2017",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2017/su336-17.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 256,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "33e2a3bf1710ca05c8333d8ddc623ba3b37fc7e2338639bd252d89d271d5e974"
+    },
+    {
+      "doc_id": "sentencia_su-452_2024",
+      "titulo": "Sentencia SU-452 de 2024",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2024/su452-24.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 136,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "45ea22ed1c98ed4d0ed938215734d497cdfff91cd70ae5f0c94c368cc7a9a727"
+    },
+    {
+      "doc_id": "sentencia_su-499_2024",
+      "titulo": "Sentencia SU-499 de 2024",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2024/su499-24.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 164,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "9bb27fc7f529f5cd7b05908d65779313e469382b087f49e63bc202256c816dfc"
+    },
+    {
+      "doc_id": "sentencia_su-575_2019",
+      "titulo": "Sentencia SU-575 de 2019",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2019/su575-19.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 135,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "b0ef3ded575cc7af996236bba228c5229b814d3cc01da15736f5868fcb32fd60"
+    },
+    {
+      "doc_id": "sentencia_su-691_2017",
+      "titulo": "Sentencia SU-691 de 2017",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2017/su691-17.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 252,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "b446143a07d74e1bb0f9714aa1508b1147075ebe71d1dd766a662579eb1aa9a9"
+    },
+    {
+      "doc_id": "sentencia_t-004_2016",
+      "titulo": "Sentencia T-004 de 2016",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2016/t-004-16.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de familia"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 29,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "9fb3b7b77cf79954ed464cefe1214b5433a23e51be666aa24c357dbe69689f56"
+    },
+    {
+      "doc_id": "sentencia_t-008_2026",
+      "titulo": "Sentencia T-008 de 2026",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2026/t-008-26.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 184,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "46635104e8e46bf0c8692f02e04f1753392d5041570b1eab75fddd26bef96dad"
+    },
+    {
+      "doc_id": "sentencia_t-254_2006",
+      "titulo": "Sentencia T-254 de 2006",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2006/t-254-06.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho civil"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 76,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "5d1e4d28674978f4a531abe66aa23e7eabdf046b713f7c0590d1a20cdccbe5a4"
+    },
+    {
+      "doc_id": "sentencia_t-284_2025",
+      "titulo": "Sentencia T-284 de 2025",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2025/t-284-25.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho penal"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 76,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "cce820875f886435baebf9cdd14c0a89aa61af8689437f9c213234aca6c1a19b"
+    },
+    {
+      "doc_id": "sentencia_t-456_2024",
+      "titulo": "Sentencia T-456 de 2024",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2024/t-456-24.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho laboral"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 80,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "91498fe1087d85984d45472f6a83e3a0239b23e202b3fbb5e0542f3515a38a0f"
+    },
+    {
+      "doc_id": "sentencia_t-617_2010",
+      "titulo": "Sentencia T-617 de 2010",
+      "fuente": "Corte Constitucional - Relatoría",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2010/t-617-10.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 168,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "e70c2ae7d909270241b48a484ebe23b9315518db6be17348c0d2ebc6a2208a3d"
+    },
+    {
+      "doc_id": "ley_0045_1990",
+      "titulo": "Ley 45 de 1990",
+      "fuente": "Departamento Administrativo de la Función Pública - Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=77540",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 99,
+      "n_fragmentos": 105,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "1ac56f3f17e12cc18b89e5197349c5907ceb4e5ba6c06dd7b2231746ff744fbd"
+    },
+    {
+      "doc_id": "ley_0099_1993",
+      "titulo": "Ley 99 de 1993",
+      "fuente": "Secretaría General del Senado",
+      "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_0099_1993.html",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 43,
+      "n_fragmentos": 121,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "3030736d6373ab8d5f3a0686e2f40f1ad333d1fbc3cb4870123a1f6f3ee26b60"
+    },
+    {
+      "doc_id": "decreto_678_2020",
+      "titulo": "Decreto 678 de 2020",
+      "fuente": "Departamento Administrativo de la Función Pública - Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=124662",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 10,
+      "n_fragmentos": 34,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "224c5f88d9ecc8188566eabf9ef582501491d2920ba1b6efb3cf07ed52c38aea"
+    },
+    {
+      "doc_id": "decreto_4302_2008",
+      "titulo": "Decreto 4302 de 2008",
+      "fuente": "Superintendencia de Industria y Comercio (copia del Diario Oficial 47.172)",
+      "url": "https://www.sic.gov.co/sites/default/files/normatividad/Decreto_4302_2008.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 9,
+      "n_fragmentos": 10,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por articulo",
+      "sha256": "3415eeea498a8885914bd3fb306f33a48f98b8c58ea5171573ec12ab8bb65d8e"
+    },
+    {
+      "doc_id": "minambiente_resolucion_368_2014",
+      "titulo": "Resolución 368 de 2014 — competencia sobre recuperación ambiental del relleno sanitario El Carrasco",
+      "fuente": "MinAmbiente — archivo normativo",
+      "url": "https://www.minambiente.gov.co/wp-content/uploads/2021/10/Resolucon-0368-de-2014.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo",
+        "Derecho constitucional"
+      ],
+      "tipo": "resolucion",
+      "vigencia": null,
+      "n_articulos": 10,
+      "n_fragmentos": 50,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + texto plano + segmentacion por articulo",
+      "sha256": "a5f220a8200eede5f6cb819452bdcdbbc346baa883a2a65fa28eb96c3e562edb"
+    },
+    {
+      "doc_id": "minambiente_resolucion_1684_2008",
+      "titulo": "Resolución 1684 de 2008 — disposición transitoria de residuos sólidos",
+      "fuente": "Régimen Legal de Bogotá — Alcaldía Mayor",
+      "url": "https://www.bogotajuridica.gov.co/sisjur/normas/Norma1.jsp?i=33203",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "resolucion",
+      "vigencia": null,
+      "n_articulos": 3,
+      "n_fragmentos": 5,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "172c8ab180a15ac362f059c8e314e3d4eac38289f788ae6f3b2f243012838762"
+    },
+    {
+      "doc_id": "minambiente_proyecto_restitucion_carrasco_2021",
+      "titulo": "Proyecto de resolución de MinAmbiente (2021) que restituye a la CDMB la competencia sobre el relleno sanitario El Carrasco (versión publicada, sin número)",
+      "fuente": "MinAmbiente — archivo normativo",
+      "url": "https://www.minambiente.gov.co/wp-content/uploads/2021/10/Resolucion-1036-de-2021.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 45,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "7eed61961b7c94ce678b3ec3376df1da77152b29c9f729314c7ff57df0e46acc"
+    },
+    {
+      "doc_id": "ley_1333_2009",
+      "titulo": "Ley 1333 de 2009 — procedimiento sancionatorio ambiental",
+      "fuente": "Función Pública — Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=36879",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 70,
+      "n_fragmentos": 88,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "4f2d6f6fbf73c2fb0879a6995b9e536164e53abfa3dc1ebcc255638cb104c8a1"
+    },
+    {
+      "doc_id": "ley_2387_2024",
+      "titulo": "Ley 2387 de 2024 — modificación del procedimiento sancionatorio ambiental",
+      "fuente": "Función Pública — Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=246696",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 36,
+      "n_fragmentos": 47,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "1789a03f4806aa7d1e65fb7b198a8bd92127b63c59ea01f2b875633cf1ea2671"
+    },
+    {
+      "doc_id": "decreto_3570_2011",
+      "titulo": "Decreto Ley 3570 de 2011 — objetivos y estructura de MinAmbiente",
+      "fuente": "Función Pública — Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=65328",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "decreto_ley",
+      "vigencia": null,
+      "n_articulos": 40,
+      "n_fragmentos": 64,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "29e3980c05f27345ac18eb192664ca128adb1d4e2dbf9e03e7fbb0926a96e69d"
+    },
+    {
+      "doc_id": "decreto_3573_2011",
+      "titulo": "Decreto Ley 3573 de 2011 — Autoridad Nacional de Licencias Ambientales",
+      "fuente": "Función Pública — Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=64920",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "decreto_ley",
+      "vigencia": null,
+      "n_articulos": 24,
+      "n_fragmentos": 32,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "fff57e44775ff70602ec4fefdb52dafdaaa3b4f1c5ae226aee67ba38239f0546"
+    },
+    {
+      "doc_id": "ley_267_1996",
+      "titulo": "Ley 267 de 1996 — Convenio CIADI",
+      "fuente": "Cancillería — compilación jurídica",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_0267_1996.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo",
+        "Derecho procesal"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 78,
+      "n_fragmentos": 113,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "24781470ff88a5975c4003da00209eba6cc7abc1773d1461671087e3103ca611"
+    },
+    {
+      "doc_id": "ley_170_1994",
+      "titulo": "Ley 170 de 1994 — Acuerdo OMC, incluido ADPIC",
+      "fuente": "Función Pública — Gestor Normativo",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=37805",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]",
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 73,
+      "n_fragmentos": 585,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "b9667e6002eb347c3636fcd1c4d0f09aca67eb78beadd1ed1e9673206fb8a709"
+    },
+    {
+      "doc_id": "ley_1143_2007",
+      "titulo": "Ley 1143 de 2007 — TLC Colombia–Estados Unidos y documentos anexos oficiales",
+      "fuente": "Cancillería y MINCIT — TLC",
+      "url": "https://www.cancilleria.gov.co/normograma/compilacion/docs/ley_1143_2007.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo",
+        "Derecho comercial y sociedades",
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 283,
+      "n_fragmentos": 566,
+      "metodo_ingesta": "parser HTML + extraccion de PDF (OCR si no hay capa de texto) + texto plano + segmentacion por articulo",
+      "sha256": "538d9d4a85ce51b9e9a7d07af61ea79c04d5c7157cb0a5ef09addd2311677600"
+    },
+    {
+      "doc_id": "bogota_decreto_271_2002",
+      "titulo": "Decreto Distrital 271 de 2002 — retenciones de ICA en Bogotá",
+      "fuente": "Régimen Legal de Bogotá",
+      "url": "https://www.bogotajuridica.gov.co/sisjur/normas/Norma1.jsp?dt=S&i=5139",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "decreto",
+      "vigencia": "derogada",
+      "n_articulos": 15,
+      "n_fragmentos": 17,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "c9fc2ff177044fa97d1069b9a45f819e70d9502f3d783272b814ebb03a1b79bc"
+    },
+    {
+      "doc_id": "bogota_decreto_807_1993",
+      "titulo": "Decreto Distrital 807 de 1993 — procedimiento tributario distrital",
+      "fuente": "Régimen Legal de Bogotá",
+      "url": "https://www.bogotajuridica.gov.co/sisjur/normas/Norma1.jsp?i=1637",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 244,
+      "n_fragmentos": 392,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "9de7b72df1d9e244044bbf404aa126b26dab4a16f7661cee4447c3ad83f9a51f"
+    },
+    {
+      "doc_id": "bogota_decreto_639_2025",
+      "titulo": "Decreto Distrital 639 de 2025 — Decreto Único del Sector Tributario",
+      "fuente": "Secretaría Distrital de Hacienda — compilación jurídica",
+      "url": "https://compilacionjuridica.shd.gov.co/compilacion/docs/d_alcabog_0639_2025.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 265,
+      "n_fragmentos": 302,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "acd147f7e33ebe4272738e3e5410e63426bc58157b6dc9ea7074330560314856"
+    },
+    {
+      "doc_id": "onu_principios_rectores_empresas_ddhh_2011",
+      "titulo": "Principios Rectores sobre las Empresas y los Derechos Humanos",
+      "fuente": "ACNUDH",
+      "url": "https://www.ohchr.org/sites/default/files/Documents/Publications/GuidingPrinciplesBusinessHR_SP.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional",
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]",
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 48,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "ce87befd399151904e466747a87508c8d308c6c99448cac73929493d1d4abf75"
+    },
+    {
+      "doc_id": "ocde_guia_debida_diligencia_2018",
+      "titulo": "Guía de la OCDE de Debida Diligencia para una Conducta Empresarial Responsable",
+      "fuente": "OCDE",
+      "url": "https://www.oecd.org/content/dam/oecd/es/publications/reports/2018/02/oecd-due-diligence-guidance-for-responsible-business-conduct_c669bd57/14922561-es.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional",
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]",
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 143,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "0c0b88fc818b7841c31745ea098830ccfa1ae5f48be75a0872113759f29f75e8"
+    },
+    {
+      "doc_id": "ripd_guia_ccm_2022",
+      "titulo": "Guía de implementación de cláusulas contractuales modelo para la transferencia internacional de datos personales",
+      "fuente": "RIPD",
+      "url": "https://www.redipd.org/documento/guia-implementacion-clausulas-contractuales-modelo-tidp-es.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional",
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]",
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 46,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "fbbd4b5644edba11567f838df3649accc941dd18b7f7b2d223aa58c676417630"
+    },
+    {
+      "doc_id": "ripd_anexo_ccm_2022",
+      "titulo": "Anexo — Modelos de cláusulas contractuales de la RIPD",
+      "fuente": "RIPD",
+      "url": "https://www.redipd.org/documento/anexo-modelos-clausulas-contractuales-es.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional",
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]",
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 47,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "dc10ddc893498c88dd9a9048a0b05dcbae7c6130015d885bbb1f5f6e6efb4dd2"
+    },
+    {
+      "doc_id": "consejo_europa_ccm_modulo_1_2023",
+      "titulo": "Convention 108+ — Model Contractual Clauses, Module 1: Controller to Controller",
+      "fuente": "Consejo de Europa",
+      "url": "https://rm.coe.int/t-pd-2022-1rev10-en-final/1680abc6b4",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional",
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]",
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 29,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "4da96166d7d36b5c5af7bb2a39c331fdb3d766e8fd98706f841095978ad57e35"
+    },
+    {
+      "doc_id": "acto_legislativo_01_2017",
+      "titulo": "Acto Legislativo 01 de 2017",
+      "fuente": "Congreso de la República",
+      "url": "https://fcp.gov.co/wp-content/uploads/2023/01/ACTO_LEGISLATIVO_01_2017.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "acto_legislativo",
+      "vigencia": null,
+      "n_articulos": 32,
+      "n_fragmentos": 53,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por articulo",
+      "sha256": "2ca5bf848aa86cda2be1243489c80f5401d064427390df4f2d49dc7e64794868"
+    },
+    {
+      "doc_id": "sentencia_c-167_2014",
+      "titulo": "Sentencia C-167 de 2014",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2014/c-167-14.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho tributario"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 61,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "592490c651a707cf3c4f5e39895f3bb636d1084adb76c34c32da0129b3293215"
+    },
+    {
+      "doc_id": "sentencia_c-294_2021",
+      "titulo": "Sentencia C-294 de 2021",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2021/c-294-21.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho penal"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 454,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "bd5ce9bb437fddbb22b9c8b093f1caa762d682e728d5f2132840f62818287274"
+    },
+    {
+      "doc_id": "sentencia_c-543_1996",
+      "titulo": "Sentencia C-543 de 1996",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/1996/c-543-96.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 42,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "1a9eac3e5862dd7e7ea99d8068129eae4872585ca2fb343e01826dea6585e706"
+    },
+    {
+      "doc_id": "sentencia_c-591_2005",
+      "titulo": "Sentencia C-591 de 2005",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2005/c-591-05.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho penal"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 293,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "0243542c812ee1a10ebc29bca0bb1c3804a7a362c2c57d7389b3e002a06c7709"
+    },
+    {
+      "doc_id": "sentencia_c-005_2017",
+      "titulo": "Sentencia C-005 de 2017",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2017/c-005-17.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 136,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "0ee83d5b673b6005003285528c6a97bb0aa782cd8448e81b4b5b9ee8ed95c3c1"
+    },
+    {
+      "doc_id": "sentencia_c-927_2006",
+      "titulo": "Sentencia C-927 de 2006",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2006/c-927-06.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional",
+        "Derecho tributario"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 69,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "644c6b2062ffcd19db28111fe41d4322483fc914d995e317b13722d02aea6aad"
+    },
+    {
+      "doc_id": "sentencia_su-768_2014",
+      "titulo": "Sentencia SU-768 de 2014",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2014/su768-14.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho procesal"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 95,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "1dd5eaaae08f24716218a073411354e4339ad0623ba9ec1e01dd5e0d787a4c03"
+    },
+    {
+      "doc_id": "sentencia_t-225_1993",
+      "titulo": "Sentencia T-225 de 1993",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/1993/t-225-93.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 31,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "21bb07d2cc84e89a7aa11eddf8d8e6799c15b2b14c46d497e7743d90d092c21e"
+    },
+    {
+      "doc_id": "sentencia_t-057_2025",
+      "titulo": "Sentencia T-057 de 2025",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2025/t-057-25.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho constitucional"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 161,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "d25237e223ccc6c3d422d83612acf6df5077281acf3ef25b1ca0064cdaad0aad"
+    },
+    {
+      "doc_id": "sentencia_t-854_2012",
+      "titulo": "Sentencia T-854 de 2012",
+      "fuente": "Corte Constitucional",
+      "url": "https://www.corteconstitucional.gov.co/relatoria/2012/t-854-12.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de familia"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 42,
+      "metodo_ingesta": "parser HTML + segmentacion por seccion",
+      "sha256": "38d456977268f9507d8d5301c8170d2d30fdffbc5a4ec2871f6feb0d17d2ae3c"
+    },
+    {
+      "doc_id": "ce_sentencia_21410_2011",
+      "titulo": "Consejo de Estado, Sección Tercera, sentencia del 15 de noviembre de 2011, expediente 21410",
+      "fuente": "Consejo de Estado",
+      "url": "https://www.consejodeestado.gov.co/documentos/boletines/95/S3/19001-23-31-000-1999-01134-01(21410).pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 61,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "126747829ba90a6bceaf9c0ab71aeabe8741d73416e33f60dd2082f5b009ec90"
+    },
+    {
+      "doc_id": "ce_acuerdo_080_2019",
+      "titulo": "Acuerdo 080 de 2019 del Consejo de Estado (reglamento), con sus modificaciones",
+      "fuente": "Consejo de Estado",
+      "url": "https://www.consejodeestado.gov.co/wp-content/uploads/2025/ACUERDO%20No%20080%20de%202019%20con%20sus%20modificaciones%20VF.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho procesal"
+      ],
+      "tipo": "concepto",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 59,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "be593424ee3d11f88bd5a4b0b4bc124e0c53cabb5bc88e36502d144f45b8da20"
+    },
+    {
+      "doc_id": "sentencia_sc-5679_2018",
+      "titulo": "Sentencia SC-5679 de 2018",
+      "fuente": "Corte Suprema de Justicia",
+      "url": "https://www.cortesuprema.gov.co/corte/wp-content/uploads/2019/01/SC5679-2018.pdf",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "sentencia",
+      "vigencia": null,
+      "n_articulos": null,
+      "n_fragmentos": 40,
+      "metodo_ingesta": "extraccion de PDF (OCR si no hay capa de texto) + segmentacion por seccion",
+      "sha256": "6b4014ccff8490ab56c8a42566e3b9c95728e9ebe3f7892932c9baa046cca826"
+    },
+    {
+      "doc_id": "decreto_255_2022",
+      "titulo": "Decreto 255 de 2022",
+      "fuente": "Presidencia de la República",
+      "url": "https://www1.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=179087",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de los mercados [competencia, consumidor, datos personales y propiedad intelectual]"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 10,
+      "n_fragmentos": 15,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "4be4f529b3e067302869c65d64e707900b2a2e39c92aa2e7318d2296424dcfd7"
+    },
+    {
+      "doc_id": "decreto_4121_2011",
+      "titulo": "Decreto Ley 4121 de 2011",
+      "fuente": "Presidencia de la República",
+      "url": "https://normativa.colpensiones.gov.co/colpens/compilacion/docs/decreto_4121_2011.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho administrativo"
+      ],
+      "tipo": "decreto_ley",
+      "vigencia": null,
+      "n_articulos": 8,
+      "n_fragmentos": 11,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "5b1e10c59f405191562acf1b7011d901e192c73cc329391d08cb773d7149be8b"
+    },
+    {
+      "doc_id": "decreto_913_1993",
+      "titulo": "Decreto 913 de 1993",
+      "fuente": "Presidencia de la República",
+      "url": "https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?i=7093",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho civil",
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "decreto",
+      "vigencia": null,
+      "n_articulos": 8,
+      "n_fragmentos": 9,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "4b43b8c4258355247a7f23d9fb4c2274cbf90673e18a89da2f749c15e3029135"
+    },
+    {
+      "doc_id": "ley_51_1918",
+      "titulo": "Ley 51 de 1918",
+      "fuente": "Congreso de la República",
+      "url": "https://gestornormativo.creg.gov.co/gestor/entorno/docs/ley_0051_1918.htm",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho comercial y sociedades"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 27,
+      "n_fragmentos": 28,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "62c976a8b8dd41fa334565d420af153836a9dde38df451f5f2603193c97b42c8"
+    },
+    {
+      "doc_id": "ley_731_2002",
+      "titulo": "Ley 731 de 2002",
+      "fuente": "Congreso de la República",
+      "url": "https://www.alcaldiabogota.gov.co/sisjur/normas/Norma1.jsp?dt=S&i=52105",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho de familia"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 41,
+      "n_fragmentos": 63,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "f44de54dd293e59adc4a976c578536a6b64a2d81ba583e0ab4176bb5e0f7c351"
+    },
+    {
+      "doc_id": "ley_95_1890",
+      "titulo": "Ley 95 de 1890",
+      "fuente": "Congreso de la República",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=12387",
+      "fecha_consulta": "2026-10-03",
+      "areas": [
+        "Derecho civil"
+      ],
+      "tipo": "ley",
+      "vigencia": null,
+      "n_articulos": 30,
+      "n_fragmentos": 34,
+      "metodo_ingesta": "parser HTML + segmentacion por articulo",
+      "sha256": "1e850760f75785ea915d09a0299840aa8315216b7a9882f3e8d57443911791bb"
     }
   ]
 }

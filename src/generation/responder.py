@@ -14,6 +14,7 @@ from src.config import Config, config
 from src.generation.contexto import MAX_TOKENS, esquema, esquema_mc_abierta, mensajes
 from src.generation.llm import LLM, Generacion
 from src.retrieval.hibrido import Pasaje, Recuperador
+from src.generation.seleccion_mc import cobertura, seleccionar_contexto, seleccionar_mc
 
 
 @dataclass
@@ -86,8 +87,14 @@ def consultas_extra(item: dict, cfg: Config = config, frecuencia=None) -> list[s
     if item.get("formato") != "multiple_choice":
         return []
     pregunta = item.get("pregunta") or ""
-    return [consulta_opcion(pregunta, v, cfg, frecuencia)
+    return [consulta_con_area(item, consulta_opcion(pregunta, v, cfg, frecuencia), cfg)
             for _, v in sorted((item.get("opciones") or {}).items()) if str(v).strip()]
+
+
+def consulta_con_area(item: dict, consulta: str, cfg: Config) -> str:
+    """Usa solo el área declarada de la pregunta, sin inferir temas ni respuestas."""
+    area = str(item.get("area") or "").strip()
+    return f"{area}\n{consulta}" if cfg.mc_incluir_area and area else consulta
 
 
 def recuperar(item: dict, rec: Recuperador, cfg: Config = config) -> list[Pasaje]:
@@ -97,6 +104,34 @@ def recuperar(item: dict, rec: Recuperador, cfg: Config = config) -> list[Pasaje
 
 
 def recuperar_mc(item: dict, rec: Recuperador, cfg: Config = config) -> list[Pasaje]:
+    """Selecciona evidencia equilibrada; el modo anterior queda para comparación."""
+    if cfg.mc_rerank_consenso:
+        return recuperar_mc_consenso(item, rec, cfg)
+    if not cfg.mc_reparto_equilibrado:
+        return recuperar_mc_anterior(item, rec, cfg)
+    pregunta = (item.get("pregunta") or "").strip()
+    k = min(10, cfg.top_k_pasajes)
+    base = rec.buscar(consulta_con_area(item, pregunta, cfg), area=item.get("area"), k=k,
+                      n_rerank=cfg.mc_rerank_candidatos_pregunta)
+    por_opcion = {
+        letra: rec.buscar(consulta_con_area(item, consulta_opcion(pregunta, texto, cfg, rec.bm25.frecuencia), cfg),
+                          area=item.get("area"), k=cfg.pasajes_por_opcion + 2,
+                          n_rerank=cfg.rerank_candidatos_opcion)
+        for letra, texto in sorted(item["opciones"].items()) if str(texto).strip()}
+    _, cuerpos_mencionados = rec.router(pregunta)
+    todos = base + [p for candidatos in por_opcion.values() for p in candidatos]
+    documentos_mencionados = frozenset(p.doc_id for p in todos
+                                       if cuerpos_mencionados & rec.cuerpo_doc[p.id])
+    from src.retrieval.hibrido import aplicar_cuota, cuota_para
+
+    puestos = min(cfg.puestos_pregunta, max(0, k - len(por_opcion)))
+    primeros = aplicar_cuota(base, puestos, cuota_para(puestos, cfg), rec.es_norma)
+    ids = {p.chunk_id for p in primeros}
+    base = primeros + [p for p in base if p.chunk_id not in ids]
+    return seleccionar_mc(base, por_opcion, cfg, documentos_mencionados, rec.complementarios)
+
+
+def recuperar_mc_anterior(item: dict, rec: Recuperador, cfg: Config = config) -> list[Pasaje]:
     """Evidencia representativa por opción (selección múltiple).
 
     `PUESTOS_PREGUNTA` puestos para lo mejor de la pregunta y el resto repartido por turnos
@@ -106,15 +141,51 @@ def recuperar_mc(item: dict, rec: Recuperador, cfg: Config = config) -> list[Pas
     pasaje de opción queda marcado con su letra (`meta["opcion"]`) para el prompt.
     Respeta el tope por documento (C-02), salvo documentos mencionados en la pregunta.
     """
+    base, por_opcion, mencionados = candidatos_mc(item, rec, cfg)
+    return fusion_mc_anterior(base, por_opcion, mencionados, rec, cfg)
+
+
+def candidatos_mc(item: dict, rec: Recuperador, cfg: Config):
+    """Búsquedas originales; los topes MC se pueden medir por separado."""
     k = cfg.top_k_pasajes
     pregunta = (item.get("pregunta") or "").strip()
-    base = rec.buscar(pregunta, area=item.get("area"), k=k)
+    base = rec.buscar(consulta_con_area(item, pregunta, cfg), area=item.get("area"), k=k,
+                      n_rerank=cfg.mc_rerank_candidatos_pregunta)
     por_opcion = {
-        letra: rec.buscar(consulta_opcion(pregunta, texto, cfg, rec.bm25.frecuencia),
+        letra: rec.buscar(consulta_con_area(item, consulta_opcion(pregunta, texto, cfg, rec.bm25.frecuencia), cfg),
                           area=item.get("area"),
                           k=cfg.pasajes_por_opcion + 2, n_rerank=cfg.rerank_candidatos_opcion)
         for letra, texto in sorted(item["opciones"].items()) if str(texto).strip()}
     _, mencionados = rec.router(pregunta)
+    return base, por_opcion, mencionados
+
+
+def recuperar_mc_consenso(item: dict, rec: Recuperador, cfg: Config) -> list[Pasaje]:
+    """Segunda pasada con pregunta y todas las opciones, sin llamar al decoder.
+
+    Consulta distinta para reducir el desvío temático de búsquedas por opción.
+    Conserva los puestos de pregunta y la fusión original. Experimental.
+    """
+    from src.generation.consenso_mc import reordenar
+
+    base, por_opcion, mencionados = candidatos_mc(item, rec, cfg)
+    if rec.reranker is None or not cfg.use_reranker:
+        raise ValueError("El perfil consenso requiere el reranker real configurado.")
+    unicos = {p.chunk_id: p for p in base}
+    for candidatos in por_opcion.values():
+        for p in candidatos:
+            unicos.setdefault(p.chunk_id, p)
+    pool = [unicos[cid] for cid in sorted(unicos)]
+    consulta = "\n".join([item["pregunta"], *(str(item["opciones"][l])
+                                             for l in sorted(item["opciones"]))])
+    puntos = rec.reranker.puntuar(consulta_con_area(item, consulta, cfg), [p.texto for p in pool])
+    por_opcion = reordenar(por_opcion, pool, puntos)
+    return fusion_mc_anterior(base, por_opcion, mencionados, rec, cfg)
+
+
+def fusion_mc_anterior(base, por_opcion, mencionados, rec, cfg):
+    """Selección v12: cuatro puestos de pregunta y turnos por alternativa."""
+    k = cfg.top_k_pasajes
 
     elegidos: list[Pasaje] = []
     vistos: set[str] = set()
@@ -157,22 +228,54 @@ def recuperar_mc(item: dict, rec: Recuperador, cfg: Config = config) -> list[Pas
     return elegidos
 
 
+def preparar_contexto(item: dict, pasajes, llm: LLM, cfg: Config = config,
+                     etapa: str | None = None, max_tokens: int | None = None,
+                     respuesta_abierta: str = "", instruccion_extra: str = "",
+                     gemma_pensamiento_tokens: int = 0) -> tuple[list[dict], list[int]]:
+    """Contexto que cabe y sus números originales Pn, preservando cobertura MC.
+
+    Elimina redundancia primero y vuelve a insertar pasajes que quepan. Nunca
+    cambia offsets/textos ni renumera las citas hacia un pasaje diferente.
+    """
+    maximo = llm.n_ctx - (max_tokens or MAX_TOKENS[item["formato"]]) - 32
+    equilibrado = item["formato"] == "multiple_choice" and cfg.mc_contexto_cobertura
+    numeros = list(range(1, min(10, len(pasajes)) + 1)) if equilibrado else list(
+        range(1, min(cfg.pasajes_prompt, len(pasajes)) + 1))
+    letras = sorted(item.get("opciones") or {})
+
+    def construir(indices):
+        seleccionados = [pasajes[i - 1] for i in indices]
+        msgs = mensajes(item, seleccionados, dataclasses.replace(cfg, pasajes_prompt=len(indices)),
+                        etapa=etapa, respuesta_abierta=respuesta_abierta,
+                        numeros_pasajes=indices)
+        if instruccion_extra:
+            msgs[-1]["content"] += "\n\n" + instruccion_extra
+        return msgs
+
+    def contar(msgs):
+        return (llm.contar_tokens(msgs, gemma_pensamiento_tokens=gemma_pensamiento_tokens)
+                if gemma_pensamiento_tokens else llm.contar_tokens(msgs))
+
+    if equilibrado:
+        numeros = seleccionar_contexto(pasajes, cfg.pasajes_prompt, maximo,
+                                        lambda indices: contar(construir(indices)), letras)
+        return construir(numeros), numeros
+    while True:
+        msgs = construir(numeros)
+        if len(numeros) <= cfg.pasajes_prompt and contar(msgs) <= maximo:
+            break
+        if not numeros:
+            raise ValueError("La pregunta y las instrucciones exceden la ventana de contexto.")
+        numeros.pop()
+    return msgs, numeros
+
+
 def mensajes_que_caben(item: dict, pasajes, llm: LLM, cfg: Config = config,
                        etapa: str | None = None, max_tokens: int | None = None,
                        respuesta_abierta: str = "") -> tuple[list[dict], int]:
-    """Mensajes con tantos pasajes como quepan en la ventana de contexto.
-
-    Quita pasajes del final (los menos pertinentes) hasta que prompt + salida
-    quepan. Determinista. Devuelve también cuántos pasajes leyó el modelo.
-    """
-    maximo = llm.n_ctx - (max_tokens or MAX_TOKENS[item["formato"]]) - 32
-    n = min(cfg.pasajes_prompt, len(pasajes))
-    while True:
-        msgs = mensajes(item, pasajes, dataclasses.replace(cfg, pasajes_prompt=n), etapa=etapa,
-                        respuesta_abierta=respuesta_abierta)
-        if n == 0 or llm.contar_tokens(msgs) <= maximo:
-            return msgs, n
-        n -= 1
+    """Compatibilidad: mensajes y cantidad de pasajes leídos."""
+    msgs, numeros = preparar_contexto(item, pasajes, llm, cfg, etapa, max_tokens, respuesta_abierta)
+    return msgs, len(numeros)
 
 
 def opcion_por_similitud(item: dict, respuesta: str, encoder) -> str | None:
@@ -204,25 +307,46 @@ def generar_respuesta(item: dict, pasajes, llm: LLM, cfg: Config = config,
     primero"). La generación devuelta es la del paso 2, con tiempos y tokens sumados; `extra`
     lleva la respuesta abierta y la opción más parecida según el encoder (diagnóstico).
     """
+    if item["formato"] == "multiple_choice" and cfg.mc_verificacion_independiente:
+        from src.generation.verificacion_mc import verificar
+        return verificar(item, pasajes, llm, cfg, usar_cache)
     mc_abierta = item["formato"] == "multiple_choice" and cfg.mc_modo == "abierta"
     if not mc_abierta:
         # Selección múltiple con razonamiento (C-09): Qwen3 piensa antes de escribir el JSON;
         # se reserva su tope de tokens al decidir cuántos pasajes caben.
         pensar = cfg.mc_razonamiento_tokens if item["formato"] == "multiple_choice" else 0
-        msgs, n = mensajes_que_caben(item, pasajes, llm, cfg,
-                                     max_tokens=MAX_TOKENS[item["formato"]] + pensar)
-        g = llm.generar(msgs, esquema=esquema(item, cfg), max_tokens=MAX_TOKENS[item["formato"]],
-                        usar_cache=usar_cache, razonamiento_tokens=pensar)
-        return g, n, ({"razonamiento": g.razonamiento} if pensar else {})
+        gemma = cfg.mc_gemma_pensamiento_tokens if item["formato"] == "multiple_choice" else 0
+        msgs, numeros = preparar_contexto(item, pasajes, llm, cfg,
+                                     max_tokens=MAX_TOKENS[item["formato"]] + pensar + gemma,
+                                     gemma_pensamiento_tokens=gemma)
+        g = llm.generar(msgs, esquema=esquema(item, cfg, numeros_pasajes=(
+            numeros if item["formato"] == "multiple_choice" and cfg.mc_citas_visibles else None)),
+                        max_tokens=MAX_TOKENS[item["formato"]],
+                        usar_cache=usar_cache, razonamiento_tokens=pensar,
+                        **({"gemma_pensamiento_tokens": gemma} if gemma else {}))
+        extra = {"indices_pasajes_leidos": numeros,
+                 "chunk_ids_leidos": [pasajes[i - 1].chunk_id for i in numeros]}
+        if item["formato"] == "multiple_choice":
+            extra.update(mc_modo=cfg.mc_modo,
+                         cobertura_recuperada=cobertura(pasajes, item.get("opciones") or {}),
+                         cobertura_leida=cobertura([pasajes[i - 1] for i in numeros],
+                                                  item.get("opciones") or {}))
+        if pensar or gemma:
+            extra["razonamiento"] = g.razonamiento
+            extra["razonamiento_truncado"] = g.razonamiento_truncado
+        return g, len(numeros), extra
 
-    msgs1, _ = mensajes_que_caben(item, pasajes, llm, cfg, etapa="abierta",
+    msgs1, numeros1 = preparar_contexto(item, pasajes, llm, cfg, etapa="abierta",
                                   max_tokens=MAX_TOKENS["mc_abierta"])
-    g1 = llm.generar(msgs1, esquema=esquema_mc_abierta(), max_tokens=MAX_TOKENS["mc_abierta"],
+    g1 = llm.generar(msgs1, esquema=esquema_mc_abierta(numeros1 if cfg.mc_citas_visibles else None),
+                     max_tokens=MAX_TOKENS["mc_abierta"],
                      usar_cache=usar_cache)
     abierta = str((g1.datos or {}).get("respuesta") or "").strip()
-    msgs2, n = mensajes_que_caben(item, pasajes, llm, cfg, etapa="desde_abierta",
+    msgs2, numeros2 = preparar_contexto(item, pasajes, llm, cfg, etapa="desde_abierta",
                                   respuesta_abierta=abierta)
-    g2 = llm.generar(msgs2, esquema=esquema(item, cfg), max_tokens=MAX_TOKENS[item["formato"]],
+    g2 = llm.generar(msgs2, esquema=esquema(item, cfg, numeros_pasajes=(
+        numeros2 if cfg.mc_citas_visibles else None)),
+                     max_tokens=MAX_TOKENS[item["formato"]],
                      usar_cache=usar_cache)
     suma = lambda a, b: (a or 0) + (b or 0) if a is not None or b is not None else None
     g = dataclasses.replace(g2, segundos=g1.segundos + g2.segundos,
@@ -231,14 +355,24 @@ def generar_respuesta(item: dict, pasajes, llm: LLM, cfg: Config = config,
                             desde_cache=g1.desde_cache and g2.desde_cache,
                             truncada=g1.truncada or g2.truncada)
     extra = {"mc_modo": "abierta", "respuesta_abierta": abierta,
+             "indices_pasajes_leidos": numeros2,
+             "indices_pasajes_leidos_abierta": numeros1,
+             "chunk_ids_leidos": [pasajes[i - 1].chunk_id for i in numeros2],
+             "cobertura_recuperada": cobertura(pasajes, item.get("opciones") or {}),
+             "cobertura_leida": cobertura([pasajes[i - 1] for i in numeros2],
+                                          item.get("opciones") or {}),
              "abierta_json_valido": g1.datos is not None,
              "opcion_por_similitud": opcion_por_similitud(item, abierta, encoder)}
-    return g, n, extra
+    return g, len(numeros2), extra
 
 
 def responder(item: dict, rec: Recuperador, llm: LLM, cfg: Config = config,
               usar_cache: bool = True) -> Resultado:
     pasajes = recuperar(item, rec, cfg)
-    g, _, extra = generar_respuesta(item, pasajes, llm, cfg, usar_cache,
+    g, n_leidos, extra = generar_respuesta(item, pasajes, llm, cfg, usar_cache,
                                     encoder=getattr(rec, "encoder", None))
+    if item["formato"] == "multiple_choice" and cfg.mc_revision_evidencia:
+        from src.generation.revision_mc import revisar
+        pasajes, g, n_leidos, extra = revisar(
+            item, pasajes, g, n_leidos, extra, rec, llm, cfg, usar_cache)
     return Resultado(item=item, pasajes=pasajes, generacion=g, datos=g.datos, extra=extra)
