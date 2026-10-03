@@ -12,7 +12,7 @@ descargados de Hugging Face. Ningún modelo cerrado ni API de terceros intervien
 de modelos abiertos en la configuración lo impone. El único servicio externo es el juez de RAGAS,
 que usa el evaluador oficial.
 
-1. **Ingesta.** 650 documentos oficiales (Constitución, códigos, leyes —incluidos 16 convenios
+1. **Ingesta.** 728 documentos oficiales (Constitución, códigos, leyes —incluidos 16 convenios
    para evitar la doble imposición—, decretos, resoluciones, circulares, sentencias y conceptos de
    DIAN, SIC y Supersociedades) se limpian y se segmentan **por artículo** y **por secciones** en
    sentencias y conceptos (en sentencias, detectadas de forma estricta: antecedentes,
@@ -20,9 +20,10 @@ que usa el evaluador oficial.
    preámbulos y notas de vigencia. Cada fragmento empieza con el nombre canónico de su
    norma («Ley 1150 de 2007, artículo 11.»), verificado con el extractor de citas del evaluador.
    Una guardia anti-fuga bloquea la indexación si detecta material del banco de preguntas.
-2. **Indexación.** 77.014 fragmentos (47.340 de artículos, 23.472 de secciones, 1.212 de preámbulos y
-   4.990 de notas): vectores `bge-m3` en FAISS exacto y BM25 con un tokenizador
-   jurídico que conserva números de artículo y de sentencia. El índice se congela por sha256.
+2. **Indexación.** 86.963 fragmentos (49.286 de artículos, 30.622 de secciones, 1.374 de preámbulos y
+   5.681 de notas): vectores `bge-m3` en FAISS exacto y BM25 con un tokenizador
+   jurídico que conserva números de artículo y de sentencia. El índice se construye una sola vez,
+   se congela por sha256 y se distribuye idéntico a todas las máquinas de la ejecución.
 3. **Recuperación.** Router de artículos citados en la pregunta + BM25 + denso, fusionados con RRF,
    sesgo por área, topes de diversidad (por artículo y 4 por documento), reordenamiento con
    `bge-reranker-v2-m3` y un **cupo de 4 normas** entre los 10 pasajes para que los fragmentos de
@@ -31,9 +32,13 @@ que usa el evaluador oficial.
    raras de la pregunta.
 4. **Generación.** El decoder recibe los 10 pasajes numerados `[P1]…[P10]` completos, con la
    plantilla de chat propia del modelo, y produce el JSON del formato, forzado con una gramática
-   derivada del esquema. En selección múltiple, el prompt pide elegir la opción que mejor coincide
-   con la evidencia, tolerando errores de digitación en números y años, y maneja opciones
-   combinadas («(a) y (b)», «Todas las anteriores»).
+   derivada del esquema. En selección múltiple, cada alternativa se **verifica por separado**:
+   una llamada independiente por opción la clasifica como *respaldada*, *contradicha* o con
+   *evidencia insuficiente*, con citas textuales que se comprueban literalmente contra el pasaje
+   (una cita alterada degrada la conclusión). Una quinta llamada compara los cuatro informes
+   comprobados y elige; así se distingue «no encontré respaldo» de «es incorrecta» y el modelo no
+   justifica a posteriori una letra ya elegida. El prompt tolera errores de digitación en números y
+   años y maneja opciones combinadas («(a) y (b)», «Todas las anteriores»).
 5. **Verificación.** Un post-filtro elimina toda cita que no figure en los 10 pasajes y las
    referencias se renderizan desde los encabezados de los pasajes. La línea se valida contra el
    esquema oficial.
@@ -47,10 +52,13 @@ que usa el evaluador oficial.
 | Reranker | `BAAI/bge-reranker-v2-m3` (Apache-2.0) | Cross-encoder multilingüe, coherente con el encoder | Sin reranker |
 
 **Inferencia.** Temperatura 0 (decodificación voraz), semilla fija, sin modo de razonamiento,
-ventana de 8.192 tokens, `llama.cpp` en GPU. Tiempo por pregunta en una T4: 40 s en promedio
-(selección múltiple 40 s, semiabiertas 34 s, abiertas 76 s). Para las 992 preguntas (~11 h en una
-GPU) el banco se reparte por rangos entre varias máquinas (`run.py --rango INICIO FIN`). La
-corrida es reproducible: dos ejecuciones en máquinas distintas produjeron respuestas idénticas.
+ventana de 8.192 tokens, `llama.cpp` en GPU. Tiempo por pregunta con una llamada: ~40 s en una
+T4 y ~10 s en una RTX 4090; la verificación de alternativas usa cinco llamadas por pregunta de
+selección múltiple (290 de las 992). El banco se reparte por rangos (`run.py --rango INICIO FIN`)
+entre tres equipos con RTX 4090 de la sala Turing y sesiones de Colab y Kaggle, todos con el mismo
+índice (verificado por sha256). En Turing, `llama.cpp` se compiló en cada máquina para su
+procesador: la rueda precompilada usaba instrucciones AVX-512 que esos procesadores no tienen.
+La corrida es reproducible: dos ejecuciones en máquinas distintas produjeron respuestas idénticas.
 
 ## 3. Estrategia de recuperación
 
@@ -83,9 +91,10 @@ de 500 palabras.
 
 ## 5. Resultados sobre las preguntas de muestra
 
-Evaluador oficial (`scripts/evaluate.py --ragas`), sistema de entrega (umbral de abstención 0,025),
-juez sin fallos. Ninguna pregunta de la muestra queda por debajo del umbral (pertinencia mínima
-0,034), por lo que no hubo abstenciones:
+Evaluador oficial (`scripts/evaluate.py --ragas`), corrida `muestra_v12` (corpus de 650
+documentos, selección múltiple con elección directa), con el umbral de abstención de 0,025 del
+sistema de entrega y juez sin fallos. Ninguna pregunta de la muestra queda por debajo del umbral
+(pertinencia mínima 0,034), por lo que no hubo abstenciones:
 
 | Componente | Puntos | Posibles |
 |---|---:|---:|
@@ -106,10 +115,15 @@ el doble de tiempo y menos citas) y la respuesta en abierto antes de elegir (+1 
 doble de latencia). Lección metodológica: varias caídas aparentes de RAGAS eran respuestas sin veredicto
 del juez por fallos de red, que el evaluador cuenta como cero.
 
-**Errores en selección múltiple (4 de 15).** 647 (la ayuda como efecto personal del matrimonio:
+**Verificación de alternativas (sistema final).** Sobre las mismas 15 preguntas cerradas, la
+verificación independiente de cada opción acertó **12 de 15** (frente a 11 con elección directa),
+lo que equivale a 16,00 de 20 puntos en exactitud. Solo se midió la exactitud: la verificación
+también reescribe la justificación de las cerradas (de donde se extraen sus citas), y ese efecto no
+se volvió a medir; semiabiertas y abiertas no cambian.
+
+**Errores en selección múltiple con elección directa (4 de 15).** 647 (la ayuda como efecto personal del matrimonio:
 la evidencia son sentencias y no el art. 176 del Código Civil), 671 (reglas de desempate de
-residencia en convenios de doble imposición: doctrina) y dos claves discutibles:
-- 58, que pide la «Ley 1564 de 2002» (el Código General del Proceso es de 2012), y 128, que exige «Fintech» cuando la norma solo nombra bancos y compañías de
+residencia en convenios de doble imposición: doctrina) y dos claves discutibles: la 58, que pide la «Ley 1564 de 2002» (el Código General del Proceso es de 2012), y la 128, que exige «Fintech» cuando la norma solo nombra bancos y compañías de
   financiamiento.
 
 ## 6. Limitaciones
@@ -119,9 +133,15 @@ residencia en convenios de doble imposición: doctrina) y dos claves discutibles
 2. **Citas a nivel de cuerpo:** la verificación garantiza que la norma citada está en la evidencia,
    no que el artículo concreto sea el pertinente.
 3. **Razonamiento del modelo de 8B:** en selección múltiple, con la misma evidencia la letra elegida
-   varía según cómo se presentan las opciones. La exactitud (0,73) sigue lejos de la referencia
-   (0,905).
-4. **Costo de cómputo:** ~40 s por pregunta en GPU T4 y ~3,5 min en CPU; el banco completo
-   requiere varias GPU en paralelo.
+   varía según cómo se presentan las opciones. La exactitud (0,80 con la verificación de
+   alternativas) sigue lejos de la referencia (0,905).
+4. **Costo de cómputo:** ~40 s por pregunta en GPU T4, ~10 s en RTX 4090 y ~3,5 min en CPU; la
+   verificación multiplica por cinco las llamadas en selección múltiple. El banco completo requiere
+   varias GPU en paralelo.
 5. **Doctrina no normativa:** las preguntas cuyo fundamento es doctrina o derecho extranjero (p. ej.
-   el caso *Dow Chemical*) solo se responden con evidencia parcial.
+   el caso *Dow Chemical*) solo se responden con evidencia parcial. Las orientaciones internacionales
+   incorporadas (ONU, OCDE, RIPD) sirven como evidencia, pero el evaluador no las reconoce como cita.
+6. **Corpus final sin medición completa:** el 3 de octubre se incorporaron 78 fuentes oficiales
+   más (documentadas en `CORPUS.md`), identificadas a partir de las normas que nombran los
+   enunciados del banco; el sistema final no se volvió a evaluar completo sobre la muestra con ese
+   corpus.
